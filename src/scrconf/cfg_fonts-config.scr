@@ -1,0 +1,20 @@
+/**
+ * File:
+ *   cfg_fonts-config.scr
+ * Summary:
+ *   SCR Agent for reading/writing /etc/sysconfig/fonts-config
+ * Access:
+ *   read/write
+ * Authors:
+ *   Petr Gajdos <pgajdos@suse.cz>
+ *
+ *
+ * Read/Sets the values defined in <tt>/etc/sysconfig/fonts-config</tt>
+ * in an easy manner.
+ */
+.sysconfig.fonts-config
+
+`ag_ini(
+  `SysConfigFile("/etc/sysconfig/fonts-config")
+)
+

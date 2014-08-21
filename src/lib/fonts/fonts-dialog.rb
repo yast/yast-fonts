@@ -21,6 +21,8 @@ module FontsConfig
     def self.run
       fontsconfig_dialog = FontsConfigDialog.new
       fontsconfig_dialog.run
+      # for testsuite
+      return @fcstate
     end
 
     def run
@@ -43,7 +45,7 @@ module FontsConfig
     def initialize_aamonooff_checkbox(key)
       UI.ChangeWidget(Id("chkb_aa_mono_off"), :Value,
                       @fcstate.force_aa_off_mono)
-      UI.ChangeWidget(Id("chkb_aa_mono_off"), :Enabled, !@fcstate.force_aa_off)
+      UI.ChangeWidget(Id("chkb_aa_mono_off"), :Enabled, !@fcstate.force_aa_off_mono)
     end
 
     def handle_aaoffmono_checkbox(key, map)
@@ -260,22 +262,22 @@ module FontsConfig
     end
 
     def handle_presets_button(widget, event)
-      if event["EventType"] == "MenuEvent" && 
+      if event && event["EventType"] == "MenuEvent" && 
            FontsConfigState::is_preset(event["ID"]) != nil
         @fcstate.load_preset(event["ID"])
         if CWMTab.CurrentTab == "algorithms"
-          initialize_aaoffcheck_box("")
+          initialize_aaoff_checkbox("")
           initialize_aamonooff_checkbox("")
           initialize_ahon_checkbox("")
-          initialize_searchmc_checkbox("")
-          initialize_noother_checkbox("")
           initialize_hintstyle_combo("")
           initialize_lcdfilter_combo("")
           initialize_subpixellayout_combo("")
+          initialize_embeddedbitmaps_widget("")
         else
           initialize_genericaliases_table("")
           initialize_familylist_widget("")
-          initialize_embeddedbitmaps_widget("")
+          initialize_searchmc_checkbox("")
+          initialize_noother_checkbox("")
         end
       end
       return nil
@@ -621,7 +623,7 @@ module FontsConfig
 
       Progress.NextStage
       y2milestone("reading /etc/sysconfig/fonts-config")
-      @fcstate.Read
+      @fcstate.read(".sysconfig.fonts-config")
       y2milestone("read: " + @fcstate.to_s)
       Progress.Finish
 
@@ -638,7 +640,8 @@ module FontsConfig
           "back_button"        => "",
         }
       )
-      
+     
+ 
       case ret
         when :next
           y2milestone("saving configuration")
@@ -659,7 +662,7 @@ module FontsConfig
 
           Progress.NextStage 
           y2milestone("writing /etc/sysconfig/fonts-config")
-          @fcstate.Write
+          @fcstate.write(".sysconfig.fonts-config")
           y2milestone("written: " + @fcstate.to_s)
           Progress.NextStage
           y2milestone("running fonts-config")
@@ -680,6 +683,7 @@ module FontsConfig
     def initialize
       Yast.import "UI"
       @fcstate = FontsConfigState.new
+      @fcstate.load_preset("default")
     end
 
     def font_configuration_module

@@ -1,6 +1,7 @@
+require "yast"
+
 module FontsConfig
-  include Yast
-  BASH_SCR_PATH = Path.new(".target.bash_output")
+  BASH_SCR_PATH = Yast::Path.new(".target.bash_output")
 
   class FontconfigCommands
 
@@ -21,6 +22,7 @@ module FontsConfig
         end
         return families
       else
+        # failure, at least some fonts are installed
         return []
       end
     end

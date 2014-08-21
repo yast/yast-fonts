@@ -17,7 +17,7 @@
 
 
 Name:           yast2-fonts
-Version:        3.1.0
+Version:        3.1.1
 Release:        0
 BuildArch:      noarch
 
@@ -34,6 +34,10 @@ BuildRequires:  yast2-ruby-bindings >= 1.2.0
 BuildRequires:  yast2-devtools >= 1.2.0
 BuildRequires:  yast2 >= 3.0.5
 BuildRequires:  rubygem-yast-rake
+# for testing
+BuildRequires:  rubygem-rspec
+BuildRequires:  dejavu-fonts
+BuildRequires:  fonts-config
 
 Summary:        YaST2 - Fonts Configuration
 Group:          System/YaST
@@ -41,15 +45,20 @@ License:        GPL-2.0+
 Url:            https://github.com/yast/yast-fonts
 
 %description
-Module for configuring X11 fonts able to select prefered font families
+Module for configuring X11 fonts able to select preferred font families
 as well as set rendering algorithms to be used.
 
 
 %prep
 %setup -n %{name}-%{version}
 
+%build
+
 %install
 rake install DESTDIR="%{buildroot}"
+
+%check
+rake test:unit
 
 %files
 %defattr(-,root,root)
@@ -61,5 +70,6 @@ rake install DESTDIR="%{buildroot}"
 %dir %{yast_docdir}
 %doc %{yast_docdir}/CONTRIBUTING.md
 %doc %{yast_docdir}/COPYING
+%doc %{yast_docdir}/README.md
 
 %changelog

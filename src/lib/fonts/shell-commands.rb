@@ -28,7 +28,7 @@ module FontsConfig
     end
 
     def self.is_family_installed(family)
-      cmd="fc-list --quiet \"" + family + "\""
+      cmd="fc-list --quiet '#{Yast::String.Quote family}'"
       Yast::SCR.Execute(BASH_SCR_PATH, cmd)["exit"].zero?
     end
   end

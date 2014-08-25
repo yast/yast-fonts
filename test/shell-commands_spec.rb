@@ -30,7 +30,7 @@ describe FontsConfig::FontconfigCommands do
   describe "#is_family_installed" do
     it "returns false when family is not installed" do
       family = FontsConfig::FontconfigCommands::is_family_installed("foo")
-      expect(family).to be_false
+      expect(family).to be false
     end
   end
 
@@ -39,7 +39,7 @@ describe FontsConfig::FontconfigCommands do
       families = FontsConfig::FontconfigCommands::installed_families("family")
       expect(families).to be_a(Array)
       expect(families.length).to be > 0
-      expect(are_installed(families)).to be_true
+      expect(are_installed(families)).to be true
     end
   end
 
@@ -53,7 +53,7 @@ describe FontsConfig::FontconfigCommands do
     it "understands important fontconfig pattern entries" do
       entries = ["family", "fontformat"]
       families = FontsConfig::FontconfigCommands::installed_families(entries.join(" "))
-      expect(contain_pattern_entries(families, entries)).to be_true
+      expect(contain_pattern_entries(families, entries)).to be true
     end
   end
 end

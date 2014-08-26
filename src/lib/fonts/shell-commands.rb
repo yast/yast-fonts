@@ -1,5 +1,6 @@
 require "yast"
 
+
 module FontsConfig
   BASH_SCR_PATH = Yast::Path.new(".target.bash_output")
 
@@ -11,6 +12,8 @@ module FontsConfig
       "decsess.pcf",
       "cursor.pcf",
     ]
+
+    Yast.import "String"
 
     def self.installed_families(pattern_elements)
       cmd = "fc-list : #{pattern_elements} | sed 's@,.*:@:@' | sort | uniq"

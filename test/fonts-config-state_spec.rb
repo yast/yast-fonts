@@ -47,7 +47,7 @@ describe FontsConfig::FontsConfigState do
   describe "#presets" do
     it "returns list of presets" do
       for k in FontsConfig::FontsConfigState::presets.keys do
-        expect(FontsConfig::FontsConfigState::is_preset(k)).to be_true
+        expect(FontsConfig::FontsConfigState::is_preset(k)).not_to be_nil
       end
     end
   end
@@ -65,7 +65,7 @@ describe FontsConfig::FontsConfigState do
   describe "#initialize" do
     it "loads `unset' profile" do
       fcstate = FontsConfig::FontsConfigState.new
-      expect(preset_loaded(fcstate, "unset")).to be_true
+      expect(preset_loaded(fcstate, "unset")).to be true
     end
   end
 
@@ -88,7 +88,7 @@ describe FontsConfig::FontsConfigState do
   describe "#read" do
     for p in FontsConfig::FontsConfigState::preset_list do
       it "reads variables from sysconfig file (#{p[0]} profile)" do
-        expect(test_read("test/data/sysconfig.fonts-config.#{p[0]}", p[0])).to be_true
+        expect(test_read("test/data/sysconfig.fonts-config.#{p[0]}", p[0])).to be true
       end
     end
   end
@@ -96,7 +96,7 @@ describe FontsConfig::FontsConfigState do
   describe "#write" do
     for p in FontsConfig::FontsConfigState::preset_list do
       it "writes variables to sysconfig file (#{p[0]} profile)" do
-        expect(test_write("/tmp/sysconfig.fonts-config.#{p[0]}", p[0])).to be_true
+        expect(test_write("/tmp/sysconfig.fonts-config.#{p[0]}", p[0])).to be true
       end
     end
   end

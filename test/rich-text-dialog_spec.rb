@@ -20,6 +20,6 @@ describe FontsConfig::RichTextDialog do
   it "run rich text dialog with given content" do
     rtd = FontsConfig::RichTextDialog.new
     mock_dialog
-    expect(rtd.run("<h1>It works!</h1>", "Test")).to be_true
+    expect {rtd.run("<h1>It works!</h1>", "Test")}.to_not raise_error
   end
 end

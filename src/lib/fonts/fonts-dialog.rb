@@ -330,19 +330,9 @@ module FontsConfig
       end
     end
 
-    def run_dialog
-      Yast.import "UI"
-      Yast.import "CWM"
-      Yast.import "CWMTab"
-      Yast.import "HTML"
-      Yast.import "Icon"
-      Yast.import "Label"
-      Yast.import "Wizard"
-      Yast.import "Progress"
-
+    def widgets
       help = FontsConfigDialogHelp.new
-
-      @widgets_description = {
+      widgets_description = {
         "chkb_aa_off" => {
           "widget"        => :checkbox,
           "label"         => _("Turn &Antialiasing Off"),
@@ -525,7 +515,7 @@ module FontsConfig
         },
       }
 
-      @tabs_description = {
+      tabs_description = {
         "algorithms" => {
           "header"       => _("&Rendering"),
           "contents"     => 
@@ -589,16 +579,16 @@ module FontsConfig
         },
       }
 
-      @widgets_description["tabs_fonts_configuration"] = CWMTab.CreateWidget(
+      widgets_description["tabs_fonts_configuration"] = CWMTab.CreateWidget(
           {
             "tab_order"    => ["algorithms", "families"],
-            "tabs"         => @tabs_description,
-            "widget_descr" => @widgets_description,
+            "tabs"         => tabs_description,
+            "widget_descr" => widgets_description,
             "initial_tab"  => "families"
           }
         )
 
-      @widgets_description["btn_presets"] = {
+      widgets_description["btn_presets"] = {
           "widget"        => :menu_button,
           "opt"           => [ :notify, :immediate ],
           "label"         => _("&Presets"),
@@ -607,7 +597,21 @@ module FontsConfig
                                      "symbol (string, map)"),
           "help"          => help.font_configuration_module
         }
+  
+      widgets_description
+    end
 
+    def run_dialog
+      Yast.import "UI"
+      Yast.import "CWM"
+      Yast.import "CWMTab"
+      Yast.import "HTML"
+      Yast.import "Icon"
+      Yast.import "Label"
+      Yast.import "Wizard"
+      Yast.import "Progress"
+
+      widgets_description = widgets
 
       y2milestone("module started")
       Wizard.CreateDialog
@@ -631,7 +635,7 @@ module FontsConfig
       ret = CWM.ShowAndRun(
         {
           "widget_names"       => [ "btn_presets", "tabs_fonts_configuration" ],
-          "widget_descr"       => @widgets_description,
+          "widget_descr"       => widgets_description,
           "contents"           => VBox(HBox(HStretch(), "btn_presets"),
                                   "tabs_fonts_configuration"),
           "caption"            => _("Font Configuration"),

@@ -3,6 +3,7 @@ require "yast"
 module FontsConfig
   class FontsConfigState
     include Yast
+    extend Yast::I18n
 
     HINT_STYLES = [
       "none",
@@ -31,9 +32,9 @@ module FontsConfig
     # in case of changing profiles, please reflect
     # edits in test/data/sysconfig.fonts-config.*
     # otherwise testsuite will fail
-    @@presets = {
+    PRESETS = {
         "unset" => {
-          "name" => "Unset",
+          "name" => N_("Unset"),
           "fpl" => {
             "sans-serif" => nil,
             "serif" => nil,
@@ -52,7 +53,7 @@ module FontsConfig
           "subpixel_layout" => nil,
         },
         "bitmap_fonts" => {
-          "name" => "Bitmap Fonts",
+          "name" => N_("Bitmap Fonts"),
           "fpl" =>  {
             "sans-serif" => [
               "Adobe Helvetica",
@@ -99,7 +100,7 @@ module FontsConfig
           "subpixel_layout" => SUBPIXEL_LAYOUTS[0],
         },
         "bw_fonts" => {
-          "name" => "Black and White Rendering",
+          "name" => N_("Black and White Rendering"),
           "fpl" =>  {
             "sans-serif" => [],
             "serif" => [],
@@ -118,7 +119,7 @@ module FontsConfig
           "subpixel_layout" => SUBPIXEL_LAYOUTS[0],
         },
         "bw_mono_fonts" => {
-          "name" => "Black and White Rendering for Monospace Fonts",
+          "name" => N_("Black and White Rendering for Monospace Fonts"),
           "fpl" =>  {
             "sans-serif" => [],
             "serif" => [],
@@ -137,7 +138,7 @@ module FontsConfig
           "subpixel_layout" => SUBPIXEL_LAYOUTS[0],
         },
         "default" => {
-          "name" => "Default",
+          "name" => N_("Default"),
           "fpl" =>  {
             "sans-serif" => [],
             "serif" => [],
@@ -156,7 +157,7 @@ module FontsConfig
           "subpixel_layout" => SUBPIXEL_LAYOUTS[0],
         },
         "cff_fonts" => {
-          "name" => "CFF Fonts",
+          "name" => N_("CFF Fonts"),
           "fpl" =>  {
             "sans-serif" => [
               "Source Sans Pro",
@@ -197,7 +198,7 @@ module FontsConfig
           "subpixel_layout" => SUBPIXEL_LAYOUTS[0],
         },
         "autohinter" => {
-          "name" => "Exclusive Autohinter Rendering",
+          "name" => N_("Exclusive Autohinter Rendering"),
           "fpl" =>  {
             "sans-serif" => [],
             "serif" => [],
@@ -234,7 +235,7 @@ module FontsConfig
 
     # for testsuite
     def self.presets
-      @@presets
+      PRESETS
     end
 
     def initialize
@@ -243,29 +244,29 @@ module FontsConfig
   
     # create list of preset [key, name] pairs
     def self.preset_list
-      @@presets.keys.drop(1).map do |preset|
-         [ preset, @@presets[preset]["name"] ]
+      PRESETS.keys.drop(1).map do |preset|
+         [ preset, _(PRESETS[preset]["name"]) ]
        end
     end
 
     def self.is_preset(key)
-      @@presets.keys.index(key)
+      PRESETS.keys.index(key)
     end
 
     def load_preset(preset)
-      @fpl = deep_copy(@@presets[preset]["fpl"])
-      @search_metric_compatible = @@presets[preset]["search_metric_compatible"]
-      @really_force_fpl = @@presets[preset]["really_force_fpl"]
+      @fpl = deep_copy(PRESETS[preset]["fpl"])
+      @search_metric_compatible = PRESETS[preset]["search_metric_compatible"]
+      @really_force_fpl = PRESETS[preset]["really_force_fpl"]
 
-      @force_aa_off  = @@presets[preset]["force_aa_off"]
-      @force_aa_off_mono = @@presets[preset]["force_aa_off_mono"] 
-      @force_ah_on = @@presets[preset]["force_ah_on"]
-      @force_hintstyle = @@presets[preset]["force_hintstyle"]
-      @embedded_bitmaps = @@presets[preset]["embedded_bitmaps"]
-      @all_ebl = @@presets[preset]["all_ebl"]
-      @ebl = @@presets[preset]["ebl"]
-      @lcd_filter = @@presets[preset]["lcd_filter"]
-      @subpixel_layout = @@presets[preset]["subpixel_layout"]
+      @force_aa_off  = PRESETS[preset]["force_aa_off"]
+      @force_aa_off_mono = PRESETS[preset]["force_aa_off_mono"] 
+      @force_ah_on = PRESETS[preset]["force_ah_on"]
+      @force_hintstyle = PRESETS[preset]["force_hintstyle"]
+      @embedded_bitmaps = PRESETS[preset]["embedded_bitmaps"]
+      @all_ebl = PRESETS[preset]["all_ebl"]
+      @ebl = PRESETS[preset]["ebl"]
+      @lcd_filter = PRESETS[preset]["lcd_filter"]
+      @subpixel_layout = PRESETS[preset]["subpixel_layout"]
    end
 
    def to_s

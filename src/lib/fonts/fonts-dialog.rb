@@ -676,6 +676,7 @@ module FontsConfig
         when :abort
          y2milestone("aborted, do not save configuration")
       end
+      Wizard.CloseDialog
     end
   end
 

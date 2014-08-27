@@ -692,13 +692,21 @@ module FontsConfig
     end
 
     def font_configuration_module
-      _("<h1>Font Configuration Module</h1>") +
+      Yast.import "String"
+      presets = FontsConfigState::presets 
+      _("<h1>Font Configuraution Module</h1>") +
       _("<p>Module to control system wide font rendering setting.</p>") +
-      _("<p>Use <b>Presets</b> button to choose predefined profiles.</p>")
+      _("<p>Use <b>Presets</b> button to choose predefined profiles: <ul>") +
+      presets.keys.drop(1).map do |preset|
+        _("<li><b>#{presets[preset]["name"]}: </b>#{presets[preset]["help"]}</li>")
+      end.join + "</ul>" +
+      _("Every single item there just fills appropriate setting in both tabs. ") +
+      _("That setting can be later arbitrarily customized in depth by respective ") +
+      _("individual fields of both tabs.</p>")
     end
 
     def antialiasing
-      _("<h2>Rendering</h2>") +
+      _("<h2 id=\"tab_help\">Rendering Tab</h2>") +
       _("<p>This tab controls <b>how</b> fonts are rendered.") +
       _(" It allows you to amend font rendering algorithms to be used and change their options.</p>") +
       _("<h3>Antialiasing</h3>") +
@@ -733,7 +741,7 @@ module FontsConfig
     end
 
     def family_preferences
-      _("<h2>Prefered Families</h2>") +
+      _("<h2>Prefered Families Tab</h2>") +
       _("<p>This tab controls <b>which</b> fonts are rendered.</p>") +
       _("<h3>Preference Lists</h3>") +
       _("<p>Family preference lists (FPL) for generic aliases (%s) can be defined.") % @fcstate.fpl.keys.join(', ') +

@@ -256,8 +256,8 @@ module FontsConfig
        end
     end
 
-    def self.is_preset(key)
-      PRESETS.keys.index(key)
+    def self.preset?(key)
+      PRESETS.has_key?(key)
     end
 
     def load_preset(preset)

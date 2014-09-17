@@ -47,7 +47,7 @@ describe FontsConfig::FontsConfigState do
   describe "#presets" do
     it "returns list of presets" do
       for k in FontsConfig::FontsConfigState::presets.keys do
-        expect(FontsConfig::FontsConfigState::is_preset(k)).not_to be_nil
+        expect(FontsConfig::FontsConfigState::preset?(k)).to be_true
       end
     end
   end
@@ -72,15 +72,15 @@ describe FontsConfig::FontsConfigState do
   describe "#preset_list" do
     it "returns list of preset ids" do
       for p in FontsConfig::FontsConfigState::preset_list do
-        expect(FontsConfig::FontsConfigState::is_preset(p[0])).not_to be_nil
+        expect(FontsConfig::FontsConfigState::preset?(p[0])).to be_true
       end
     end
   end
 
-  describe "#is_preset" do
+  describe "#preset?" do
     it "returns true when argument is a preset" do
       for p in FontsConfig::FontsConfigState::preset_list do
-        expect(FontsConfig::FontsConfigState::is_preset(p[0])).not_to be_nil
+        expect(FontsConfig::FontsConfigState::preset?(p[0])).to be_true
       end
     end
   end

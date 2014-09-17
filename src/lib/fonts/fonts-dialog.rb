@@ -693,7 +693,7 @@ module FontsConfig
 
     def font_configuration_module
       Yast.import "String"
-      presets = FontsConfigState::presets 
+      presets = FontsConfigState::PRESETS
       _("<h1>Font Configuraution Module</h1>") +
       _("<p>Module to control system wide font rendering setting.</p>") +
       _("<p>Use <b>Presets</b> button to choose predefined profiles: <ul>") +

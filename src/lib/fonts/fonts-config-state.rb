@@ -240,11 +240,6 @@ module FontsConfig
     attr_accessor :lcd_filter
     attr_accessor :subpixel_layout
 
-    # for testsuite and help
-    def self.presets
-      PRESETS
-    end
-
     def initialize
       load_preset("unset")
     end

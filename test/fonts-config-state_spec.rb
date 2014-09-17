@@ -6,7 +6,7 @@ describe FontsConfig::FontsConfigState do
   include Yast
 
   def preset_loaded(fcstate, preset)
-    dp = FontsConfig::FontsConfigState::presets[preset]
+    dp = FontsConfig::FontsConfigState::PRESETS[preset]
     return fcstate.fpl == dp["fpl"] &&
            fcstate.search_metric_compatible == dp["search_metric_compatible"] && 
            fcstate.really_force_fpl == dp["really_force_fpl"] &&
@@ -44,18 +44,10 @@ describe FontsConfig::FontsConfigState do
     return true
   end
 
-  describe "#presets" do
-    it "returns list of presets" do
-      for k in FontsConfig::FontsConfigState::presets.keys do
-        expect(FontsConfig::FontsConfigState::preset?(k)).to be_true
-      end
-    end
-  end
-
   describe "#load_preset" do
     it "loads given preset" do
       fcstate = FontsConfig::FontsConfigState.new
-      for k in FontsConfig::FontsConfigState::presets.keys do
+      for k in FontsConfig::FontsConfigState::PRESETS.keys do
         fcstate.load_preset(k)
         preset_loaded(fcstate, k)
       end

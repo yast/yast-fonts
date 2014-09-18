@@ -627,7 +627,7 @@ module FontsConfig
 
       Progress.NextStage
       y2milestone("reading /etc/sysconfig/fonts-config")
-      @fcstate.read(".sysconfig.fonts-config")
+      @fcstate.read
       y2milestone("read: " + @fcstate.to_s)
       Progress.Finish
 
@@ -666,7 +666,7 @@ module FontsConfig
 
           Progress.NextStage 
           y2milestone("writing /etc/sysconfig/fonts-config")
-          @fcstate.write(".sysconfig.fonts-config")
+          @fcstate.write
           y2milestone("written: " + @fcstate.to_s)
           Progress.NextStage
           y2milestone("running fonts-config")

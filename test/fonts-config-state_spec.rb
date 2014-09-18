@@ -5,6 +5,14 @@ require "yast"
 describe FontsConfig::FontsConfigState do
   include Yast
 
+  def set_chroot_path(sc_example_subdir)
+    root = File.join(File.expand_path(File.dirname(__FILE__)), 
+                     "data/sysconfig-examples", 
+                      sc_example_subdir)
+    handle = Yast::WFM.SCROpen("chroot=#{root}:scr", false)
+    Yast::WFM.SCRSetDefault(handle)
+  end
+
   def preset_loaded(fcstate, preset)
     dp = FontsConfig::FontsConfigState::PRESETS[preset]
     return fcstate.fpl == dp["fpl"] &&
@@ -20,27 +28,21 @@ describe FontsConfig::FontsConfigState do
            fcstate.subpixel_layout == dp["subpixel_layout"]
   end
 
-  def test_read(filepath, preset)
-    Yast::SCR.RegisterAgent(
-            path(".test.sysconfig.fonts-config"),
-            term(:ag_ini, term(:SysConfigFile, filepath)))
+  def test_read(preset)
     fcstate = FontsConfig::FontsConfigState.new
-    fcstate.read(".test.sysconfig.fonts-config")
+    set_chroot_path(preset)
+    fcstate.read
     ret = preset_loaded(fcstate, preset)
-    Yast::SCR.UnregisterAgent(path(".test.sysconfig.fonts-config"))
     return ret
   end
 
-  def test_write(filepath, preset)
-    Yast::SCR.RegisterAgent(
-            path(".test.sysconfig.fonts-config"),
-            term(:ag_ini, term(:SysConfigFile, filepath)))
+  def test_write(preset)
     fcstate = FontsConfig::FontsConfigState.new
+    set_chroot_path(preset)
     fcstate.load_preset(preset)
-    fcstate.write(".test.sysconfig.fonts-config")
-    fcstate.read(".test.sysconfig.fonts-config")
+    fcstate.write
+    fcstate.read
     ret = preset_loaded(fcstate, preset)
-    Yast::SCR.UnregisterAgent(path(".test.sysconfig.fonts-config"))
     return true
   end
 
@@ -80,7 +82,7 @@ describe FontsConfig::FontsConfigState do
   describe "#read" do
     for p in FontsConfig::FontsConfigState::preset_list do
       it "reads variables from sysconfig file (#{p[0]} profile)" do
-        expect(test_read("test/data/sysconfig.fonts-config.#{p[0]}", p[0])).to be true
+        expect(test_read(p[0])).to be true
       end
     end
   end
@@ -88,8 +90,9 @@ describe FontsConfig::FontsConfigState do
   describe "#write" do
     for p in FontsConfig::FontsConfigState::preset_list do
       it "writes variables to sysconfig file (#{p[0]} profile)" do
-        expect(test_write("/tmp/sysconfig.fonts-config.#{p[0]}", p[0])).to be true
+        expect(test_write(p[0])).to be true
       end
     end
   end
 end
+

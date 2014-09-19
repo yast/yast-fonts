@@ -80,16 +80,16 @@ describe FontsConfig::FontsConfigState do
   end
 
   describe "#read" do
-    for p in FontsConfig::FontsConfigState::preset_list do
-      it "reads variables from sysconfig file (#{p[0]} profile)" do
+    it "reads variables from sysconfig file" do
+      for p in FontsConfig::FontsConfigState::preset_list do
         expect(test_read(p[0])).to be true
       end
     end
   end
 
   describe "#write" do
-    for p in FontsConfig::FontsConfigState::preset_list do
-      it "writes variables to sysconfig file (#{p[0]} profile)" do
+    it "writes variables to sysconfig file" do
+      for p in FontsConfig::FontsConfigState::preset_list do
         expect(test_write(p[0])).to be true
       end
     end

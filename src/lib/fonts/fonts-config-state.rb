@@ -373,6 +373,11 @@ module FontsConfig
         @subpixel_layout
       )
 
+      # flush
+      SCR.Write(
+        path(SC_PATH),
+        nil
+      )
    end
 
    def read

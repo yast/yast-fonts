@@ -66,7 +66,7 @@ describe FontsConfig::FontsConfigState do
   describe "#preset_list" do
     it "returns list of preset ids" do
       for p in FontsConfig::FontsConfigState::preset_list do
-        expect(FontsConfig::FontsConfigState::preset?(p[0])).to be_true
+        expect(FontsConfig::FontsConfigState::preset?(p[0])).to be true
       end
     end
   end
@@ -74,7 +74,7 @@ describe FontsConfig::FontsConfigState do
   describe "#preset?" do
     it "returns true when argument is a preset" do
       for p in FontsConfig::FontsConfigState::preset_list do
-        expect(FontsConfig::FontsConfigState::preset?(p[0])).to be_true
+        expect(FontsConfig::FontsConfigState::preset?(p[0])).to be true
       end
     end
   end

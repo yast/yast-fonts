@@ -263,7 +263,7 @@ module FontsConfig
 
     def handle_presets_button(widget, event)
       if event && event["EventType"] == "MenuEvent" && 
-           FontsConfigState::preset?(event["ID"]) != nil
+           FontsConfigState::preset?(event["ID"])
         @fcstate.load_preset(event["ID"])
         if CWMTab.CurrentTab == "algorithms"
           initialize_aaoff_checkbox("")

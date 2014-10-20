@@ -9,8 +9,8 @@ font appearance on the system in two aspects:
 The main mission is to bring font rendering options closer 
 to user. It is intended to weaken term 'default font setting'.
 
-Note: this module expect recent changes to fontconfig 
-and fonts-config package. It will not work with
-respective openSUSE:13.1 packages. You can install new
-versions of packages from M17N repository though.
+Note: module is just developed, so it do not live in YaST 
+namespace so far. For openSUSE 13.2 or later and Factory, please 
+find packages in  
+[home:pgajdos:font-setting](http://software.opensuse.org/package/yast2-fonts?search_term=yast2-fonts).
 

@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Oct 20 15:05:52 UTC 2014 - pgajdos@suse.com
+
+- added subpixel rendering profile
+- 3.1.2
+
+-------------------------------------------------------------------
 Thu Aug 21 08:53:49 UTC 2014 - pgajdos@suse.com
 
 - added test suite

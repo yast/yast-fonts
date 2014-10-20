@@ -17,7 +17,7 @@
 
 
 Name:           yast2-fonts
-Version:        3.1.1
+Version:        3.1.2
 Release:        0
 BuildArch:      noarch
 

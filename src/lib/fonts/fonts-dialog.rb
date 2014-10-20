@@ -21,6 +21,8 @@ module FontsConfig
     def self.run
       fontsconfig_dialog = FontsConfigDialog.new
       fontsconfig_dialog.run
+      # for testsuite
+      return @fcstate
     end
 
     def run
@@ -43,7 +45,7 @@ module FontsConfig
     def initialize_aamonooff_checkbox(key)
       UI.ChangeWidget(Id("chkb_aa_mono_off"), :Value,
                       @fcstate.force_aa_off_mono)
-      UI.ChangeWidget(Id("chkb_aa_mono_off"), :Enabled, !@fcstate.force_aa_off)
+      UI.ChangeWidget(Id("chkb_aa_mono_off"), :Enabled, !@fcstate.force_aa_off_mono)
     end
 
     def handle_aaoffmono_checkbox(key, map)
@@ -260,22 +262,22 @@ module FontsConfig
     end
 
     def handle_presets_button(widget, event)
-      if event["EventType"] == "MenuEvent" && 
-           FontsConfigState::is_preset(event["ID"]) != nil
+      if event && event["EventType"] == "MenuEvent" && 
+           FontsConfigState::preset?(event["ID"])
         @fcstate.load_preset(event["ID"])
         if CWMTab.CurrentTab == "algorithms"
-          initialize_aaoffcheck_box("")
+          initialize_aaoff_checkbox("")
           initialize_aamonooff_checkbox("")
           initialize_ahon_checkbox("")
-          initialize_searchmc_checkbox("")
-          initialize_noother_checkbox("")
           initialize_hintstyle_combo("")
           initialize_lcdfilter_combo("")
           initialize_subpixellayout_combo("")
+          initialize_embeddedbitmaps_widget("")
         else
           initialize_genericaliases_table("")
           initialize_familylist_widget("")
-          initialize_embeddedbitmaps_widget("")
+          initialize_searchmc_checkbox("")
+          initialize_noother_checkbox("")
         end
       end
       return nil
@@ -328,19 +330,9 @@ module FontsConfig
       end
     end
 
-    def run_dialog
-      Yast.import "UI"
-      Yast.import "CWM"
-      Yast.import "CWMTab"
-      Yast.import "HTML"
-      Yast.import "Icon"
-      Yast.import "Label"
-      Yast.import "Wizard"
-      Yast.import "Progress"
-
+    def widgets
       help = FontsConfigDialogHelp.new
-
-      @widgets_description = {
+      widgets_description = {
         "chkb_aa_off" => {
           "widget"        => :checkbox,
           "label"         => _("Turn &Antialiasing Off"),
@@ -523,7 +515,7 @@ module FontsConfig
         },
       }
 
-      @tabs_description = {
+      tabs_description = {
         "algorithms" => {
           "header"       => _("&Rendering"),
           "contents"     => 
@@ -587,16 +579,16 @@ module FontsConfig
         },
       }
 
-      @widgets_description["tabs_fonts_configuration"] = CWMTab.CreateWidget(
+      widgets_description["tabs_fonts_configuration"] = CWMTab.CreateWidget(
           {
             "tab_order"    => ["algorithms", "families"],
-            "tabs"         => @tabs_description,
-            "widget_descr" => @widgets_description,
+            "tabs"         => tabs_description,
+            "widget_descr" => widgets_description,
             "initial_tab"  => "families"
           }
         )
 
-      @widgets_description["btn_presets"] = {
+      widgets_description["btn_presets"] = {
           "widget"        => :menu_button,
           "opt"           => [ :notify, :immediate ],
           "label"         => _("&Presets"),
@@ -605,7 +597,21 @@ module FontsConfig
                                      "symbol (string, map)"),
           "help"          => help.font_configuration_module
         }
+  
+      widgets_description
+    end
 
+    def run_dialog
+      Yast.import "UI"
+      Yast.import "CWM"
+      Yast.import "CWMTab"
+      Yast.import "HTML"
+      Yast.import "Icon"
+      Yast.import "Label"
+      Yast.import "Wizard"
+      Yast.import "Progress"
+
+      widgets_description = widgets
 
       y2milestone("module started")
       Wizard.CreateDialog
@@ -621,7 +627,7 @@ module FontsConfig
 
       Progress.NextStage
       y2milestone("reading /etc/sysconfig/fonts-config")
-      @fcstate.Read
+      @fcstate.read
       y2milestone("read: " + @fcstate.to_s)
       Progress.Finish
 
@@ -629,7 +635,7 @@ module FontsConfig
       ret = CWM.ShowAndRun(
         {
           "widget_names"       => [ "btn_presets", "tabs_fonts_configuration" ],
-          "widget_descr"       => @widgets_description,
+          "widget_descr"       => widgets_description,
           "contents"           => VBox(HBox(HStretch(), "btn_presets"),
                                   "tabs_fonts_configuration"),
           "caption"            => _("Font Configuration"),
@@ -638,7 +644,8 @@ module FontsConfig
           "back_button"        => "",
         }
       )
-      
+     
+ 
       case ret
         when :next
           y2milestone("saving configuration")
@@ -659,7 +666,7 @@ module FontsConfig
 
           Progress.NextStage 
           y2milestone("writing /etc/sysconfig/fonts-config")
-          @fcstate.Write
+          @fcstate.write
           y2milestone("written: " + @fcstate.to_s)
           Progress.NextStage
           y2milestone("running fonts-config")
@@ -669,6 +676,7 @@ module FontsConfig
         when :abort
          y2milestone("aborted, do not save configuration")
       end
+      Wizard.CloseDialog
     end
   end
 
@@ -680,16 +688,25 @@ module FontsConfig
     def initialize
       Yast.import "UI"
       @fcstate = FontsConfigState.new
+      @fcstate.load_preset("default")
     end
 
     def font_configuration_module
-      _("<h1>Font Configuration Module</h1>") +
+      Yast.import "String"
+      presets = FontsConfigState::PRESETS
+      _("<h1>Font Configuraution Module</h1>") +
       _("<p>Module to control system wide font rendering setting.</p>") +
-      _("<p>Use <b>Presets</b> button to choose predefined profiles.</p>")
+      _("<p>Use <b>Presets</b> button to choose predefined profiles: <ul>") +
+      presets.keys.drop(1).map do |preset|
+        _("<li><b>#{presets[preset]["name"]}: </b>#{presets[preset]["help"]}</li>")
+      end.join + "</ul>" +
+      _("Every single item there just fills appropriate setting in both tabs. ") +
+      _("That setting can be later arbitrarily customized in depth by respective ") +
+      _("individual fields of both tabs.</p>")
     end
 
     def antialiasing
-      _("<h2>Rendering</h2>") +
+      _("<h2 id=\"tab_help\">Rendering Tab</h2>") +
       _("<p>This tab controls <b>how</b> fonts are rendered.") +
       _(" It allows you to amend font rendering algorithms to be used and change their options.</p>") +
       _("<h3>Antialiasing</h3>") +
@@ -724,7 +741,7 @@ module FontsConfig
     end
 
     def family_preferences
-      _("<h2>Prefered Families</h2>") +
+      _("<h2>Prefered Families Tab</h2>") +
       _("<p>This tab controls <b>which</b> fonts are rendered.</p>") +
       _("<h3>Preference Lists</h3>") +
       _("<p>Family preference lists (FPL) for generic aliases (%s) can be defined.") % @fcstate.fpl.keys.join(', ') +

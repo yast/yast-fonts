@@ -225,6 +225,34 @@ module FontsConfig
           "subpixel_layout" => SUBPIXEL_LAYOUTS[0],
           "help" => N_("Unlike in default profile, even for good hinted fonts, freetype's autohinter is used (on the 'hintslight' level). That leads to thicker, but sometimes fuzzier (and therefore less readable), glyphs. Default family preference list is used."),
         },
+        "subpixel_rendering" => {
+          "name" => N_("Subpixel Rendering"),
+          "fpl" =>  {
+            "sans-serif" => [
+              "Arial",
+              "Ubuntu",
+            ],
+            "serif" => [
+              "Times New Roman",
+            ],
+            "monospace" => [
+              "Courier New",
+              "Ubuntu Mono",
+            ],
+          },
+          "search_metric_compatible" => true,
+          "really_force_fpl" => false,
+          "force_aa_off" => false,
+          "force_aa_off_mono" => false,
+          "force_ah_on" => false,
+          "force_hintstyle" => HINT_STYLES[0],
+          "embedded_bitmaps" => true,
+          "all_ebl" => false,
+          "ebl" => [ "ja", "ko", "zh" ],
+          "lcd_filter" => LCD_FILTERS[1],
+          "subpixel_layout" => SUBPIXEL_LAYOUTS[1],
+          "help" => N_("Use subpixel rendering capability of LCD monitor. Requires subpixel rendering enabled FreeType library."),
+        },
       }
 
     # fpl ~ family preference lists

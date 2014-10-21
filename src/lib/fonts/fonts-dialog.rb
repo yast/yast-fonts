@@ -105,11 +105,14 @@ module FontsConfig
                       FontsConfigState::LCD_FILTERS)
       UI.ChangeWidget(Id("cmb_lcd_filter"), :Value, 
                       @fcstate.lcd_filter)
+      UI.ChangeWidget(Id("cmb_subpixel_layout"), :Enabled,
+           @fcstate.lcd_filter != FontsConfigState::LCD_FILTERS[0])
     end
 
     def handle_lcdfilter_combo(key, map)
       @fcstate.lcd_filter =
         UI.QueryWidget(Id("cmb_lcd_filter"), :Value)
+      initialize_lcdfilter_combo("")
       return nil
     end
 

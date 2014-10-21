@@ -60,14 +60,14 @@ end
 
 describe FontsConfig::FontsConfigCommand do
   describe "#run_fonts_config" do    
-    it "raises error when not run under root" do
+    it "error popup when not run under root" do
       if (Process.uid != 0)
-        expect{FontsConfig::FontsConfigCommand::run_fonts_config}.to raise_error
+        expect(FontsConfig::FontsConfigCommand::run_fonts_config).to be false
       end
     end
-    it "raises no error when run under root" do
+    it "no error popup when run under root" do
       if (Process.uid == 0)
-        expect{FontsConfig::FontsConfigCommand::run_fonts_config}.not_to raise_error
+        expect(FontsConfig::FontsConfigCommand::run_fonts_config).to be true
       end
     end
   end

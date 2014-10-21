@@ -333,6 +333,29 @@ module FontsConfig
       end
     end
 
+    def subpixel_freetype_warning
+      if (@fcstate.lcd_filter != FontsConfigState::SUBPIXEL_LAYOUTS[1])
+        text = _("You have set LCD filter type (%s).") % @fcstate.lcd_filter +
+               _(" This needs subpixel rendering capabality\ncompiled" +
+                 " in FreeType library. Unfortunately, we can not ship" + 
+                 " it in binary form due\npatent reasons.") +
+               _(" See below an example how to get modified library.")
+        summary = ""
+        summary += "<code>"
+        summary += "$ cd /tmp<br/>"
+        summary += "$ osc co -c M17N freetype2<br/>"
+        summary += "$ cd freetype2<br/>"
+        summary += "$ sed -i 's:\(enable_subpixel_rendering \)0:\\11:' freetype2.spec<br/>"
+        summary += "$ OSC_BUILD_ROOT=/tmp/freetype2/buildroot osc build &lt;product&gt;<br/>"
+        summary += "$ sudo rpm -Uhv --force &lt;produced_libfreetype6_rpm&gt;<br/>"
+        summary += "$ rm -r /tmp/freetype2<br/>"
+        summary += "$ sudo zypper addlock libfreetype6<br/>"
+        summary += "</code>"
+        warning_dialog = RichTextDialog.new
+        warning_dialog.run(text, summary)
+      end
+    end
+
     def widgets
       help = FontsConfigDialogHelp.new
       widgets_description = {
@@ -655,6 +678,9 @@ module FontsConfig
 
           y2milestone("performing installation summary check")
           installation_summary_check
+
+          y2milestone("issue freetype subpixel rendering warning if applicable")
+          subpixel_freetype_warning
 
           Progress.New(
             _("Writing Font Configuration"),

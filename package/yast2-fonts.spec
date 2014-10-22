@@ -60,7 +60,8 @@ as well as set rendering algorithms to be used.
 %install
 rake install DESTDIR="%{buildroot}"
 # install FreeType2 ruby binding
-install -m 755 ext/ft2_rendering/ft2_rendering.so %{buildroot}%{_libdir}/ruby/vendor_ruby/%{rb_ver}/%{rb_arch}/
+mkdir -p  %{buildroot}%{_libdir}/ruby/vendor_ruby/%{rb_ver}/%{rb_arch}/yast
+install -m 755 ext/ft2_rendering/ft2_rendering.so %{buildroot}%{_libdir}/ruby/vendor_ruby/%{rb_ver}/%{rb_arch}/yast
 
 %check
 rake test:unit

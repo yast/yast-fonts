@@ -1,1 +1,5 @@
 /package/*.tar.bz2
+/src/ext/ft2_rendering/Makefile
+/src/ext/ft2_rendering/*.o
+/src/ext/ft2_rendering/*.so
+/src/lib/yast

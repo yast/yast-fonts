@@ -34,6 +34,8 @@ BuildRequires:  yast2-ruby-bindings >= 1.2.0
 BuildRequires:  yast2-devtools >= 1.2.0
 BuildRequires:  yast2 >= 3.0.5
 BuildRequires:  rubygem-yast-rake
+# ft2_rendering extension
+BuildRequires:  freetype2-devel
 BuildRequires:  ruby-devel
 # for testing
 BuildRequires:  rubygem-rspec

@@ -6,18 +6,20 @@ Yast::Tasks.configuration do |conf|
   conf.skip_license_check << /.*/
 end
 
-#
-# freetype2 binding
-#
-extname = "ft2_rendering"
-olddir = Dir.pwd
-Dir.chdir("src/ext/#{extname}")
-ruby 'extconf.rb'
-sh 'make'
-Dir.chdir(olddir)
-# for testing {
-unless FileTest.exist?("src/lib/yast")
-  FileUtils.ln_s("../ext/#{extname}", "src/lib/yast")
+task :compile do
+  #
+  # freetype2 binding
+  #
+  extname = "ft2_rendering"
+  olddir = Dir.pwd
+  Dir.chdir("src/ext/#{extname}")
+  ruby 'extconf.rb'
+  sh 'make'
+  Dir.chdir(olddir)
+  # for testing {
+  unless FileTest.exist?("src/lib/yast")
+    FileUtils.ln_s("../ext/#{extname}", "src/lib/yast")
+  end
+  # }
 end
-# }
 

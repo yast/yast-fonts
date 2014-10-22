@@ -56,6 +56,8 @@ as well as set rendering algorithms to be used.
 %setup -n %{name}-%{version}
 
 %build
+# build FreeType2 ruby binding
+rake compile
 
 %install
 rake install DESTDIR="%{buildroot}"

@@ -6,11 +6,14 @@ require "fonts/select-ebl-dialog"
 require "fonts/shell-commands"
 require "fonts/rich-text-dialog"
 
+require "yast/ft2_rendering"
+
 module FontsConfig
   class FontsConfigDialog
     include Yast
     include UIShortcuts
     include I18n
+    include Ft2Rendering
 
     def initialize
       @fcstate = FontsConfigState.new
@@ -334,7 +337,9 @@ module FontsConfig
     end
 
     def subpixel_freetype_warning
-      if (@fcstate.lcd_filter != FontsConfigState::LCD_FILTERS[0])
+      if (@fcstate.lcd_filter != FontsConfigState::LCD_FILTERS[0] &&
+          (ft2_have_freetype &&
+           !ft2_have_subpixel_rendering))
         Yast.import "Popup"
         text = _("You have set LCD filter type (%s).") % @fcstate.lcd_filter +
                _(" This needs subpixel rendering capabality\ncompiled" +

@@ -3,3 +3,4 @@
 /src/ext/ft2_rendering/*.o
 /src/ext/ft2_rendering/*.so
 /src/lib/yast
+/package/.yast2-fonts.spec.swp

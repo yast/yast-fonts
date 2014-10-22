@@ -17,7 +17,7 @@
 
 
 Name:           yast2-fonts
-Version:        3.1.2
+Version:        3.1.3
 Release:        0
 BuildArch:      noarch
 
@@ -34,6 +34,7 @@ BuildRequires:  yast2-ruby-bindings >= 1.2.0
 BuildRequires:  yast2-devtools >= 1.2.0
 BuildRequires:  yast2 >= 3.0.5
 BuildRequires:  rubygem-yast-rake
+BuildRequires:  ruby-devel
 # for testing
 BuildRequires:  rubygem-rspec
 BuildRequires:  dejavu-fonts

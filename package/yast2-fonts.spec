@@ -72,7 +72,7 @@ rake unittest
 %defattr(-,root,root)
 %dir %{yast_libdir}/fonts
 %{yast_libdir}/fonts/*.rb
-%{_libdir}/ruby/vendor_ruby/%{rb_ver}/%{rb_arch}/ft2_rendering.so
+%{_libdir}/ruby/vendor_ruby/%{rb_ver}/%{rb_arch}/yast/ft2_rendering.so
 %{yast_clientdir}/fonts.rb
 %{yast_desktopdir}/fonts.desktop
 %{yast_scrconfdir}/*.scr

@@ -19,7 +19,6 @@
 Name:           yast2-fonts
 Version:        3.1.3
 Release:        0
-BuildArch:      noarch
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 Source0:        %{name}-%{version}.tar.bz2

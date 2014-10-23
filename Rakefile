@@ -17,21 +17,26 @@ task :compile do
   Dir.chdir(olddir)
 end
 
-task :unittest => :compile do
-  FileUtils.ln_s(".", "src/ext/#{extname}/yast") unless FileTest.exist?("src/ext/ft2_rendering/yast")
-  Rake::Task["test:unit"].invoke
+namespace :test do
+  task :prepare => :compile do
+    # let yast know where ft2_rendering extension is
+    ln_s("../ext/ft2_rendering", "src/lib/yast")  unless FileTest.exists?("src/lib/yast")
+  end
+
+  task :unit => :prepare do
+    rm("src/lib/yast") if FileTest.exists?("src/lib/yast")
+  end
 end
 
-task :manualtest => :compile do
-  FileUtils.ln_s("../ext/ft2_rendering", "src/lib/yast")  unless FileTest.exists?("src/lib/yast")
-  Rake::Task["run"].invoke
+task :run => "test:prepare" do
+  rm("src/lib/yast") if FileTest.exists?("src/lib/yast")
 end
 
 task :clean do
-  FileUtils.rm_f("src/ext/#{extname}/ft2_rendering.so")
-  FileUtils.rm_f("src/ext/#{extname}/ft2-rendering.o")
-  FileUtils.rm_f("src/ext/#{extname}/Makefile")
-  FileUtils.rm_f("src/ext/#{extname}/yast")
-  FileUtils.rm_f("src/lib/yast")
+  FileUtils.rm("src/ext/ft2_rendering/ft2_rendering.so")
+  FileUtils.rm("src/ext/ft2_rendering/ft2-rendering.o")
+  FileUtils.rm("src/ext/ft2_rendering/Makefile")
+  FileUtils.rm("src/ext/ft2_rendering/yast")
+  FileUtils.rm("src/lib/yast")
 end
 

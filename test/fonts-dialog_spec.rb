@@ -1,7 +1,6 @@
 require_relative "spec-helper"
 require "fonts/fonts-dialog"
 require "fonts/fonts-config-state"
-require "yast"
 
 describe FontsConfig::FontsConfigDialog do
   # TODO

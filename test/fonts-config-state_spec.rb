@@ -1,6 +1,5 @@
 require_relative "spec-helper"
 require "fonts/fonts-config-state"
-require "yast"
 
 describe FontsConfig::FontsConfigState do
   include Yast
@@ -20,27 +19,33 @@ describe FontsConfig::FontsConfigState do
            fcstate.subpixel_layout == dp["subpixel_layout"]
   end
 
-  def test_read(filepath, preset)
-    Yast::SCR.RegisterAgent(
-            path(".test.sysconfig.fonts-config"),
-            term(:ag_ini, term(:SysConfigFile, filepath)))
+  def test_read(preset)
+    directory = File.expand_path("../data/sysconfig-examples/#{preset}", __FILE__)
+    scr_handle = Yast::WFM.SCROpen("chroot=#{directory}:scr", false)
+    raise "Error creating the chrooted scr instance!" if scr_handle < 0
+    Yast::WFM.SCRSetDefault(scr_handle)
+
     fcstate = FontsConfig::FontsConfigState.new
-    fcstate.read(".test.sysconfig.fonts-config")
+    fcstate.read
     ret = preset_loaded(fcstate, preset) unless preset.nil?
-    Yast::SCR.UnregisterAgent(path(".test.sysconfig.fonts-config"))
+
+    Yast::WFM.SCRClose(scr_handle) 
     return ret
   end
 
-  def test_write(filepath, preset)
-    Yast::SCR.RegisterAgent(
-            path(".test.sysconfig.fonts-config"),
-            term(:ag_ini, term(:SysConfigFile, filepath)))
+  def test_write(preset)
+    directory = File.expand_path("../data/sysconfig-examples/#{preset}", __FILE__)
+    scr_handle = Yast::WFM.SCROpen("chroot=#{directory}:scr", false)
+    raise "Error creating the chrooted scr instance!" if scr_handle < 0
+    Yast::WFM.SCRSetDefault(scr_handle)
+
     fcstate = FontsConfig::FontsConfigState.new
     fcstate.load_preset(preset)
-    fcstate.write(".test.sysconfig.fonts-config")
-    fcstate.read(".test.sysconfig.fonts-config")
+    fcstate.write
+    fcstate.read
     ret = preset_loaded(fcstate, preset)
-    Yast::SCR.UnregisterAgent(path(".test.sysconfig.fonts-config"))
+
+    Yast::WFM.SCRClose(scr_handle) 
     return true
   end
 
@@ -80,23 +85,22 @@ describe FontsConfig::FontsConfigState do
   describe "#read" do
     it "reads variables from sysconfig file" do
       for p in FontsConfig::FontsConfigState::preset_list do
-        expect(test_read("test/data/sysconfig-examples/#{p[0]}/etc/sysconfig/fonts-config", p[0])).to be true
+        expect(test_read(p[0])).to be true
       end
     end
-  end
 
-  describe "#read" do
     it "do not crash on sysconfig file without some of PREFER_*_FAMILIES variables" do
-      expect{test_read("test/data/sysconfig-examples/13.1/etc/sysconfig/fonts-config", nil)}.not_to raise_error
+      expect{test_read(nil)}.not_to raise_error
     end
   end
 
   describe "#write" do
     it "writes variables to sysconfig file" do
       for p in FontsConfig::FontsConfigState::preset_list do
-        expect(test_write("/tmp/sysconfig.fonts-config.#{p[0]}", p[0])).to be true
+        expect(test_write(p[0])).to be true
       end
     end
   end
+
 end
 

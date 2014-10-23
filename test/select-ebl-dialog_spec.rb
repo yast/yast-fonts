@@ -1,6 +1,5 @@
 require_relative "spec-helper"
 require "fonts/select-ebl-dialog"
-require "yast"
 
 describe FontsConfig::Languages do
   describe "#languages" do

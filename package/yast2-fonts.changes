@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu Oct 23 12:52:44 UTC 2014 - pgajdos@suse.com
+
+- rewrite Rakefile again and employ chrooted test read and write 
+  (thanks to jreidinger)
+- 3.1.6
+
+-------------------------------------------------------------------
 Thu Oct 23 09:38:54 UTC 2014 - pgajdos@suse.com
 
 - better lcdfilter usage warning

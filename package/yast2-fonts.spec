@@ -17,7 +17,7 @@
 
 
 Name:           yast2-fonts
-Version:        3.1.5
+Version:        3.1.6
 Release:        0
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
@@ -65,7 +65,7 @@ mkdir -p  %{buildroot}%{_libdir}/ruby/vendor_ruby/%{rb_ver}/%{rb_arch}/yast
 install -m 755 src/ext/ft2_rendering/ft2_rendering.so %{buildroot}%{_libdir}/ruby/vendor_ruby/%{rb_ver}/%{rb_arch}/yast
 
 %check
-rake unittest
+rake test:unit
 
 %files
 %defattr(-,root,root)

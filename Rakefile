@@ -6,26 +6,24 @@ Yast::Tasks.configuration do |conf|
   conf.skip_license_check << /.*/
 end
 
-extname = "ft2_rendering"
-
 task :compile do
   #
   # freetype2 binding
   #
   olddir = Dir.pwd
-  Dir.chdir("src/ext/#{extname}")
+  Dir.chdir("src/ext/ft2_rendering")
   ruby 'extconf.rb'
   sh 'make'
   Dir.chdir(olddir)
 end
 
 task :unittest => :compile do
-  FileUtils.ln_s(".", "src/ext/#{extname}/yast") unless FileTest.exist?("src/ext/#{extname}/yast")
+  FileUtils.ln_s(".", "src/ext/#{extname}/yast") unless FileTest.exist?("src/ext/ft2_rendering/yast")
   Rake::Task["test:unit"].invoke
 end
 
 task :manualtest => :compile do
-  FileUtils.ln_s("../ext/#{extname}", "src/lib/yast")  unless FileTest.exists?("src/lib/yast")
+  FileUtils.ln_s("../ext/ft2_rendering", "src/lib/yast")  unless FileTest.exists?("src/lib/yast")
   Rake::Task["run"].invoke
 end
 

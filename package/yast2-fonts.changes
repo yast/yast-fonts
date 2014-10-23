@@ -1,4 +1,13 @@
 -------------------------------------------------------------------
+Thu Oct 23 07:59:38 UTC 2014 - pgajdos@suse.com
+
+- do not crash on sysconfig file without some of PREFER_*_FAMILIES 
+  variables
+- error out before attempt to write sysconfig file and run 
+  fonts-config as non-root user
+- 3.1.4
+
+-------------------------------------------------------------------
 Wed Oct 22 12:54:39 UTC 2014 - pgajdos@suse.com
 
 - warn when installed FreeType2 do not support subpixel rendering

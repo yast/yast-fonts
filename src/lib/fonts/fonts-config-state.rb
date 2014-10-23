@@ -409,73 +409,82 @@ module FontsConfig
    end
 
    def read(sc_path = SC_PATH)
+      # use values from "default" profile in case
+      # some sysconfig variables are missing
+      load_preset("default")
+
       temp = SCR.Read(
               path(sc_path + ".PREFER_SANS_FAMILIES")
              )
-      @fpl["sans-serif"] = temp.split(':')
+      @fpl["sans-serif"] = temp.split(':') unless temp.nil?
 
       temp = SCR.Read(
               path(sc_path + ".PREFER_SERIF_FAMILIES")
              )
-      @fpl["serif"] = temp.split(':')
+      @fpl["serif"] = temp.split(':') unless temp.nil?
 
       temp = SCR.Read(
               path(sc_path + ".PREFER_MONO_FAMILIES")
              )
-      @fpl["monospace"] = temp.split(':')
+      @fpl["monospace"] = temp.split(':') unless temp.nil?
 
       temp = SCR.Read(
                path(sc_path + ".SEARCH_METRIC_COMPATIBLE"),
              )
-      @search_metric_compatible = temp == "yes"
+      @search_metric_compatible = temp == "yes" unless temp.nil?
 
       temp = SCR.Read(
                path(sc_path + ".FORCE_FAMILY_PREFERENCE_LISTS"),
              )
-      @really_force_fpl = temp == "yes"
+      @really_force_fpl = temp == "yes" unless temp.nil?
 
       temp = SCR.Read(
                path(sc_path + ".FORCE_BW"),
              )
-      @force_aa_off = temp == "yes"
+      @force_aa_off = temp == "yes" unless temp.nil?
 
       temp = SCR.Read(
                path(sc_path + ".FORCE_BW_MONOSPACE"),
              )
-      @force_aa_off_mono = temp == "yes"
+      @force_aa_off_mono = temp == "yes" unless temp.nil?
 
       temp = SCR.Read(
                path(sc_path + ".FORCE_AUTOHINT"),
              )
-      @force_ah_on = temp == "yes"
+      @force_ah_on = temp == "yes" unless temp.nil?
 
-      @force_hintstyle = SCR.Read(
-                           path(sc_path + ".FORCE_HINTSTYLE"),
-                         )
+      temp = SCR.Read(
+               path(sc_path + ".FORCE_HINTSTYLE"),
+             )
+      @force_hintstyle = temp unless temp.nil?
 
       temp = SCR.Read(
                path(sc_path + ".USE_EMBEDDED_BITMAPS")
              )
-      @embedded_bitmaps = temp == "yes"
+      @embedded_bitmaps = temp == "yes" unless temp.nil?
 
       temp = SCR.Read(
               path(sc_path + ".EMBEDDED_BITMAPS_LANGUAGES")
              )
-      if (temp == "")
-        @all_ebl = true
-        @ebl = []
-      else
-        @all_ebl = false
-        @ebl = temp.split(':')
+      unless temp.nil?
+        if (temp == "")
+          @all_ebl = true
+          @ebl = []
+        else
+          @all_ebl = false
+          @ebl = temp.split(':')
+        end
       end
 
-      @lcd_filter = SCR.Read(
-                      path(sc_path + ".USE_LCDFILTER"),
-                    )
+      temp = SCR.Read(
+               path(sc_path + ".USE_LCDFILTER"),
+            )
+      @lcd_filter = temp unless temp.nil?
 
-      @subpixel_layout = SCR.Read(
-                           path(sc_path + ".USE_RGBA"),
-                         )
+      temp = SCR.Read(
+               path(sc_path + ".USE_RGBA"),
+             )
+      @subpixel_layout = temp unless temp.nil?
    end
   end
 end

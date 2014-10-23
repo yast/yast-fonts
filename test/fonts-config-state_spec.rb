@@ -26,7 +26,7 @@ describe FontsConfig::FontsConfigState do
             term(:ag_ini, term(:SysConfigFile, filepath)))
     fcstate = FontsConfig::FontsConfigState.new
     fcstate.read(".test.sysconfig.fonts-config")
-    ret = preset_loaded(fcstate, preset)
+    ret = preset_loaded(fcstate, preset) unless preset.nil?
     Yast::SCR.UnregisterAgent(path(".test.sysconfig.fonts-config"))
     return ret
   end
@@ -82,6 +82,12 @@ describe FontsConfig::FontsConfigState do
       for p in FontsConfig::FontsConfigState::preset_list do
         expect(test_read("test/data/sysconfig-examples/#{p[0]}/etc/sysconfig/fonts-config", p[0])).to be true
       end
+    end
+  end
+
+  describe "#read" do
+    it "do not crash on sysconfig file without some of PREFER_*_FAMILIES variables" do
+      expect{test_read("test/data/sysconfig-examples/13.1/etc/sysconfig/fonts-config", nil)}.not_to raise_error
     end
   end
 

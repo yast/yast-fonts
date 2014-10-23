@@ -20,7 +20,7 @@ task :compile do
 end
 
 task :unittest => :compile do
-  FileUtils.ln_s(".", "src/ext/#{extname}/yast") unless FileTest.exist?("yast")
+  FileUtils.ln_s(".", "src/ext/#{extname}/yast") unless FileTest.exist?("src/ext/#{extname}/yast")
   Rake::Task["test:unit"].invoke
 end
 

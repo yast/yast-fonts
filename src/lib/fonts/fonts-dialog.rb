@@ -343,8 +343,12 @@ module FontsConfig
         Yast.import "Popup"
         text = _("You have set LCD filter type (%s).") % @fcstate.lcd_filter +
                _(" This needs subpixel rendering capabality\ncompiled" +
-                 " in FreeType library. Unfortunately, we can not ship" + 
-                 " it due patent reasons.\n") 
+                 " in FreeType library.") +
+               _(" Unfortunately, we can not ship it due patent reasons.\n\n") +
+               _("Further reading:\n") +
+               _("http://david.freetype.org/cleartype-patents.html\n") +
+               _("http://www.freetype.org/freetype2/docs/reference/ft2-lcd_filtering.html\n")
+               
         Popup.Warning(text)
       end
     end

@@ -24,7 +24,7 @@ task :unittest => :compile do
   Rake::Task["test:unit"].invoke
 end
 
-task :test => :compile do
+task :manualtest => :compile do
   FileUtils.ln_s("../ext/#{extname}", "src/lib/yast")  unless FileTest.exists?("src/lib/yast")
   Rake::Task["run"].invoke
 end

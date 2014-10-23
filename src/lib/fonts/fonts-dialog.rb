@@ -349,6 +349,17 @@ module FontsConfig
       end
     end
 
+    def root_user?
+      if (Process.uid != 0)
+        Yast.import "Popup"
+        text = _("root user privileges are required to save and apply font settings.")
+        Popup.Error(text)
+        return false
+      end
+
+      return true
+    end
+
     def widgets
       help = FontsConfigDialogHelp.new
       widgets_description = {
@@ -667,35 +678,37 @@ module FontsConfig
  
       case ret
         when :next
-          y2milestone("saving configuration")
+          if (root_user?)
+            y2milestone("saving configuration")
 
-          y2milestone("performing installation summary check")
-          installation_summary_check
+            y2milestone("performing installation summary check")
+            installation_summary_check
 
-          y2milestone("issue freetype subpixel rendering warning if applicable")
-          subpixel_freetype_warning
+            y2milestone("issue freetype subpixel rendering warning if applicable")
+            subpixel_freetype_warning
 
-          Progress.New(
-            _("Writing Font Configuration"),
-            " ",
-            2,
-            [ _("Write sysconfig file"),
-              _("Run fonts-config") ],
-            [ _("Writing sysconfig file..."),
-              _("Running fonts-config...") ],
-            ""
-          )
+            Progress.New(
+              _("Writing Font Configuration"),
+              " ",
+              2,
+              [ _("Write sysconfig file"),
+                _("Run fonts-config") ],
+              [ _("Writing sysconfig file..."),
+                _("Running fonts-config...") ],
+              ""
+            )
 
-          Progress.NextStage 
-          y2milestone("writing /etc/sysconfig/fonts-config")
-          @fcstate.write
-          y2milestone("written: " + @fcstate.to_s)
-          Progress.NextStage
-          y2milestone("running fonts-config")
-          FontsConfigCommand::run_fonts_config
-          Progress.Finish
-          y2milestone("module finished")
-        when :abort
+            Progress.NextStage 
+            y2milestone("writing /etc/sysconfig/fonts-config")
+            @fcstate.write
+            y2milestone("written: " + @fcstate.to_s)
+            Progress.NextStage
+            y2milestone("running fonts-config")
+            FontsConfigCommand::run_fonts_config
+            Progress.Finish
+            y2milestone("module finished")
+         end
+       when :abort
          y2milestone("aborted, do not save configuration")
       end
       Wizard.CloseDialog

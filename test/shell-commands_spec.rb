@@ -32,6 +32,10 @@ describe FontsConfig::FontconfigCommands do
       family = FontsConfig::FontconfigCommands::is_family_installed("foo")
       expect(family).to be false
     end
+
+    it "returns true when family is installed" do
+      expect(FontsConfig::FontconfigCommands::is_family_installed(an_installed_family()))
+    end    
   end
 
   describe "#installed_families" do
@@ -41,15 +45,7 @@ describe FontsConfig::FontconfigCommands do
       expect(families.length).to be > 0
       expect(are_installed(families)).to be true
     end
-  end
 
-  describe "#is_family_installed" do
-    it "returns true when family is installed" do
-      expect(FontsConfig::FontconfigCommands::is_family_installed(an_installed_family()))
-    end    
-  end
-
-  describe "#installed_families" do
     it "understands important fontconfig pattern entries" do
       entries = ["family", "fontformat"]
       families = FontsConfig::FontconfigCommands::installed_families(entries.join(" "))
@@ -65,6 +61,7 @@ describe FontsConfig::FontsConfigCommand do
         expect(FontsConfig::FontsConfigCommand::run_fonts_config).to be false
       end
     end
+
     it "no error popup when run under root" do
       if (Process.uid == 0)
         expect(FontsConfig::FontsConfigCommand::run_fonts_config).to be true

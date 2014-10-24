@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Oct 24 16:41:08 UTC 2014 - pgajdos@suse.com
+
+- fix internal error
+- 3.1.8
+
+-------------------------------------------------------------------
 Fri Oct 24 16:30:55 UTC 2014 - pgajdos@suse.com
 
 - implemented some suggestions for tests

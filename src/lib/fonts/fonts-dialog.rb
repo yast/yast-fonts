@@ -150,7 +150,7 @@ module FontsConfig
 
     def initialize_familylist_widget(key)
       items = []
-      @fcstate.fpl[@current_fpl].each do |p|
+      @fcstate.fpl[@current_fpl].each do |f|
         indication = FontconfigCommands::is_family_installed(f) ?
                        _("installed") : _("not installed")
         items.push(Item(f, indication));

@@ -19,9 +19,9 @@ describe FontsConfig::Languages do
   describe "#names" do
     it "returns list of names for given ISO 639-1 codes" do
       lgs = FontsConfig::Languages.languages
-      codes = lgs.keys
-      names = lgs.values
-      expect(names == FontsConfig::Languages.names(codes))
+      codes = ["cs", "de"]
+      names = ["Czech", "German"]
+      expect(FontsConfig::Languages.names(codes)).to eq names
     end
   end
 end

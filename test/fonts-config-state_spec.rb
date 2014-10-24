@@ -6,17 +6,13 @@ describe FontsConfig::FontsConfigState do
 
   def preset_loaded?(fcstate, preset)
     dp = FontsConfig::FontsConfigState::PRESETS[preset]
-    return fcstate.fpl == dp["fpl"] &&
-           fcstate.search_metric_compatible == dp["search_metric_compatible"] && 
-           fcstate.really_force_fpl == dp["really_force_fpl"] &&
-           fcstate.force_aa_off == dp["force_aa_off"] &&
-           fcstate.force_aa_off_mono == dp["force_aa_off_mono"] &&
-           fcstate.force_ah_on == dp["force_ah_on"] &&
-           fcstate.force_hintstyle == dp["force_hintstyle"] &&
-           fcstate.embedded_bitmaps == dp["embedded_bitmaps"] &&
-           fcstate.all_ebl == dp["all_ebl"] &&
-           fcstate.lcd_filter == dp["lcd_filter"] && 
-           fcstate.subpixel_layout == dp["subpixel_layout"]
+    attrs =  dp.keys
+    attrs.delete("name")
+    attrs.delete("help")
+    attrs.each do |attr|
+      return false if fcstate.instance_variable_get("@" + attr) != dp[attr]
+    end
+    return true
   end
 
   def test_read(preset)

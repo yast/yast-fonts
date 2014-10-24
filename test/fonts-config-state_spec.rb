@@ -4,7 +4,7 @@ require "fonts/fonts-config-state"
 describe FontsConfig::FontsConfigState do
   include Yast
 
-  def preset_loaded(fcstate, preset)
+  def preset_loaded?(fcstate, preset)
     dp = FontsConfig::FontsConfigState::PRESETS[preset]
     return fcstate.fpl == dp["fpl"] &&
            fcstate.search_metric_compatible == dp["search_metric_compatible"] && 
@@ -27,7 +27,7 @@ describe FontsConfig::FontsConfigState do
 
     fcstate = FontsConfig::FontsConfigState.new
     fcstate.read
-    ret = preset_loaded(fcstate, preset) unless preset.nil?
+    ret = (preset.nil? ? true : preset_loaded?(fcstate, preset))
 
     Yast::WFM.SCRClose(scr_handle) 
     return ret
@@ -43,10 +43,10 @@ describe FontsConfig::FontsConfigState do
     fcstate.load_preset(preset)
     fcstate.write
     fcstate.read
-    ret = preset_loaded(fcstate, preset)
+    ret = preset_loaded?(fcstate, preset)
 
     Yast::WFM.SCRClose(scr_handle) 
-    return true
+    return ret
   end
 
   describe "#load_preset" do
@@ -54,7 +54,7 @@ describe FontsConfig::FontsConfigState do
       fcstate = FontsConfig::FontsConfigState.new
       FontsConfig::FontsConfigState::PRESETS.keys.each do |k|
         fcstate.load_preset(k)
-        preset_loaded(fcstate, k)
+        preset_loaded?(fcstate, k)
       end
     end
   end
@@ -62,7 +62,7 @@ describe FontsConfig::FontsConfigState do
   describe "#initialize" do
     it "loads `unset' profile" do
       fcstate = FontsConfig::FontsConfigState.new
-      expect(preset_loaded(fcstate, "unset")).to be true
+      expect(preset_loaded?(fcstate, "unset")).to be true
     end
   end
 

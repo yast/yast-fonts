@@ -52,7 +52,7 @@ describe FontsConfig::FontsConfigState do
   describe "#load_preset" do
     it "loads given preset" do
       fcstate = FontsConfig::FontsConfigState.new
-      for k in FontsConfig::FontsConfigState::PRESETS.keys do
+      FontsConfig::FontsConfigState::PRESETS.keys.each do |k|
         fcstate.load_preset(k)
         preset_loaded(fcstate, k)
       end
@@ -68,7 +68,7 @@ describe FontsConfig::FontsConfigState do
 
   describe "#preset_list" do
     it "returns list of preset ids" do
-      for p in FontsConfig::FontsConfigState::preset_list do
+      FontsConfig::FontsConfigState::preset_list.each do |p|
         expect(FontsConfig::FontsConfigState::preset?(p[0])).to be true
       end
     end
@@ -76,7 +76,7 @@ describe FontsConfig::FontsConfigState do
 
   describe "#preset?" do
     it "returns true when argument is a preset" do
-      for p in FontsConfig::FontsConfigState::preset_list do
+      FontsConfig::FontsConfigState::preset_list.each do |p|
         expect(FontsConfig::FontsConfigState::preset?(p[0])).to be true
       end
     end
@@ -84,7 +84,7 @@ describe FontsConfig::FontsConfigState do
 
   describe "#read" do
     it "reads variables from sysconfig file" do
-      for p in FontsConfig::FontsConfigState::preset_list do
+      FontsConfig::FontsConfigState::preset_list.each do |p|
         expect(test_read(p[0])).to be true
       end
     end
@@ -96,7 +96,7 @@ describe FontsConfig::FontsConfigState do
 
   describe "#write" do
     it "writes variables to sysconfig file" do
-      for p in FontsConfig::FontsConfigState::preset_list do
+      FontsConfig::FontsConfigState::preset_list.each do |p|
         expect(test_write(p[0])).to be true
       end
     end

@@ -19,7 +19,7 @@ module FontsConfig
       result = Yast::SCR.Execute(BASH_SCR_PATH, cmd)
       if (result["exit"].zero?)
         families = result["stdout"].split("\n")
-        for bf in BLACKLIST_FAMILIES do
+        BLACKLIST_FAMILIES.each do |bf|
           families.delete_if{|f| f =~ /#{bf}/}
         end
         return families

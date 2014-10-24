@@ -134,7 +134,7 @@ module FontsConfig
 
     def initialize_genericaliases_table(key)
       items = []
-      for a in @fcstate.fpl.keys do
+      @fcstate.fpl.keys.each do |a|
         items.push(Item(a)); 
       end
       UI.ChangeWidget(Id("tbl_generic_aliases"), 
@@ -150,7 +150,7 @@ module FontsConfig
 
     def initialize_familylist_widget(key)
       items = []
-      for f in @fcstate.fpl[@current_fpl] do
+      @fcstate.fpl[@current_fpl].each do |p|
         indication = FontconfigCommands::is_family_installed(f) ?
                        _("installed") : _("not installed")
         items.push(Item(f, indication));
@@ -291,7 +291,7 @@ module FontsConfig
 
     def installed_families_from(family_list)
       installed = []
-      for f in family_list do
+      family_list.each do |f|
         if FontconfigCommands::is_family_installed(f)
           installed << f
         end
@@ -302,7 +302,7 @@ module FontsConfig
     def installation_summary_check
       installed = Hash.new
       not_installed_for_aliases = []
-      for a in @fcstate.fpl.keys
+      @fcstate.fpl.keys.each do |a|
         installed[a] = 
           installed_families_from(@fcstate.fpl[a])
         if (installed[a].empty? &&
@@ -319,9 +319,9 @@ module FontsConfig
                  "no effect.")
         summary = ""
         summary += "<table>"
-        for a in @fcstate.fpl.keys
+        @fcstate.fpl.keys.each do |a|
           summary += "<tr><td><h3>#{a}</h3></td></tr>"
-          for f in @fcstate.fpl[a]
+          @fcstate.fpl[a].each do |f|
             indication = FontconfigCommands::is_family_installed(f) ? 
                          "<font color=\"green\">installed</font>" :
                          "<font color=\"red\">not installed</font>";

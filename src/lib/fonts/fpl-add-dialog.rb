@@ -16,8 +16,8 @@ module FontsConfig
       @available_families = FontconfigCommands::installed_families("family fontformat")
       # delete families, that are part of list for some alias
       if (@available_families)
-        for key in @fcstate.fpl.keys do
-          for family in  @fcstate.fpl[key] do
+         @fcstate.fpl.keys.each do |key|
+          @fcstate.fpl[key] do |family|
             if (@available_families.index(family))
               @available_families.delete_if{|f| f =~ /#{family}/}
             end

@@ -3,7 +3,7 @@ require "fonts/shell-commands"
 
 describe FontsConfig::FontconfigCommands do
   def are_installed(families)
-    for family in families do
+    families.each do |family|
       if (!FontsConfig::FontconfigCommands::is_family_installed(family))
         return false
       end
@@ -17,8 +17,8 @@ describe FontsConfig::FontconfigCommands do
 
   def contain_pattern_entries(families, entries)
     entries.delete("family")
-    for family in families do
-      for entry in entries do
+    families.each do |family|
+      entries.each do |entry|
         if (!family.include?(entry + "="))
           return false
         end

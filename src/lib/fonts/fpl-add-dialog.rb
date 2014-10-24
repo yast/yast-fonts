@@ -17,7 +17,7 @@ module FontsConfig
       # delete families, that are part of list for some alias
       if (@available_families)
          @fcstate.fpl.keys.each do |key|
-          @fcstate.fpl[key] do |family|
+          @fcstate.fpl[key].each do |family|
             if (@available_families.index(family))
               @available_families.delete_if{|f| f =~ /#{family}/}
             end

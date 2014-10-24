@@ -354,7 +354,7 @@ module FontsConfig
     end
 
     def root_user?
-      if (Process.uid != 0)
+      if (Process.euid != 0)
         Yast.import "Popup"
         text = _("root user privileges are required to save and apply font settings.")
         Popup.Error(text)

@@ -54,16 +54,19 @@ describe FontsConfig::SelectEBLDialog do
     mock_dialog("btn_ok", [])
     expect(ebld.run([])).to eq []
   end
+
   it "returns languages selected before dialog run when no changes made" do
     ebld = FontsConfig::SelectEBLDialog.new
     mock_dialog("btn_ok", ["ab", "zh-SG", "zu"])
     expect(ebld.run(["ab", "zh-SG", "zu"])).to eq ["ab", "zh-SG", "zu"]
   end
+
   it "returns languages selected in the dialog" do
     ebld = FontsConfig::SelectEBLDialog.new
     mock_dialog("btn_ok", ["rw", "zh-SG", "mt", "ms"])
     expect(ebld.run(["ab", "zh-SG", "zu"])).to eq ["rw", "zh-SG", "mt", "ms"]
   end
+
   it "returns languages selected before dialog run when dialog canceled" do
     ebld = FontsConfig::SelectEBLDialog.new
     mock_dialog("btn_cancel", ["rw", "zh-SG", "mt", "ms"])

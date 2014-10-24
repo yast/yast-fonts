@@ -6,11 +6,14 @@ require "fonts/select-ebl-dialog"
 require "fonts/shell-commands"
 require "fonts/rich-text-dialog"
 
+require "yast/ft2_rendering"
+
 module FontsConfig
   class FontsConfigDialog
     include Yast
     include UIShortcuts
     include I18n
+    include Ft2Rendering
 
     def initialize
       @fcstate = FontsConfigState.new
@@ -21,6 +24,8 @@ module FontsConfig
     def self.run
       fontsconfig_dialog = FontsConfigDialog.new
       fontsconfig_dialog.run
+      # for testsuite
+      return @fcstate
     end
 
     def run
@@ -43,7 +48,7 @@ module FontsConfig
     def initialize_aamonooff_checkbox(key)
       UI.ChangeWidget(Id("chkb_aa_mono_off"), :Value,
                       @fcstate.force_aa_off_mono)
-      UI.ChangeWidget(Id("chkb_aa_mono_off"), :Enabled, !@fcstate.force_aa_off)
+      UI.ChangeWidget(Id("chkb_aa_mono_off"), :Enabled, !@fcstate.force_aa_off_mono)
     end
 
     def handle_aaoffmono_checkbox(key, map)
@@ -103,11 +108,14 @@ module FontsConfig
                       FontsConfigState::LCD_FILTERS)
       UI.ChangeWidget(Id("cmb_lcd_filter"), :Value, 
                       @fcstate.lcd_filter)
+      UI.ChangeWidget(Id("cmb_subpixel_layout"), :Enabled,
+           @fcstate.lcd_filter != FontsConfigState::LCD_FILTERS[0])
     end
 
     def handle_lcdfilter_combo(key, map)
       @fcstate.lcd_filter =
         UI.QueryWidget(Id("cmb_lcd_filter"), :Value)
+      initialize_lcdfilter_combo("")
       return nil
     end
 
@@ -260,22 +268,22 @@ module FontsConfig
     end
 
     def handle_presets_button(widget, event)
-      if event["EventType"] == "MenuEvent" && 
-           FontsConfigState::is_preset(event["ID"]) != nil
+      if event && event["EventType"] == "MenuEvent" && 
+           FontsConfigState::preset?(event["ID"])
         @fcstate.load_preset(event["ID"])
         if CWMTab.CurrentTab == "algorithms"
-          initialize_aaoffcheck_box("")
+          initialize_aaoff_checkbox("")
           initialize_aamonooff_checkbox("")
           initialize_ahon_checkbox("")
-          initialize_searchmc_checkbox("")
-          initialize_noother_checkbox("")
           initialize_hintstyle_combo("")
           initialize_lcdfilter_combo("")
           initialize_subpixellayout_combo("")
+          initialize_embeddedbitmaps_widget("")
         else
           initialize_genericaliases_table("")
           initialize_familylist_widget("")
-          initialize_embeddedbitmaps_widget("")
+          initialize_searchmc_checkbox("")
+          initialize_noother_checkbox("")
         end
       end
       return nil
@@ -328,19 +336,37 @@ module FontsConfig
       end
     end
 
-    def run_dialog
-      Yast.import "UI"
-      Yast.import "CWM"
-      Yast.import "CWMTab"
-      Yast.import "HTML"
-      Yast.import "Icon"
-      Yast.import "Label"
-      Yast.import "Wizard"
-      Yast.import "Progress"
+    def subpixel_freetype_warning
+      if (@fcstate.lcd_filter != FontsConfigState::LCD_FILTERS[0] &&
+          (ft2_have_freetype &&
+           !ft2_have_subpixel_rendering))
+        Yast.import "Popup"
+        text = _("You have set LCD filter type (%s).") % @fcstate.lcd_filter +
+               _(" This needs subpixel rendering capabality\ncompiled" +
+                 " in FreeType library.") +
+               _(" Unfortunately, we can not ship it due patent reasons.\n\n") +
+               _("Further reading:\n") +
+               _("http://david.freetype.org/cleartype-patents.html\n") +
+               _("http://www.freetype.org/freetype2/docs/reference/ft2-lcd_filtering.html\n")
+               
+        Popup.Warning(text)
+      end
+    end
 
+    def root_user?
+      if (Process.uid != 0)
+        Yast.import "Popup"
+        text = _("root user privileges are required to save and apply font settings.")
+        Popup.Error(text)
+        return false
+      end
+
+      return true
+    end
+
+    def widgets
       help = FontsConfigDialogHelp.new
-
-      @widgets_description = {
+      widgets_description = {
         "chkb_aa_off" => {
           "widget"        => :checkbox,
           "label"         => _("Turn &Antialiasing Off"),
@@ -523,7 +549,7 @@ module FontsConfig
         },
       }
 
-      @tabs_description = {
+      tabs_description = {
         "algorithms" => {
           "header"       => _("&Rendering"),
           "contents"     => 
@@ -587,16 +613,16 @@ module FontsConfig
         },
       }
 
-      @widgets_description["tabs_fonts_configuration"] = CWMTab.CreateWidget(
+      widgets_description["tabs_fonts_configuration"] = CWMTab.CreateWidget(
           {
             "tab_order"    => ["algorithms", "families"],
-            "tabs"         => @tabs_description,
-            "widget_descr" => @widgets_description,
+            "tabs"         => tabs_description,
+            "widget_descr" => widgets_description,
             "initial_tab"  => "families"
           }
         )
 
-      @widgets_description["btn_presets"] = {
+      widgets_description["btn_presets"] = {
           "widget"        => :menu_button,
           "opt"           => [ :notify, :immediate ],
           "label"         => _("&Presets"),
@@ -605,7 +631,21 @@ module FontsConfig
                                      "symbol (string, map)"),
           "help"          => help.font_configuration_module
         }
+  
+      widgets_description
+    end
 
+    def run_dialog
+      Yast.import "UI"
+      Yast.import "CWM"
+      Yast.import "CWMTab"
+      Yast.import "HTML"
+      Yast.import "Icon"
+      Yast.import "Label"
+      Yast.import "Wizard"
+      Yast.import "Progress"
+
+      widgets_description = widgets
 
       y2milestone("module started")
       Wizard.CreateDialog
@@ -621,7 +661,7 @@ module FontsConfig
 
       Progress.NextStage
       y2milestone("reading /etc/sysconfig/fonts-config")
-      @fcstate.Read
+      @fcstate.read
       y2milestone("read: " + @fcstate.to_s)
       Progress.Finish
 
@@ -629,7 +669,7 @@ module FontsConfig
       ret = CWM.ShowAndRun(
         {
           "widget_names"       => [ "btn_presets", "tabs_fonts_configuration" ],
-          "widget_descr"       => @widgets_description,
+          "widget_descr"       => widgets_description,
           "contents"           => VBox(HBox(HStretch(), "btn_presets"),
                                   "tabs_fonts_configuration"),
           "caption"            => _("Font Configuration"),
@@ -638,37 +678,44 @@ module FontsConfig
           "back_button"        => "",
         }
       )
-      
+     
+ 
       case ret
         when :next
-          y2milestone("saving configuration")
+          if (root_user?)
+            y2milestone("saving configuration")
 
-          y2milestone("performing installation summary check")
-          installation_summary_check
+            y2milestone("performing installation summary check")
+            installation_summary_check
 
-          Progress.New(
-            _("Writing Font Configuration"),
-            " ",
-            2,
-            [ _("Write sysconfig file"),
-              _("Run fonts-config") ],
-            [ _("Writing sysconfig file..."),
-              _("Running fonts-config...") ],
-            ""
-          )
+            y2milestone("issue freetype subpixel rendering warning if applicable")
+            subpixel_freetype_warning
 
-          Progress.NextStage 
-          y2milestone("writing /etc/sysconfig/fonts-config")
-          @fcstate.Write
-          y2milestone("written: " + @fcstate.to_s)
-          Progress.NextStage
-          y2milestone("running fonts-config")
-          FontsConfigCommand::run_fonts_config
-          Progress.Finish
-          y2milestone("module finished")
-        when :abort
+            Progress.New(
+              _("Writing Font Configuration"),
+              " ",
+              2,
+              [ _("Write sysconfig file"),
+                _("Run fonts-config") ],
+              [ _("Writing sysconfig file..."),
+                _("Running fonts-config...") ],
+              ""
+            )
+
+            Progress.NextStage 
+            y2milestone("writing /etc/sysconfig/fonts-config")
+            @fcstate.write
+            y2milestone("written: " + @fcstate.to_s)
+            Progress.NextStage
+            y2milestone("running fonts-config")
+            FontsConfigCommand::run_fonts_config
+            Progress.Finish
+            y2milestone("module finished")
+         end
+       when :abort
          y2milestone("aborted, do not save configuration")
       end
+      Wizard.CloseDialog
     end
   end
 
@@ -680,16 +727,25 @@ module FontsConfig
     def initialize
       Yast.import "UI"
       @fcstate = FontsConfigState.new
+      @fcstate.load_preset("default")
     end
 
     def font_configuration_module
-      _("<h1>Font Configuration Module</h1>") +
+      Yast.import "String"
+      presets = FontsConfigState::PRESETS
+      _("<h1>Font Configuraution Module</h1>") +
       _("<p>Module to control system wide font rendering setting.</p>") +
-      _("<p>Use <b>Presets</b> button to choose predefined profiles.</p>")
+      _("<p>Use <b>Presets</b> button to choose predefined profiles: <ul>") +
+      presets.keys.drop(1).map do |preset|
+        _("<li><b>#{presets[preset]["name"]}: </b>#{presets[preset]["help"]}</li>")
+      end.join + "</ul>" +
+      _("Every single item there just fills appropriate setting in both tabs. ") +
+      _("That setting can be later arbitrarily customized in depth by respective ") +
+      _("individual fields of both tabs.</p>")
     end
 
     def antialiasing
-      _("<h2>Rendering</h2>") +
+      _("<h2 id=\"tab_help\">Rendering Tab</h2>") +
       _("<p>This tab controls <b>how</b> fonts are rendered.") +
       _(" It allows you to amend font rendering algorithms to be used and change their options.</p>") +
       _("<h3>Antialiasing</h3>") +
@@ -724,7 +780,7 @@ module FontsConfig
     end
 
     def family_preferences
-      _("<h2>Prefered Families</h2>") +
+      _("<h2>Prefered Families Tab</h2>") +
       _("<p>This tab controls <b>which</b> fonts are rendered.</p>") +
       _("<h3>Preference Lists</h3>") +
       _("<p>Family preference lists (FPL) for generic aliases (%s) can be defined.") % @fcstate.fpl.keys.join(', ') +

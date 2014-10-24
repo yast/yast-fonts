@@ -17,9 +17,8 @@
 
 
 Name:           yast2-fonts
-Version:        3.1.0
+Version:        3.1.6
 Release:        0
-BuildArch:      noarch
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 Source0:        %{name}-%{version}.tar.bz2
@@ -34,6 +33,13 @@ BuildRequires:  yast2-ruby-bindings >= 1.2.0
 BuildRequires:  yast2-devtools >= 1.2.0
 BuildRequires:  yast2 >= 3.0.5
 BuildRequires:  rubygem-yast-rake
+# ft2_rendering extension
+BuildRequires:  freetype2-devel
+BuildRequires:  ruby-devel
+# for testing
+BuildRequires:  rubygem-rspec
+BuildRequires:  dejavu-fonts
+BuildRequires:  fonts-config
 
 Summary:        YaST2 - Fonts Configuration
 Group:          System/YaST
@@ -41,25 +47,37 @@ License:        GPL-2.0+
 Url:            https://github.com/yast/yast-fonts
 
 %description
-Module for configuring X11 fonts able to select prefered font families
+Module for configuring X11 fonts able to select preferred font families
 as well as set rendering algorithms to be used.
 
 
 %prep
 %setup -n %{name}-%{version}
 
+%build
+# build FreeType2 ruby binding
+rake compile
+
 %install
 rake install DESTDIR="%{buildroot}"
+# install FreeType2 ruby binding
+mkdir -p  %{buildroot}%{_libdir}/ruby/vendor_ruby/%{rb_ver}/%{rb_arch}/yast
+install -m 755 src/ext/ft2_rendering/ft2_rendering.so %{buildroot}%{_libdir}/ruby/vendor_ruby/%{rb_ver}/%{rb_arch}/yast
+
+%check
+rake test:unit
 
 %files
 %defattr(-,root,root)
 %dir %{yast_libdir}/fonts
 %{yast_libdir}/fonts/*.rb
+%{_libdir}/ruby/vendor_ruby/%{rb_ver}/%{rb_arch}/yast/ft2_rendering.so
 %{yast_clientdir}/fonts.rb
 %{yast_desktopdir}/fonts.desktop
 %{yast_scrconfdir}/*.scr
 %dir %{yast_docdir}
 %doc %{yast_docdir}/CONTRIBUTING.md
 %doc %{yast_docdir}/COPYING
+%doc %{yast_docdir}/README.md
 
 %changelog

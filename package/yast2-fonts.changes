@@ -1,6 +1,46 @@
 -------------------------------------------------------------------
+Thu Oct 23 12:52:44 UTC 2014 - pgajdos@suse.com
+
+- rewrite Rakefile again and employ chrooted test read and write 
+  (thanks to jreidinger)
+- 3.1.6
+
+-------------------------------------------------------------------
+Thu Oct 23 09:38:54 UTC 2014 - pgajdos@suse.com
+
+- better lcdfilter usage warning
+- 3.1.5
+
+-------------------------------------------------------------------
+Thu Oct 23 07:59:38 UTC 2014 - pgajdos@suse.com
+
+- do not crash on sysconfig file without some of PREFER_*_FAMILIES 
+  variables
+- error out before attempt to write sysconfig file and run 
+  fonts-config as non-root user
+- 3.1.4
+
+-------------------------------------------------------------------
+Wed Oct 22 12:54:39 UTC 2014 - pgajdos@suse.com
+
+- warn when installed FreeType2 do not support subpixel rendering
+- 3.1.3
+
+-------------------------------------------------------------------
+Mon Oct 20 15:05:52 UTC 2014 - pgajdos@suse.com
+
+- added subpixel rendering profile
+- 3.1.2
+
+-------------------------------------------------------------------
+Thu Aug 21 08:53:49 UTC 2014 - pgajdos@suse.com
+
+- added test suite
+- 3.1.1
+
+-------------------------------------------------------------------
 Wed Jun 11 13:13:19 UTC 2014 - pgajdos@suse.com
 
-- initial version 3.0.0
+- initial version 3.1.0
 
 

@@ -1,3 +1,5 @@
+require "yast"
+
 module FontsConfig
   class Languages
       LANGUAGES = {
@@ -196,7 +198,7 @@ module FontsConfig
           "zu" => "Zulu",
         }
 
-    def self.languages()
+    def self.languages
       LANGUAGES
     end
 

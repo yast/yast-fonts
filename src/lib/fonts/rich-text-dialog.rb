@@ -1,3 +1,5 @@
+require "yast"
+
 module FontsConfig
   class RichTextDialog
     include Yast

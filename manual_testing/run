@@ -1,3 +1,0 @@
-#! /bin/sh
-export Y2DIR=../src
-/usr/sbin/yast2 fonts

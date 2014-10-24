@@ -1,6 +1,5 @@
 require "yast"
 
-
 module FontsConfig
   BASH_SCR_PATH = Yast::Path.new(".target.bash_output")
 
@@ -50,3 +49,4 @@ module FontsConfig
     end
   end
 end
+

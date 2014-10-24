@@ -16,6 +16,7 @@ describe FontsConfig::Languages do
       expect(lgs["nb"]).to eq "Norwegian Bokmål"
     end
   end
+
   describe "#names" do
     it "returns list of names for given ISO 639-1 codes" do
       lgs = FontsConfig::Languages.languages

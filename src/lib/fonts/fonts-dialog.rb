@@ -7,6 +7,7 @@ require "fonts/shell-commands"
 require "fonts/rich-text-dialog"
 
 require "yast/ft2_rendering"
+require "yast/fontconfig_setting"
 
 module FontsConfig
   class FontsConfigDialog
@@ -14,6 +15,7 @@ module FontsConfig
     include UIShortcuts
     include I18n
     include Ft2Rendering
+    include FontconfigSetting
 
     def initialize
       @fcstate = FontsConfigState.new
@@ -151,7 +153,7 @@ module FontsConfig
     def initialize_familylist_widget(key)
       items = []
       @fcstate.fpl[@current_fpl].each do |f|
-        indication = FontconfigCommands::is_family_installed(f) ?
+        indication = fc_is_family_installed(f) ?
                        _("installed") : _("not installed")
         items.push(Item(f, indication));
       end
@@ -292,7 +294,7 @@ module FontsConfig
     def installed_families_from(family_list)
       installed = []
       family_list.each do |f|
-        if FontconfigCommands::is_family_installed(f)
+        if fc_is_family_installed(f)
           installed << f
         end
       end
@@ -322,7 +324,7 @@ module FontsConfig
         @fcstate.fpl.keys.each do |a|
           summary += "<tr><td><h3>#{a}</h3></td></tr>"
           @fcstate.fpl[a].each do |f|
-            indication = FontconfigCommands::is_family_installed(f) ? 
+            indication = fc_is_family_installed(f) ? 
                          "<font color=\"green\">installed</font>" :
                          "<font color=\"red\">not installed</font>";
             summary += "<tr><td>#{f}</td><td>#{indication}</td></tr>"

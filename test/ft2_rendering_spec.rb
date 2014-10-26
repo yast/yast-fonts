@@ -12,7 +12,7 @@ describe Ft2Rendering do
 
   describe "#ft2_have_subpixel_rendering" do
     it "do not raise" do
-      expect(ft2_have_subpixel_rendering).to_not raise_error
+      expect{ft2_have_subpixel_rendering}.to_not raise_error
     end	
   end
 end

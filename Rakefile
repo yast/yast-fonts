@@ -7,36 +7,38 @@ Yast::Tasks.configuration do |conf|
 end
 
 task :compile do
-  #
-  # freetype2 binding
-  #
   olddir = Dir.pwd
-  Dir.chdir("src/ext/ft2_rendering")
-  ruby 'extconf.rb'
-  sh 'make'
-  Dir.chdir(olddir)
+  ["ft2_rendering", "fontconfig_setting"].each do |ext|
+    Dir.chdir("src/ext/#{ext}")
+    ruby 'extconf.rb'
+    sh 'make'
+    Dir.chdir(olddir)
+  end
 end
 
 namespace :test do
   task :prepare => :compile do
     # let yast know where ft2_rendering extension is
-    ln_s("../ext/ft2_rendering", "src/lib/yast")  unless FileTest.exists?("src/lib/yast")
+    mkdir_p "src/lib/yast"
+    ["ft2_rendering", "fontconfig_setting"].each do |ext|
+      ln_sf("../../ext/#{ext}/#{ext}.so", "src/lib/yast/#{ext}.so")
+    end
   end
 
   task :unit => :prepare do
-    rm("src/lib/yast") if FileTest.exists?("src/lib/yast")
+    rm_r("src/lib/yast") if FileTest.exists?("src/lib/yast")
   end
 end
 
 task :run => "test:prepare" do
-  rm("src/lib/yast") if FileTest.exists?("src/lib/yast")
+  rm_r("src/lib/yast") if FileTest.exists?("src/lib/yast")
 end
 
 task :clean do
-  FileUtils.rm_f("src/ext/ft2_rendering/ft2_rendering.so")
-  FileUtils.rm_f("src/ext/ft2_rendering/ft2-rendering.o")
-  FileUtils.rm_f("src/ext/ft2_rendering/Makefile")
-  FileUtils.rm_f("src/ext/ft2_rendering/yast")
-  FileUtils.rm_f("src/lib/yast")
+  rm_f("src/ext/*/*.so")
+  rm_f("src/ext/*/*.o")
+  rm_f("src/ext/*/Makefile")
+  rm_f("src/ext/*/yast")
+  rm_rf("src/lib/yast")
 end
 

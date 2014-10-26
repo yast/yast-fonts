@@ -1,8 +1,11 @@
+require "yast/fontconfig_setting"
+
 module FontsConfig
   class FPLAddDialog
     include Yast
     include UIShortcuts
     include I18n
+    include FontconfigSetting
 
     BLACKLIST = [
       "micro.pcf",
@@ -13,7 +16,7 @@ module FontsConfig
 
     def initialize(fcstate)
       @fcstate = fcstate
-      @available_families = FontconfigCommands::installed_families("family fontformat")
+      @available_families = fc_installed_families(["family", "fontformat"])
       # delete families, that are part of list for some alias
       if (@available_families)
          @fcstate.fpl.keys.each do |key|

@@ -1,8 +1,7 @@
 /package/*.tar.bz2
-/src/ext/ft2_rendering/Makefile
-/src/ext/ft2_rendering/*.o
-/src/ext/ft2_rendering/*.so
-/src/ext/ft2_rendering/yast
+/src/ext/*/Makefile
+/src/ext/*/*.o
+/src/ext/*/*.so
 /src/lib/yast
 **/.*.swp
 

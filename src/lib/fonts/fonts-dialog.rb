@@ -733,8 +733,9 @@ module FontsConfig
       Yast.import "String"
       presets = FontsConfigState::PRESETS
       _("<h1>Font Configuraution Module</h1>") +
-      _("<p>Module to control system wide font rendering setting.</p>") +
-      _("<p>Use <b>Presets</b> button to choose predefined profiles: <ul>") +
+      _("<p>Module to control system wide font rendering setting.") +
+      _(" Help for <i>Presets</i> button and for the current tab follows.</p>") +
+      _("<p><b>Presets</b> button serves a possibility to choose predefined profiles: <ul>") +
       presets.keys.drop(1).map do |preset|
         _("<li><b>#{presets[preset]["name"]}: </b>#{presets[preset]["help"]}</li>")
       end.join + "</ul>" +

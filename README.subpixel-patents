@@ -1,0 +1,150 @@
+Source: 
+http://david.freetype.org/cleartype-patents.html
+Further reading: 
+http://www.freetype.org/freetype2/docs/reference/ft2-lcd_filtering.html
+
+      ClearType Patents, FreeType and the Unix Desktop: an explanation
+      ================================================================
+             David Turner (david at freetype dot org) 2007-06-01
+
+Now that the first Linux distribution has removed LCD-optimized text rendering 
+from their default build, it's time to explain a few things as well as clarify 
+the situation.
+
+I. The ClearType patents
+========================
+
+I.1. Meet the patents:
+----------------------
+Microsoft lists no less than 10 patents on their ClearType licensings page. In 
+case you're interested, the relevant US patents are:
+6,219,025 	6,239,783 	6,307,566
+6,225,973 	6,243,070 	6,393,145
+6,421,054 	6,282,327 	6,624,828
+
+Essentially, these patents cover several different things, grossly sub-divided 
+into:
+
+  *  the process of displaying images where data is "mapped" to individual (e.g.
+     LCD) sub-pixels, instead of whole pixels
+  *  the process of displaying said images after filtering them for various pur-
+     poses, e.g. reducing color fringes
+  *  the process of dealing with metrics and spacing rounding in a sub-pixel 
+     world
+
+Also, it may be possible that Microsoft acquired other patents related to the 
+field in the previous years. Who knows
+
+I.2. Patent claims, prior art and validity:
+-------------------------------------------
+Steve Gibson claims that the technique used by ClearType is a reinvention of a 
+20-years old thing used on the Apple II. His exact words are "Thus, Microsoft's 
+'ClearType' application of sub-pixel text rendering does not represent the 
+dramatic breakthrough that they claim and it can not be the valid subject for 
+intellectual property acquisition". (emphasis mine).
+
+Unfortunately, Mr. Gibson doesn't understand patent law well. Under the current 
+US regime, any minor improvement to a previous technique can be considered an 
+"invention" and "protected" by a patent under the right circumstances (e.g. if 
+it's not totally trivial), If we look at the first patent, we see that the 
+Apple II Wozniak patent covering this machine's display technique is listed 
+first in the patents' citations. This shows that both Microsoft and the patent 
+examiner who granted the patents were aware of this "prior art".
+
+I'm not trying to defend Microsoft here, just want to avoid feeding false hopes
+to people who would want to see the patent revoked.
+
+Another popular view is that these patents are too general to be enforceable. 
+Well, to be fair, some of the claims in these patents do indeed use rather 
+vague descriptive terms (even for a patent lawyer or an "expert in the field"). 
+this is absolutely not surprising, it's a direct consequence of how the patent 
+game works.
+
+I'm not going to cover this in details (there are many interesting pages on the 
+subject), but will say that even if you invalidate a single patent claim (e.g. 
+with prior art), that doesn't mean the whole patent is busted. Any other inde-
+pendent and dependent claim can still be enforced.
+
+Some of these patents have up to 40 claims. Invalidating them is going to need 
+serious prior-art. Even if there are also strong chances to invalidate the most 
+general claims in there. For example, many of the cheap LCD screens on digital 
+cameras have used a screen where each pixel is either Red, Green or Blue, with 
+colour images directly mapped to them; they've been doing it for years, even 
+when displaying text/menus, and this corresponds exactly to what the most gene-
+ral claims cover. If we can find a proof that the technique was deployed before 
+the patent's filing date, we could have valid prior art to bust these.
+I.3. Possible Work-arounds:
+
+People have proposed alternatives to the ClearType method. A very good example 
+is the SubLCD technique, which uses a different way to use the sub-pixels than 
+Microsoft's ClearType implementation. Its author even says it doesn't infringe 
+on the ClearType patents.
+
+Unfortunately, I, as the FreeType author, do not share his enthusiasm. the 
+reason is precisely the very vague patent claims described previously. To me, 
+there is a non-negligible (even if small) chance, that these claim also cover 
+the SubLCD technique. The situation would probably be different if we could 
+invalidate the broader patent claims, but this is not the case currently.
+
+II. FreeType and the Unix desktop
+=================================
+
+II.1. Does FreeType implements any of the patented techniques ?:
+----------------------------------------------------------------
+Technically, no. The patents cover the whole process of generating and display-
+ing sub-pixel images. Since the font engine doesn't do the display part, it 
+cannot infringe. Apart from that, FreeType has provided the capability of con-
+verting vector shapes into un-filtered sub-pixel images for a long time, but 
+this feature isn't used at all in a typical Unix desktop (see next section).
+
+When releasing FreeType 2.3.0, I've made some drastic changes to the font 
+engine to clarify the situation:
+
+  *  the scan-line converter has been modified to always return "gray" sub-pixel
+     images, where each pixel has R=G=B. the result is visually identical to 
+     gray anti-aliasing and cannot infringe on any of the ClearType patents.
+
+  *  new LCD-specific filtering APIs have been added. However, their default im-
+     plementation simply returns an error and doesn't alter sub-pixel images.
+
+this means that, with a default FreeType build, even if you use its LCD-specific
+APIs, it's no longer possible to generate a patent-infringing sub-pixel image: 
+the result will always look like "normal" gray anti-aliasing. You can override 
+this limitation by switching a single define in a configuration file though, 
+but you should do that at your own risk.
+
+And the reason I did it is because the font engine is used in countless embedded 
+products, like cell-phones, PDAs, set-top-boxes and even video-games. Even 
+though the software is provided "AS IS" with no warranty, I prefer to avoid put-
+ting its users in legal jeopardy when they download my released code. For Linux 
+distributions, things are a bit different because packagers routinely patch 
+upstream packages, but at least that's not my problem or my responsability.
+
+II.2. Impact on Unix desktops:
+------------------------------
+The latest changes in 2.3.0 do not impact a typical Unix desktop. Because at the
+moment all LCD-optimized rendering is normally implemented by two libraries: Xft
+and Cairo. And both do all their LCD-specific processing using FreeType's 
+"normal" (non-LCD-specific) APIs. their implementations differ but produce iden-
+tical results.
+
+A common misunderstanding is that OpenSUSE removed LCD-optimized rendering be-
+cause of the changes in FreeType. This is not directly true. the real reason is 
+that they patched Xft and Cairo to either remove their LCD-specific code, or use
+the newest FreeType APIs instead. In all cases, I believe that this was the 
+right thing to do, and I urge other Linux distributions to do the same. Oh, 
+and I don't think this has anything to do with any Microsoft patent deal.
+
+Conclusion
+==========
+To make it short: OpenSUSE and Fedora did the right thing by removing any 
+patent-infringing code, and I hope other Linux distributions will follow. If you
+do it for MP3, do it for LCD text.
+
+And it'd be nice if both the upstream Xft and Cairo could use the newest LCD-
+specific FreeType APIs. I have even provided patches to do just that a loooong 
+time ago; for some reason, these have never been integrated by the respective 
+library maintainers. I hope some day they'll wake up (though my hope is pretty 
+dim). I suspect that Linux distribution packagers are already applying these 
+patches though...
+

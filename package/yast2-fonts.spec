@@ -82,5 +82,6 @@ rake test:unit
 %doc %{yast_docdir}/CONTRIBUTING.md
 %doc %{yast_docdir}/COPYING
 %doc %{yast_docdir}/README.md
+%doc %{yast_docdir}/README.subpixel-patents
 
 %changelog

@@ -33,10 +33,10 @@ task :run => "test:prepare" do
 end
 
 task :clean do
-  FileUtils.rm("src/ext/ft2_rendering/ft2_rendering.so")
-  FileUtils.rm("src/ext/ft2_rendering/ft2-rendering.o")
-  FileUtils.rm("src/ext/ft2_rendering/Makefile")
-  FileUtils.rm("src/ext/ft2_rendering/yast")
-  FileUtils.rm("src/lib/yast")
+  FileUtils.rm_f("src/ext/ft2_rendering/ft2_rendering.so")
+  FileUtils.rm_f("src/ext/ft2_rendering/ft2-rendering.o")
+  FileUtils.rm_f("src/ext/ft2_rendering/Makefile")
+  FileUtils.rm_f("src/ext/ft2_rendering/yast")
+  FileUtils.rm_f("src/lib/yast")
 end
 

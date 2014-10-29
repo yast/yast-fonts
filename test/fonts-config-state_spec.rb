@@ -10,7 +10,7 @@ describe FontsConfig::FontsConfigState do
     attrs.delete("name")
     attrs.delete("help")
     attrs.each do |attr|
-      return false if fcstate.instance_variable_get("@" + attr) != dp[attr]
+      return false if fcstate.send(attr.to_sym) != dp[attr]
     end
     return true
   end

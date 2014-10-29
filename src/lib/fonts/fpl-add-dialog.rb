@@ -16,7 +16,7 @@ module FontsConfig
 
     def initialize(fcstate)
       @fcstate = fcstate
-      @available_families = fc_installed_families(["family", "fontformat"])
+      @available_families = installed_families(["family", "fontformat"])
       # delete families, that are part of list for some alias
       if (@available_families)
          @fcstate.fpl.keys.each do |key|

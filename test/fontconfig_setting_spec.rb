@@ -6,7 +6,7 @@ describe FontconfigSetting do
 
   def are_installed(families)
     families.each do |family|
-      if (!fc_is_family_installed(family))
+      if (!family_installed?(family))
         return false
       end
     end
@@ -14,7 +14,7 @@ describe FontconfigSetting do
   end
 
   def an_installed_family
-    return fc_installed_families(["family"])[0]    
+    return installed_families(["family"])[0]    
   end
 
   def contain_pattern_entries(families, entries)
@@ -29,20 +29,20 @@ describe FontconfigSetting do
     return true
   end
 
-  describe "#fc_is_family_installed" do
+  describe "#family_installed?" do
     it "returns false when family is not installed" do
-      family = fc_is_family_installed("foo")
+      family = family_installed?("foo")
       expect(family).to be false
     end
 
     it "returns true when family is installed" do
-      expect(fc_is_family_installed(an_installed_family()))
+      expect(family_installed?(an_installed_family()))
     end    
   end
 
-  describe "#fc_installed_families" do
+  describe "#installed_families" do
     it "returns non empty list of installed families" do
-      families = fc_installed_families(["family"])
+      families = installed_families(["family"])
       expect(families).to be_a(Array)
       expect(families.length).to be > 0
       expect(are_installed(families)).to be true
@@ -50,7 +50,7 @@ describe FontconfigSetting do
 
     it "understands important fontconfig pattern entries" do
       entries = ["family", "fontformat"]
-      families = fc_installed_families(entries)
+      families = installed_families(entries)
       expect(contain_pattern_entries(families, entries)).to be true
     end
   end

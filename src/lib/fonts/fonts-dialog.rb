@@ -153,7 +153,7 @@ module FontsConfig
     def initialize_familylist_widget(key)
       items = []
       @fcstate.fpl[@current_fpl].each do |f|
-        indication = fc_is_family_installed(f) ?
+        indication = family_installed?(f) ?
                        _("installed") : _("not installed")
         items.push(Item(f, indication));
       end
@@ -294,7 +294,7 @@ module FontsConfig
     def installed_families_from(family_list)
       installed = []
       family_list.each do |f|
-        if fc_is_family_installed(f)
+        if family_installed?(f)
           installed << f
         end
       end
@@ -324,7 +324,7 @@ module FontsConfig
         @fcstate.fpl.keys.each do |a|
           summary += "<tr><td><h3>#{a}</h3></td></tr>"
           @fcstate.fpl[a].each do |f|
-            indication = fc_is_family_installed(f) ? 
+            indication = family_installed?(f) ? 
                          "<font color=\"green\">installed</font>" :
                          "<font color=\"red\">not installed</font>";
             summary += "<tr><td>#{f}</td><td>#{indication}</td></tr>"
@@ -340,8 +340,8 @@ module FontsConfig
 
     def subpixel_freetype_warning
       if (@fcstate.lcd_filter != FontsConfigState::LCD_FILTERS[0] &&
-          (ft2_have_freetype &&
-           !ft2_have_subpixel_rendering))
+          (have_freetype &&
+           !have_subpixel_rendering))
         Yast.import "Popup"
         text = _("You have set LCD filter type (%s).") % @fcstate.lcd_filter +
                _(" This needs subpixel rendering capabality\ncompiled" +

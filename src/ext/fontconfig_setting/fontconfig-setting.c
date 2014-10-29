@@ -20,9 +20,9 @@ VALUE method_fc_is_family_installed(VALUE self, VALUE str_family);
 
 void Init_fontconfig_setting() {
   FontconfigSetting = rb_define_module("FontconfigSetting");
-  rb_define_method(FontconfigSetting, "fc_installed_families", 
+  rb_define_method(FontconfigSetting, "installed_families", 
                    method_fc_installed_families, 1);
-  rb_define_method(FontconfigSetting, "fc_is_family_installed", 
+  rb_define_method(FontconfigSetting, "family_installed?", 
                    method_fc_is_family_installed, 1);
 }
 

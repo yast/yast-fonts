@@ -23,7 +23,7 @@ describe FontsConfig::FontsConfigState do
 
     fcstate = FontsConfig::FontsConfigState.new
     fcstate.read
-    ret = (preset.nil? ? true : preset_loaded?(fcstate, preset))
+    ret = preset.nil? ? true : preset_loaded?(fcstate, preset)
 
     Yast::WFM.SCRClose(scr_handle) 
     return ret

@@ -1,4 +1,16 @@
 -------------------------------------------------------------------
+Fri Oct 24 16:41:08 UTC 2014 - pgajdos@suse.com
+
+- fix internal error
+- 3.1.8
+
+-------------------------------------------------------------------
+Fri Oct 24 16:30:55 UTC 2014 - pgajdos@suse.com
+
+- implemented some suggestions for tests
+- 3.1.7
+
+-------------------------------------------------------------------
 Thu Oct 23 12:52:44 UTC 2014 - pgajdos@suse.com
 
 - rewrite Rakefile again and employ chrooted test read and write 

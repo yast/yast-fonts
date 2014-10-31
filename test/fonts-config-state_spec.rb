@@ -4,19 +4,15 @@ require "fonts/fonts-config-state"
 describe FontsConfig::FontsConfigState do
   include Yast
 
-  def preset_loaded(fcstate, preset)
+  def preset_loaded?(fcstate, preset)
     dp = FontsConfig::FontsConfigState::PRESETS[preset]
-    return fcstate.fpl == dp["fpl"] &&
-           fcstate.search_metric_compatible == dp["search_metric_compatible"] && 
-           fcstate.really_force_fpl == dp["really_force_fpl"] &&
-           fcstate.force_aa_off == dp["force_aa_off"] &&
-           fcstate.force_aa_off_mono == dp["force_aa_off_mono"] &&
-           fcstate.force_ah_on == dp["force_ah_on"] &&
-           fcstate.force_hintstyle == dp["force_hintstyle"] &&
-           fcstate.embedded_bitmaps == dp["embedded_bitmaps"] &&
-           fcstate.all_ebl == dp["all_ebl"] &&
-           fcstate.lcd_filter == dp["lcd_filter"] && 
-           fcstate.subpixel_layout == dp["subpixel_layout"]
+    attrs =  dp.keys
+    attrs.delete("name")
+    attrs.delete("help")
+    attrs.each do |attr|
+      return false if fcstate.send(attr.to_sym) != dp[attr]
+    end
+    return true
   end
 
   def test_read(preset)
@@ -27,7 +23,7 @@ describe FontsConfig::FontsConfigState do
 
     fcstate = FontsConfig::FontsConfigState.new
     fcstate.read
-    ret = preset_loaded(fcstate, preset) unless preset.nil?
+    ret = preset.nil? ? true : preset_loaded?(fcstate, preset)
 
     Yast::WFM.SCRClose(scr_handle) 
     return ret
@@ -43,18 +39,18 @@ describe FontsConfig::FontsConfigState do
     fcstate.load_preset(preset)
     fcstate.write
     fcstate.read
-    ret = preset_loaded(fcstate, preset)
+    ret = preset_loaded?(fcstate, preset)
 
     Yast::WFM.SCRClose(scr_handle) 
-    return true
+    return ret
   end
 
   describe "#load_preset" do
     it "loads given preset" do
       fcstate = FontsConfig::FontsConfigState.new
-      for k in FontsConfig::FontsConfigState::PRESETS.keys do
+      FontsConfig::FontsConfigState::PRESETS.keys.each do |k|
         fcstate.load_preset(k)
-        preset_loaded(fcstate, k)
+        preset_loaded?(fcstate, k)
       end
     end
   end
@@ -62,13 +58,13 @@ describe FontsConfig::FontsConfigState do
   describe "#initialize" do
     it "loads `unset' profile" do
       fcstate = FontsConfig::FontsConfigState.new
-      expect(preset_loaded(fcstate, "unset")).to be true
+      expect(preset_loaded?(fcstate, "unset")).to be true
     end
   end
 
   describe "#preset_list" do
     it "returns list of preset ids" do
-      for p in FontsConfig::FontsConfigState::preset_list do
+      FontsConfig::FontsConfigState::preset_list.each do |p|
         expect(FontsConfig::FontsConfigState::preset?(p[0])).to be true
       end
     end
@@ -76,7 +72,7 @@ describe FontsConfig::FontsConfigState do
 
   describe "#preset?" do
     it "returns true when argument is a preset" do
-      for p in FontsConfig::FontsConfigState::preset_list do
+      FontsConfig::FontsConfigState::preset_list.each do |p|
         expect(FontsConfig::FontsConfigState::preset?(p[0])).to be true
       end
     end
@@ -84,7 +80,7 @@ describe FontsConfig::FontsConfigState do
 
   describe "#read" do
     it "reads variables from sysconfig file" do
-      for p in FontsConfig::FontsConfigState::preset_list do
+      FontsConfig::FontsConfigState::preset_list.each do |p|
         expect(test_read(p[0])).to be true
       end
     end
@@ -96,7 +92,7 @@ describe FontsConfig::FontsConfigState do
 
   describe "#write" do
     it "writes variables to sysconfig file" do
-      for p in FontsConfig::FontsConfigState::preset_list do
+      FontsConfig::FontsConfigState::preset_list.each do |p|
         expect(test_write(p[0])).to be true
       end
     end

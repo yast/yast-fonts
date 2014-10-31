@@ -7,6 +7,7 @@ require "fonts/shell-commands"
 require "fonts/rich-text-dialog"
 
 require "yast/ft2_rendering"
+require "yast/fontconfig_setting"
 
 module FontsConfig
   class FontsConfigDialog
@@ -14,6 +15,7 @@ module FontsConfig
     include UIShortcuts
     include I18n
     include Ft2Rendering
+    include FontconfigSetting
 
     def initialize
       @fcstate = FontsConfigState.new
@@ -134,7 +136,7 @@ module FontsConfig
 
     def initialize_genericaliases_table(key)
       items = []
-      for a in @fcstate.fpl.keys do
+      @fcstate.fpl.keys.each do |a|
         items.push(Item(a)); 
       end
       UI.ChangeWidget(Id("tbl_generic_aliases"), 
@@ -150,8 +152,8 @@ module FontsConfig
 
     def initialize_familylist_widget(key)
       items = []
-      for f in @fcstate.fpl[@current_fpl] do
-        indication = FontconfigCommands::is_family_installed(f) ?
+      @fcstate.fpl[@current_fpl].each do |f|
+        indication = family_installed?(f) ?
                        _("installed") : _("not installed")
         items.push(Item(f, indication));
       end
@@ -291,8 +293,8 @@ module FontsConfig
 
     def installed_families_from(family_list)
       installed = []
-      for f in family_list do
-        if FontconfigCommands::is_family_installed(f)
+      family_list.each do |f|
+        if family_installed?(f)
           installed << f
         end
       end
@@ -302,7 +304,7 @@ module FontsConfig
     def installation_summary_check
       installed = Hash.new
       not_installed_for_aliases = []
-      for a in @fcstate.fpl.keys
+      @fcstate.fpl.keys.each do |a|
         installed[a] = 
           installed_families_from(@fcstate.fpl[a])
         if (installed[a].empty? &&
@@ -319,10 +321,10 @@ module FontsConfig
                  "no effect.")
         summary = ""
         summary += "<table>"
-        for a in @fcstate.fpl.keys
+        @fcstate.fpl.keys.each do |a|
           summary += "<tr><td><h3>#{a}</h3></td></tr>"
-          for f in @fcstate.fpl[a]
-            indication = FontconfigCommands::is_family_installed(f) ? 
+          @fcstate.fpl[a].each do |f|
+            indication = family_installed?(f) ? 
                          "<font color=\"green\">installed</font>" :
                          "<font color=\"red\">not installed</font>";
             summary += "<tr><td>#{f}</td><td>#{indication}</td></tr>"
@@ -338,23 +340,22 @@ module FontsConfig
 
     def subpixel_freetype_warning
       if (@fcstate.lcd_filter != FontsConfigState::LCD_FILTERS[0] &&
-          (ft2_have_freetype &&
-           !ft2_have_subpixel_rendering))
+          (have_freetype &&
+           !have_subpixel_rendering))
         Yast.import "Popup"
         text = _("You have set LCD filter type (%s).") % @fcstate.lcd_filter +
                _(" This needs subpixel rendering capabality\ncompiled" +
                  " in FreeType library.") +
-               _(" Unfortunately, we can not ship it due patent reasons.\n\n") +
-               _("Further reading:\n") +
-               _("http://david.freetype.org/cleartype-patents.html\n") +
-               _("http://www.freetype.org/freetype2/docs/reference/ft2-lcd_filtering.html\n")
+               _(" Unfortunately, we can not ship it due patent reasons.\n") +
+               "\n" +
+               _("See README.subpixel-patents from yast2-fonts package documentation.\n")
                
         Popup.Warning(text)
       end
     end
 
     def root_user?
-      if (Process.uid != 0)
+      if (Process.euid != 0)
         Yast.import "Popup"
         text = _("root user privileges are required to save and apply font settings.")
         Popup.Error(text)
@@ -734,8 +735,9 @@ module FontsConfig
       Yast.import "String"
       presets = FontsConfigState::PRESETS
       _("<h1>Font Configuraution Module</h1>") +
-      _("<p>Module to control system wide font rendering setting.</p>") +
-      _("<p>Use <b>Presets</b> button to choose predefined profiles: <ul>") +
+      _("<p>Module to control system wide font rendering setting.") +
+      _(" Help for <i>Presets</i> button and for the current tab follows.</p>") +
+      _("<p><b>Presets</b> button serves a possibility to choose predefined profiles: <ul>") +
       presets.keys.drop(1).map do |preset|
         _("<li><b>#{presets[preset]["name"]}: </b>#{presets[preset]["help"]}</li>")
       end.join + "</ul>" +

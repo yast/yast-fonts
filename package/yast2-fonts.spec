@@ -17,7 +17,7 @@
 
 
 Name:           yast2-fonts
-Version:        3.1.6
+Version:        3.1.8
 Release:        0
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
@@ -33,8 +33,9 @@ BuildRequires:  yast2-ruby-bindings >= 1.2.0
 BuildRequires:  yast2-devtools >= 1.2.0
 BuildRequires:  yast2 >= 3.0.5
 BuildRequires:  rubygem-yast-rake
-# ft2_rendering extension
+# extensions
 BuildRequires:  freetype2-devel
+BuildRequires:  fontconfig-devel
 BuildRequires:  ruby-devel
 # for testing
 BuildRequires:  rubygem-rspec
@@ -62,7 +63,9 @@ rake compile
 rake install DESTDIR="%{buildroot}"
 # install FreeType2 ruby binding
 mkdir -p  %{buildroot}%{_libdir}/ruby/vendor_ruby/%{rb_ver}/%{rb_arch}/yast
-install -m 755 src/ext/ft2_rendering/ft2_rendering.so %{buildroot}%{_libdir}/ruby/vendor_ruby/%{rb_ver}/%{rb_arch}/yast
+for ext in `ls src/ext`; do
+  install -m 755 src/ext/$ext/$ext.so %{buildroot}%{_libdir}/ruby/vendor_ruby/%{rb_ver}/%{rb_arch}/yast
+done
 
 %check
 rake test:unit
@@ -71,7 +74,7 @@ rake test:unit
 %defattr(-,root,root)
 %dir %{yast_libdir}/fonts
 %{yast_libdir}/fonts/*.rb
-%{_libdir}/ruby/vendor_ruby/%{rb_ver}/%{rb_arch}/yast/ft2_rendering.so
+%{_libdir}/ruby/vendor_ruby/%{rb_ver}/%{rb_arch}/yast/*.so
 %{yast_clientdir}/fonts.rb
 %{yast_desktopdir}/fonts.desktop
 %{yast_scrconfdir}/*.scr
@@ -79,5 +82,6 @@ rake test:unit
 %doc %{yast_docdir}/CONTRIBUTING.md
 %doc %{yast_docdir}/COPYING
 %doc %{yast_docdir}/README.md
+%doc %{yast_docdir}/README.subpixel-patents
 
 %changelog

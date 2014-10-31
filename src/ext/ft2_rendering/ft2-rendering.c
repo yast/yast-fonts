@@ -10,9 +10,9 @@ VALUE method_ft2_have_subpixel_rendering(VALUE self);
 
 void Init_ft2_rendering() {
   Ft2Rendering = rb_define_module("Ft2Rendering");
-  rb_define_method(Ft2Rendering, "ft2_have_freetype", 
+  rb_define_method(Ft2Rendering, "have_freetype", 
                    method_ft2_have_freetype, 0);
-  rb_define_method(Ft2Rendering, "ft2_have_subpixel_rendering", 
+  rb_define_method(Ft2Rendering, "have_subpixel_rendering", 
                    method_ft2_have_subpixel_rendering, 0);
 }
 

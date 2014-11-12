@@ -17,6 +17,7 @@ VALUE FontconfigSetting = Qnil;
 void Init_fontconfig_setting();
 VALUE method_fc_installed_families(VALUE self, VALUE array_elements);
 VALUE method_fc_is_family_installed(VALUE self, VALUE str_family);
+VALUE method_fc_match_family(VALUE self, VALUE str_family);
 
 void Init_fontconfig_setting() {
   FontconfigSetting = rb_define_module("FontconfigSetting");
@@ -24,6 +25,8 @@ void Init_fontconfig_setting() {
                    method_fc_installed_families, 1);
   rb_define_method(FontconfigSetting, "family_installed?", 
                    method_fc_is_family_installed, 1);
+  rb_define_method(FontconfigSetting, "match_family",
+                   method_fc_match_family, 1);
 }
 
 VALUE method_fc_installed_families(VALUE self, VALUE array_elements) {
@@ -62,25 +65,84 @@ VALUE method_fc_installed_families(VALUE self, VALUE array_elements) {
   return str_family_list;
 }
 
-VALUE method_fc_is_family_installed(VALUE self, VALUE str_family) {
+FcPattern *find(char *str_pattern)
+{
   FcObjectSet *objectset;
-  FcPattern *pattern;
+  FcPattern *pattern, *result;
   FcFontSet *fontset;
-
-  char *family;
-
-  family = StringValueCStr(str_family);
 
   FcInit();
   objectset = FcObjectSetBuild(FC_FAMILY, NULL);
-  pattern = FcNameParse((FcChar8 *)family);
+  pattern = FcNameParse((FcChar8 *)str_pattern);
   fontset = FcFontList (NULL, pattern, objectset);
   FcPatternDestroy (pattern);
   FcObjectSetDestroy (objectset);
 
   if (fontset->nfont > 0)
-    return Qtrue;
+    result = FcPatternDuplicate(fontset->fonts[0]);
   else
-    return Qfalse;
+    result = NULL;
+
+  FcFontSetDestroy(fontset);
+  return result;
+}
+
+FcPattern *match(char *str_pattern)
+{ 
+  FcPattern *pattern, *font;
+  FcResult r;
+  
+  FcInit(); 
+  pattern = FcNameParse((FcChar8 *)str_pattern);
+  FcConfigSubstitute(NULL, pattern, FcMatchPattern);
+  FcDefaultSubstitute(pattern);
+  font = FcFontMatch(0, pattern, &r);
+  FcPatternDestroy (pattern);
+  
+  if (r == FcResultMatch)
+    return font;
+  else
+    return NULL;
+}
+
+VALUE method_fc_is_family_installed(VALUE self, VALUE str_family) 
+{
+  FcPattern *font;
+  char *family;
+  VALUE res;
+
+  family = StringValueCStr(str_family);
+  font = find(family);
+
+  if (font)
+    res = Qtrue;
+  else
+    res = Qfalse;
+
+  FcPatternDestroy(font);
+  return res;
+}
+
+VALUE method_fc_match_family(VALUE self, VALUE str_family) 
+{
+  FcPattern *font;
+  char *family;
+  VALUE res;
+
+  family = StringValueCStr(str_family);
+  font = match(family);
+
+  if (font)
+  {
+    FcPatternGetString(font, FC_FAMILY, 0, (FcChar8**)&family);
+    res = rb_str_new2(family);
+  }
+  else
+  {
+    res = Qnil;
+  }
+
+  FcPatternDestroy(font);
+  return res;
 }
 

@@ -368,7 +368,7 @@ module FontsConfig
           items = []
           scripts.each do |script, coverage|
             items.push(Item(Id("#{script}"), 
-                       "#{script} (#{coverage})"))
+                       "#{script} (#{coverage} %)"))
           end
           UI.ChangeWidget(Id("cmb_specimen_scripts_#{generic_alias}"),
                           :Items, items)
@@ -765,7 +765,7 @@ module FontsConfig
                                  end ],
           "handle"        => fun_ref(method(:handle_specimen_widget),
                                      "symbol (string, map)"),
-          "no_help"       => true
+          "help"          => help.match_preview
         }
       }
 
@@ -969,8 +969,27 @@ module FontsConfig
       _("individual fields of both tabs.</p>")
     end
 
+    def match_preview
+      _("<h2>Match Preview Tab</h2>") +
+      _("<p>In this paragraph, <i>current setting</i> means setting " +
+        "of the system plus changes made in currently running fonts module.</p>") +
+      _("<p>Matches to system generic aliases can be seen in this initial tab. ") +
+      _("In other words, for every alias (") +
+      @fcstate.fpl.keys.join(", ") +
+      _(") you can see family name, which resolves to given alias ") +
+      _("according to <i>current setting.</i></p>") +
+      _("<p>In adition to that, graphical mode allows to display ") +
+      _("font specimen of the matched font rendered (again) taking ") +
+      _("<i>current setting</i> into account. ") +
+      _("In the corresponding combo box, script coverage of matched font ") +
+      _("can be seen and specimen string for given script can be chosen.</p>") +
+      _("<p>At the bottom, there are crucial rendering options duplicated ") +
+      _("from Rendered Details Tab, ") +
+      _("which can be used to see changes in the rendering on the fly.</p>")
+    end
+
     def antialiasing
-      _("<h2 id=\"tab_help\">Rendering Tab</h2>") +
+      _("<h2 id=\"tab_help\">Rendering Details Tab</h2>") +
       _("<p>This tab controls <b>how</b> fonts are rendered.") +
       _(" It allows you to amend font rendering algorithms to be used and change their options.</p>") +
       _("<h3>Antialiasing</h3>") +

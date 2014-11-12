@@ -337,7 +337,8 @@ module FontsConfig
 
     def create_pattern_string(generic_alias)
       pattern = @current_families[generic_alias]
-      if @fcstate.force_aa_off
+      if @fcstate.force_aa_off || 
+         (@fcstate.force_aa_off_mono && generic_alias == "monospace")
         pattern += ":antialias=0" 
       end
       if @fcstate.force_ah_on

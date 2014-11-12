@@ -735,7 +735,7 @@ module FontsConfig
                  * @fcstate.fpl.keys.map do |generic_alias|
                      specimen_alias_widget(generic_alias)
                  end
-              ),
+              ), UI.TextMode ? Label("") :
               HBox(
                 CheckBox(Id("chkb_specimen_antialiasing"), Opt(:notify, :immediate),
                           _("Turn &Antialiasing Off")),

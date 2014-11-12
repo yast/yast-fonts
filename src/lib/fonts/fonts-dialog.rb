@@ -312,18 +312,27 @@ module FontsConfig
 
     def graphic_match_preview(script, generic_alias)
         unless (script.nil?)
-          UI.ChangeWidget(Id("rt_specimen_#{generic_alias}"), :Value, 
-                          "<p><b>Family:</b> " + 
-                          "#{@current_families[generic_alias]}</b></p>" +
-                          "<p><b>Specimen for #{script}</b></p>" +
-                          "<center>" + 
-                          "<img src=\"#{@tmp_dir}/#{generic_alias}.png\"/>" + 
-                          "</center>")
+          text = "<p><b>Family:</b> #{@current_families[generic_alias]}</b></p>" +
+                 "<p><b>Specimen for #{script}</b></p>" +
+                 "<center>" + 
+                 "<img src=\"#{@tmp_dir}/#{generic_alias}.png\"/>" + 
+                 "</center>"
         else
-          UI.ChangeWidget(Id("rt_specimen_#{generic_alias}"), :Value, 
-                          "<b>No script found for " +
-                          "#{@current_families[generic_alias]}.</b>")
+          text = "<b>No script found for " +
+                 "#{@current_families[generic_alias]}.</b>"
         end
+        UI.ChangeWidget(Id("rt_specimen_#{generic_alias}"), :Value, text)
+    end
+
+    def text_match_preview(family, generic_alias)
+      scripts = font_scripts(family);
+      text = "<p><b>Family:</b> #{family}</p>" +
+             "<p><b>Scripts</b><ul>"
+      scripts.each do |script, coverage|
+        text += "<li>#{script} (#{coverage})</li>"
+      end
+      text += "</ul></p>"
+      UI.ChangeWidget(Id("rt_specimen_#{generic_alias}"), :Value, text)
     end
 
     def create_pattern_string(generic_alias)
@@ -375,7 +384,11 @@ module FontsConfig
                            :Items, [])
         end
        
-        graphic_match_preview(@current_scripts[generic_alias], generic_alias)
+        if (UI.TextMode)
+          text_match_preview(@current_families[generic_alias], generic_alias)
+        else
+          graphic_match_preview(@current_scripts[generic_alias], generic_alias)
+        end
       end
 
       UI.ChangeWidget(Id("chkb_specimen_antialiasing"), :Value, 
@@ -417,8 +430,12 @@ module FontsConfig
                        SPECIMEN_SIZE, SPECIMEN_SIZE);
         png.close
 
-        graphic_match_preview(@current_scripts[generic_alias], 
-                              generic_alias)
+        if (UI.TextMode)
+          text_match_preview(@current_families[generic_alias], generic_alias)
+        else
+          graphic_match_preview(@current_scripts[generic_alias], 
+                                generic_alias)
+        end
       end
 
       return nil
@@ -516,13 +533,13 @@ module FontsConfig
         HBox(Left(
                Label(Id("lbl_specimen_#{generic_alias}"), "Match for #{generic_alias}")
              ),
-             Right(
+             Right( UI.TextMode ? Label("") :
                ComboBox(Id("cmb_specimen_scripts_#{generic_alias}"), Opt(:notify, :immediate), "", [])
              )
         ),
         RichText(Id("rt_specimen_#{generic_alias}"),
                  Opt(:hstretch, :vstretch),
-                 "<h1>#{generic_alias} match</h1>")
+                 "")
       )
     end
 

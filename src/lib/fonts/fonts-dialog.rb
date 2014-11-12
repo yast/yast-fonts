@@ -739,7 +739,10 @@ module FontsConfig
       _(" Help for <i>Presets</i> button and for the current tab follows.</p>") +
       _("<p><b>Presets</b> button serves a possibility to choose predefined profiles: <ul>") +
       presets.keys.drop(1).map do |preset|
-        _("<li><b>#{presets[preset]["name"]}: </b>#{presets[preset]["help"]}</li>")
+        _("<li><b>%{name}: </b>%{help}</li>") % {
+            :name => presets[preset]["name"],
+            :help => presets[preset]["help"]
+        }
       end.join + "</ul>" +
       _("Every single item there just fills appropriate setting in both tabs. ") +
       _("That setting can be later arbitrarily customized in depth by respective ") +

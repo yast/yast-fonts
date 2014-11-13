@@ -66,7 +66,7 @@ describe FontconfigSetting do
       expect(are_installed [family]).to be true
     end
 
-    it "returns a installed family for serif alias" do
+    it "returns a installed family for monospace alias" do
       family = match_family("monospace")
       expect(are_installed [family]).to be true
     end

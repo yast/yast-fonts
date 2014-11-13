@@ -45,7 +45,7 @@ describe FontconfigSetting do
       families = installed_families(["family"])
       expect(families).to be_a(Array)
       expect(families.length).to be > 0
-      expect(are_installed families).to be true
+      expect(are_installed(families)).to be true
     end
 
     it "understands important fontconfig pattern entries" do
@@ -58,17 +58,17 @@ describe FontconfigSetting do
   describe "#match_family" do
     it "returns a installed family for sans-serif alias" do
       family = match_family("sans-serif")
-      expect(are_installed [family]).to be true
+      expect(are_installed([family])).to be true
     end
 
     it "returns a installed family for serif alias" do
       family = match_family("serif")
-      expect(are_installed [family]).to be true
+      expect(are_installed([family])).to be true
     end
 
     it "returns a installed family for monospace alias" do
       family = match_family("monospace")
-      expect(are_installed [family]).to be true
+      expect(are_installed([family])).to be true
     end
   end
 end

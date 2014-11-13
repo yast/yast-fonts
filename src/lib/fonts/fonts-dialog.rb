@@ -306,6 +306,7 @@ module FontsConfig
           initialize_noother_checkbox("")
         end
         subpixel_freetype_warning
+        installation_summary_check
       end
       return nil
     end
@@ -911,9 +912,6 @@ module FontsConfig
         when :next
           if (root_user?)
             y2milestone("saving configuration")
-
-            y2milestone("performing installation summary check")
-            installation_summary_check
 
             Progress.New(
               _("Writing Font Configuration"),

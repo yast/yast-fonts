@@ -36,6 +36,7 @@ BuildRequires:  rubygem-yast-rake
 # extensions
 BuildRequires:  freetype2-devel
 BuildRequires:  fontconfig-devel
+BuildRequires:  font-specimen-devel
 BuildRequires:  ruby-devel
 # for testing
 BuildRequires:  rubygem-rspec

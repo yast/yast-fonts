@@ -128,7 +128,7 @@ EMBEDDED_BITMAPS_LANGUAGES="ja:ko:zh"
 # 
 # PREFER_SANS_FAMILIES="Adobe Helvetica:B&H Lucida:Efont Biwidth:Efont Fixed:Efont Fixed Wide:Arabic Newspaper:Gnu Unifont:WenQuanYi WenQuanYi Bitmap Song"
 #
-PREFER_SANS_FAMILIES=""
+PREFER_SANS_FAMILIES="Liberation Sans"
 
 ## Path:        Desktop
 ## Description: Display font configuration
@@ -147,7 +147,7 @@ PREFER_SANS_FAMILIES=""
 # 
 # PREFER_SERIF_FAMILIES="Adobe Times:Adobe New Century Schoolbook:Adobe Utopia:B&H LucidaBright:MUTT ClearlyU Wide:MUTT ClearlyU PUA:MUTT ClearlyU Alternate Glyphs Wide"
 #
-PREFER_SERIF_FAMILIES=""
+PREFER_SERIF_FAMILIES="Liberation Serif"
 
 ## Path:        Desktop
 ## Description: Display font configuration
@@ -166,7 +166,7 @@ PREFER_SERIF_FAMILIES=""
 #
 # PREFER_MONO_FAMILIES="Adobe Courier:B&H LucidaTypewriter:Efont Fixed:Efont Fixed Wide:Gnu Unifont Mono:Misc Fixed:Misc Fixed Wide:Schumacher Clean:xos4 Terminus:WenQuanYi WenQuanYi Bitmap Song"
 #
-PREFER_MONO_FAMILIES=""
+PREFER_MONO_FAMILIES="Liberation Mono"
 
 ## Path:        Desktop
 ## Description: Display font configuration

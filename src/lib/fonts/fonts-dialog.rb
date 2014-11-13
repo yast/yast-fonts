@@ -469,8 +469,11 @@ module FontsConfig
                "do not contain any installed family.\n\n") %
                not_installed_for_aliases.join(", ") +
                _("Please make sure to install at least one for each\n" +
-                 "alias later, otherwise this preference setting has " +
-                 "no effect.")
+                 "alias, otherwise this preference setting has " +
+                 "no effect.\n\n") +
+               _("Fonts can be installed e. g. via fontinfo.opensuse.org. \n" +
+                 "If you install them when this yast module is running,\n" +
+                 "reread the profile to see results.\n")
         summary = ""
         if (UI.TextMode)
           # <table> do not work for text mode

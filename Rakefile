@@ -8,7 +8,7 @@ end
 
 task :compile do
   olddir = Dir.pwd
-  ["ft2_rendering", "fontconfig_setting"].each do |ext|
+  ["ft2_rendering", "fontconfig_setting", "font_specimen"].each do |ext|
     Dir.chdir("src/ext/#{ext}")
     ruby 'extconf.rb'
     sh 'make'
@@ -20,7 +20,7 @@ namespace :test do
   task :prepare => :compile do
     # let yast know where ft2_rendering extension is
     mkdir_p "src/lib/yast"
-    ["ft2_rendering", "fontconfig_setting"].each do |ext|
+    ["ft2_rendering", "fontconfig_setting", "font_specimen"].each do |ext|
       ln_sf("../../ext/#{ext}/#{ext}.so", "src/lib/yast/#{ext}.so")
     end
   end

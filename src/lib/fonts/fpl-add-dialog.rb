@@ -32,9 +32,8 @@ module FontsConfig
     def run
       Yast.import "UI"
       items = @available_families.map do |family|
-                fontformat = family.gsub(/.*fontformat=([^:]+).*/, '\1')
-                family = family[/^[^:]*/]
-                Item(Id(family), family, fontformat)
+                pattern = parse_pattern(family)
+                Item(Id(pattern["family"]), pattern["family"], pattern["fontformat"])
               end
 
       dialog_content = VBox(
@@ -60,6 +59,13 @@ module FontsConfig
     end
 
   private
+    def parse_pattern(str_pattern)
+      pattern = Hash.new
+      pattern["family"] = str_pattern[/^[^:]*/]
+      pattern["fontformat"] = str_pattern.gsub(/.*fontformat=([^:]+).*/, '\1')
+      pattern
+    end
+
     def controller_loop
       while true do
         input = UI.UserInput
@@ -71,7 +77,8 @@ module FontsConfig
             substring = UI.QueryWidget(Id("txt_family_name"), :Value)
             filtered_families = @available_families.select{|f| f[/#{substring}/]}
             items = filtered_families.map do |family|
-                    Item(Id(family), family)
+                    pattern = parse_pattern(family)
+                    Item(Id(pattern["family"]), pattern["family"], pattern["fontformat"])
                     end
             UI.ChangeWidget(Id("tbl_family_names"),
                             :Items, items)

@@ -319,7 +319,7 @@ module FontsConfig
                  "<img src=\"#{@tmp_dir}/#{generic_alias}.png\"/>" \
                  "</center>"
         else
-          # ulikely
+          # unlikely
           text = "<b>No script found for " \
                  "#{@current_families[generic_alias]}.</b>"
         end

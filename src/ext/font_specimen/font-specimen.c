@@ -61,9 +61,8 @@ VALUE method_specimen_write(VALUE self,
   int width     = NUM2INT(int_width);
   int height    = NUM2INT(int_height);
 
-  FILE *png;
+  FILE *png = rb_fdopen(png_fd, "w");
 
-  png = rb_fdopen(png_fd, "w");
   if (!png)
     return Qfalse;
 

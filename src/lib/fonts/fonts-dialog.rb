@@ -312,13 +312,14 @@ module FontsConfig
     end
 
     def graphic_match_preview(script, generic_alias)
-        unless (script.nil?)
+        if (script)
           text = "<p><b>Family:</b> #{@current_families[generic_alias]}</b></p>" \
                  "<p><b>Specimen for #{script}</b></p>" \
                  "<center>" \
                  "<img src=\"#{@tmp_dir}/#{generic_alias}.png\"/>" \
                  "</center>"
         else
+          # ulikely
           text = "<b>No script found for " \
                  "#{@current_families[generic_alias]}.</b>"
         end

@@ -313,13 +313,13 @@ module FontsConfig
 
     def graphic_match_preview(script, generic_alias)
         unless (script.nil?)
-          text = "<p><b>Family:</b> #{@current_families[generic_alias]}</b></p>" +
-                 "<p><b>Specimen for #{script}</b></p>" +
-                 "<center>" + 
-                 "<img src=\"#{@tmp_dir}/#{generic_alias}.png\"/>" + 
+          text = "<p><b>Family:</b> #{@current_families[generic_alias]}</b></p>" \
+                 "<p><b>Specimen for #{script}</b></p>" \
+                 "<center>" \
+                 "<img src=\"#{@tmp_dir}/#{generic_alias}.png\"/>" \
                  "</center>"
         else
-          text = "<b>No script found for " +
+          text = "<b>No script found for " \
                  "#{@current_families[generic_alias]}.</b>"
         end
         UI.ChangeWidget(Id("rt_specimen_#{generic_alias}"), :Value, text)
@@ -327,12 +327,12 @@ module FontsConfig
 
     def text_match_preview(family, generic_alias)
       scripts = font_scripts(family)
-      text = "<p><b>Family:</b> #{family}</p>" +
+      text = "<p><b>Family:</b> #{family}</p>" \
              "<p><b>Scripts</b><ul>"
       scripts.each do |script, coverage|
-        text += "<li>#{script} (#{coverage})</li>"
+        text << "<li>#{script} (#{coverage})</li>"
       end
-      text += "</ul></p>"
+      text << "</ul></p>"
       UI.ChangeWidget(Id("rt_specimen_#{generic_alias}"), :Value, text)
     end
 
@@ -340,19 +340,19 @@ module FontsConfig
       pattern = @current_families[generic_alias]
       if @fcstate.force_aa_off || 
          (@fcstate.force_aa_off_mono && generic_alias == "monospace")
-        pattern += ":antialias=0" 
+        pattern << ":antialias=0" 
       end
       if @fcstate.force_ah_on
-        pattern += ":autohint=1"  
+        pattern << ":autohint=1"  
       end
       if @fcstate.force_hintstyle != FontsConfigState::HINT_STYLES[0]
-        pattern += ":hintstyle=#{@fcstate.force_hintstyle}" 
+        pattern << ":hintstyle=#{@fcstate.force_hintstyle}" 
       end
       if @fcstate.lcd_filter !=  FontsConfigState::LCD_FILTERS[0]
-        pattern += ":lcdfilter=#{@fcstate.lcd_filter}" 
+        pattern << ":lcdfilter=#{@fcstate.lcd_filter}" 
       end
       if @fcstate.subpixel_layout != FontsConfigState::SUBPIXEL_LAYOUTS[0]
-        pattern += ":rgba=#{@fcstate.subpixel_layout}" 
+        pattern << ":rgba=#{@fcstate.subpixel_layout}" 
       end
       return pattern
     end
@@ -366,10 +366,8 @@ module FontsConfig
         @current_scripts[generic_alias] = scripts.keys[0] 
 
         if (@current_scripts[generic_alias])
-          items = []
-          scripts.each do |script, coverage|
-            items.push(Item(Id("#{script}"), 
-                       "#{script} (#{coverage} %)"))
+          items = scripts.map do |script, coverage|
+            Item(Id("#{script}"), "#{script} (#{coverage} %)")
           end
           UI.ChangeWidget(Id("cmb_specimen_scripts_#{generic_alias}"),
                           :Items, items)
@@ -463,40 +461,40 @@ module FontsConfig
         end
       end
       unless not_installed_for_aliases.empty? then
-        text = _("Family preference list for %s\n" +
+        text = _("Family preference list for %s\n" \
                "do not contain any installed family.\n\n") %
                not_installed_for_aliases.join(", ") +
-               _("Please make sure to install at least one for each\n" +
-                 "alias, otherwise this preference setting has " +
+               _("Please make sure to install at least one for each\n" \
+                 "alias, otherwise this preference setting has " \
                  "no effect.\n\n") +
-               _("Fonts can be installed e. g. via fontinfo.opensuse.org. \n" +
-                 "If you install them when this yast module is running,\n" +
+               _("Fonts can be installed e. g. via fontinfo.opensuse.org. \n" \
+                 "If you install them when this yast module is running,\n" \
                  "reread the profile to see results.\n")
         summary = ""
         if (UI.TextMode)
           # <table> do not work for text mode
           @fcstate.fpl.keys.each do |generic_alias|
-            summary += "<h3>#{generic_alias}</h3><ul>"
+            summary << "<h3>#{generic_alias}</h3><ul>"
             @fcstate.fpl[generic_alias].each do |f|
               indication = family_installed?(f) ?
                            "installed" : "not installed"
-              summary += "<li>#{f} (#{indication})</li>"
+              summary << "<li>#{f} (#{indication})</li>"
             end
-            summary += "</ul>"
+            summary << "</ul>"
           end
         else
-          summary += "<table>"
+          summary << "<table>"
           @fcstate.fpl.keys.each do |generic_alias|
-            summary += "<tr><td><h3>#{generic_alias}</h3></td></tr>"
+            summary << "<tr><td><h3>#{generic_alias}</h3></td></tr>"
             @fcstate.fpl[generic_alias].each do |f|
               indication = family_installed?(f) ? 
                            "<font color=\"green\">installed</font>" :
                            "<font color=\"red\">not installed</font>"
-              summary += "<tr><td>#{f}</td><td>#{indication}</td></tr>"
+              summary << "<tr><td>#{f}</td><td>#{indication}</td></tr>"
             end
-            summary += "<tr></tr>"
+            summary << "<tr></tr>"
           end
-          summary += "</table>"
+          summary << "</table>"
         end
 
         fpl_inst_summary_dialog = RichTextDialog.new
@@ -510,7 +508,7 @@ module FontsConfig
            !have_subpixel_rendering))
         Yast.import "Popup"
         text = _("You have set LCD filter type (%s).") % @fcstate.lcd_filter +
-               _(" This needs subpixel rendering capabality\ncompiled" +
+               _(" This needs subpixel rendering capabality\ncompiled" \
                  " in FreeType library.") +
                _(" Unfortunately, we can not ship it due patent reasons.\n") +
                "\n" +
@@ -963,73 +961,73 @@ module FontsConfig
       presets.keys.drop(1).map do |preset|
         _("<li><b>#{presets[preset]["name"]}: </b>#{presets[preset]["help"]}</li>")
       end.join + "</ul>" +
-      _("Every single item there just fills appropriate setting in both tabs. " +
-        "That setting can be later arbitrarily customized in depth by respective " +
+      _("Every single item there just fills appropriate setting in both tabs. " \
+        "That setting can be later arbitrarily customized in depth by respective " \
         "individual fields of both tabs.</p>")
     end
 
     def match_preview
       _("<h2>Match Preview Tab</h2>") +
-      _("<p>In this paragraph, <i>current setting</i> means setting " +
+      _("<p>In this paragraph, <i>current setting</i> means setting " \
         "of the system plus changes made in currently running fonts module.</p>") +
       _("<p>Matches to system generic aliases can be seen in this initial tab. ") +
-      _("In other words, for every alias () you can see family name, which" +
+      _("In other words, for every alias () you can see family name, which" \
         " resolves to given alias according to <i>current setting.</i></p>") %
           @fcstate.fpl.keys.join(", ") +
-      _("<p>In adition to that, graphical mode allows to display " +
-        "font specimen of the matched font rendered (again) taking " +
+      _("<p>In adition to that, graphical mode allows to display " \
+        "font specimen of the matched font rendered (again) taking " \
         "<i>current setting</i> into account. ") +
-      _("In the corresponding combo box, script coverage of matched font " +
+      _("In the corresponding combo box, script coverage of matched font " \
         "can be seen and specimen string for given script can be chosen.</p>") +
-      _("<p>At the bottom, there are crucial rendering options duplicated " +
-        "from Rendered Details Tab, " +
+      _("<p>At the bottom, there are crucial rendering options duplicated " \
+        "from Rendered Details Tab, " \
         "which can be used to see changes in the rendering on the fly.</p>")
     end
 
     def antialiasing
       _("<h2 id=\"tab_help\">Rendering Details Tab</h2>") +
-      _("<p>This tab controls <b>how</b> fonts are rendered." +
-        " It allows you to amend font rendering algorithms to be used " +
+      _("<p>This tab controls <b>how</b> fonts are rendered." \
+        " It allows you to amend font rendering algorithms to be used " \
         "and change their options.</p>") +
       _("<h3>Antialiasing</h3>") +
-      _("<p>By default, all outline fonts are smoothed by method called " +
+      _("<p>By default, all outline fonts are smoothed by method called " \
         "<i>antialiasing.</i>") +
-      _(" Black and white rendering can be forced for all fonts or for " +
+      _(" Black and white rendering can be forced for all fonts or for " \
         "monospaced only.</p>") +
       _("<p>See: %s<\p>") % "<i>Wikipedia: Font Rasterization</i>"
     end
 
     def hinting
       _("<h3>Hinting</h3>") +
-      _("<p>Hinting instructions helps rasterizer to fit glyphs stems " +
+      _("<p>Hinting instructions helps rasterizer to fit glyphs stems " \
         "to the grid.</p>") +
-      _("<p>In the default setting, FreeType's autohinter can be used " +
-        "depending on font type and quality of own instructions." +
-        " Use of autohinter can be forced by <b>Force Autohinting On</b> " +
+      _("<p>In the default setting, FreeType's autohinter can be used " \
+        "depending on font type and quality of own instructions." \
+        " Use of autohinter can be forced by <b>Force Autohinting On</b> " \
         "option.</p>") +
       _("<p>For each hinting algorithm, hint style (hinting level) is chosen.") +
-      _(" It is possible to set hint style globally by <b>Force Hint Style</b> " +
+      _(" It is possible to set hint style globally by <b>Force Hint Style</b> " \
         "option.</p>") +
       _("<p>See: %s<\p>") % "<i>Wikipedia: Font Rasterization, Font hinting</i>"
     end
 
     def embedded_bitmaps
       _("<h3>Embedded Bitmaps</h3>") +
-      _("<p>Some outline fonts contain so called bitmap strikes, i. e. bitmap" +
-        " version of given font for certain sizes." +
-        " In this section it can be turned off entirely, on only for fonts which" +
+      _("<p>Some outline fonts contain so called bitmap strikes, i. e. bitmap" \
+        " version of given font for certain sizes." \
+        " In this section it can be turned off entirely, on only for fonts which" \
         " cover specified languages, or on for every font.")
     end
 
     def subpixel_rendering  
       _("<h3>Subpixel Rendering</h3>") +
-      _("<p>Subpixel rendering multiples resolution in one direction by using " +
+      _("<p>Subpixel rendering multiples resolution in one direction by using " \
         "colour primaries (subpixels) of an LCD display.</p>") +
-      _("<p>Choose LCD filter, which should be used, and subpixel layout " +
+      _("<p>Choose LCD filter, which should be used, and subpixel layout " \
         "corresponding to display and its rotation.</p>") +
-      _("<p>Note, that due to patent reasons, FreeType2 has subpixel " +
+      _("<p>Note, that due to patent reasons, FreeType2 has subpixel " \
          "rendering turned off by default.") +
-      _(" Without FreeType2's subpixel rendering support compiled in, " +
+      _(" Without FreeType2's subpixel rendering support compiled in, " \
         "setting in this section has no effect.</p>") +
       _("<p>See: %s<\p>") % "<i>Wikipedia: Subpixel rendering</i>"
     end
@@ -1038,33 +1036,33 @@ module FontsConfig
       _("<h2>Prefered Families Tab</h2>") +
       _("<p>This tab controls <b>which</b> fonts are rendered.</p>") +
       _("<h3>Preference Lists</h3>") +
-      _("<p>Family preference lists (FPL) for generic aliases (%s) " +
+      _("<p>Family preference lists (FPL) for generic aliases (%s) " \
         "can be defined.") % @fcstate.fpl.keys.join(', ') +
-      _(" These are sorted lists of family names, with most prefered " +
+      _(" These are sorted lists of family names, with most prefered " \
         "family first.") +
       _(" There is default (system-wide) FPL yet defined for each generic alias.") +
       _(" FPLs defined in this dialog will be prepended to them.<\p>") +
-      _("<p>System will look for the first <b>installed</b> family in the list," +
-        " other query elements taking into account of course. Available font" +
-        " packages for SUSE distributions can be" +
+      _("<p>System will look for the first <b>installed</b> family in the list," \
+        " other query elements taking into account of course. Available font" \
+        " packages for SUSE distributions can be" \
         " browsed and installed from <b>fontinfo.opensuse.org.</b></p>")
     end
 
     def forcing_family_preferences
       _("<h3>Forcing Family Preferences</h3>") +
-      _("<p>In some circumstances, FPLs defined in this dialog are " +
-        "not taken into account." +
+      _("<p>In some circumstances, FPLs defined in this dialog are " \
+        "not taken into account." \
         " Following two options strenghten their role.</p>") +
       _("<h4>Search Metric Compatible</h4>") +
-      _("<p>Two fonts are metric compatible, when all corresponding letters" +
-        " are of the same size. That implies, document displayed using these" +
+      _("<p>Two fonts are metric compatible, when all corresponding letters" \
+        " are of the same size. That implies, document displayed using these" \
         " fonts has the same same size too, same line wraps etc.</p>") +
-      _("<p>Via default setting, fontconfig substitutes metric compatible fonts preferably," +
+      _("<p>Via default setting, fontconfig substitutes metric compatible fonts preferably," \
         " and FPLs defined in this dialog can be circumvented by this rule.</p>") +
       _("<p>Where metric compatibility do not matter, this option can be unchecked.</p>") +
       _("<h4>Really do not use other fonts</h4>") +
-      _("<p>When checked, this option introduces very strong position for here" +
-        " defined preference lists. It pushes families from there before" +
+      _("<p>When checked, this option introduces very strong position for here" \
+        " defined preference lists. It pushes families from there before" \
         " document or GUI requests, if they cover required charset.</p>")
     end
   end

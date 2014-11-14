@@ -26,14 +26,12 @@ void Init_font_specimen() {
 VALUE method_font_scripts(VALUE self, VALUE str_pattern) {
   VALUE res_hash = rb_hash_new();
 
-  char *pattern;
+  char *pattern = StringValueCStr(str_pattern);
   const char *scripts[MAX_SCRIPTS];
   double coverages[MAX_SCRIPTS];
   char str_coverage[6];
 
   int s, nscripts;
-
-  pattern = StringValueCStr(str_pattern);
 
   if ((nscripts = specimen_font_scripts(pattern, SCRIPT_SORT_PERCENT,
                                         scripts, coverages, MAX_SCRIPTS)) <= 0)
@@ -63,7 +61,7 @@ VALUE method_specimen_write(VALUE self,
   int width     = NUM2INT(int_width);
   int height    = NUM2INT(int_height);
 
-  FILE *png = NULL;
+  FILE *png;
 
   png = rb_fdopen(png_fd, "w");
   if (!png)

@@ -114,10 +114,7 @@ VALUE method_fc_is_family_installed(VALUE self, VALUE str_family)
   family = StringValueCStr(str_family);
   font = find(family);
 
-  if (font)
-    res = Qtrue;
-  else
-    res = Qfalse;
+  res = font ? Qtrue : Qfalse;
 
   FcPatternDestroy(font);
   return res;

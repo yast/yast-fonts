@@ -389,7 +389,7 @@ module FontsConfig
       SCR.Write(
         path(SC_PATH + ".EMBEDDED_BITMAPS_LANGUAGES"),
         temp 
-      );
+      )
 
       SCR.Write(
         path(SC_PATH + ".USE_LCDFILTER"),

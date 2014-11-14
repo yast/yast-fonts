@@ -27,8 +27,8 @@ module FontsConfig
 
     def initialize
       @fcstate = FontsConfigState.new
-      @current_fpl = @fcstate.fpl.keys[0];
-      @current_family = nil;
+      @current_fpl = @fcstate.fpl.keys[0]
+      @current_family = nil
       @current_families = Hash.new
       @current_scripts = Hash.new
       @fcstate.fpl.keys.each do |generic_alias|
@@ -153,7 +153,7 @@ module FontsConfig
     def initialize_genericaliases_table(key)
       items = []
       @fcstate.fpl.keys.each do |generic_alias|
-        items.push(Item(generic_alias)); 
+        items.push(Item(generic_alias)) 
       end
       UI.ChangeWidget(Id("tbl_generic_aliases"), 
                       :Items, items)
@@ -171,7 +171,7 @@ module FontsConfig
       @fcstate.fpl[@current_fpl].each do |f|
         indication = family_installed?(f) ?
                        _("installed") : _("not installed")
-        items.push(Item(f, indication));
+        items.push(Item(f, indication))
       end
       UI.ChangeWidget(Id("tbl_family_list"), :Items, 
                       items)
@@ -326,7 +326,7 @@ module FontsConfig
     end
 
     def text_match_preview(family, generic_alias)
-      scripts = font_scripts(family);
+      scripts = font_scripts(family)
       text = "<p><b>Family:</b> #{family}</p>" +
              "<p><b>Scripts</b><ul>"
       scripts.each do |script, coverage|
@@ -362,7 +362,7 @@ module FontsConfig
         @current_families[generic_alias] = 
           installed_families_from(@fcstate.fpl[generic_alias])[0]
         @current_families[generic_alias] ||= match_family(generic_alias)
-        scripts = font_scripts(@current_families[generic_alias]);
+        scripts = font_scripts(@current_families[generic_alias])
         @current_scripts[generic_alias] = scripts.keys[0] 
 
         if (@current_scripts[generic_alias])
@@ -378,7 +378,7 @@ module FontsConfig
 
           File.open("#{@tmp_dir}/#{generic_alias}.png", "w") do |png|
             specimen_write(pattern, @current_scripts[generic_alias], png,
-                           SPECIMEN_SIZE, SPECIMEN_SIZE);
+                           SPECIMEN_SIZE, SPECIMEN_SIZE)
           end
         else
            UI.ChangeWidget(Id("cmb_specimen_scripts_#{generic_alias}"),
@@ -406,18 +406,18 @@ module FontsConfig
 
     def handle_specimen_widget(widget, event)
       @fcstate.force_aa_off = 
-        UI.QueryWidget(Id("chkb_specimen_antialiasing"), :Value);
+        UI.QueryWidget(Id("chkb_specimen_antialiasing"), :Value)
       @fcstate.force_ah_on = 
-        UI.QueryWidget(Id("chkb_specimen_autohinter"), :Value);
+        UI.QueryWidget(Id("chkb_specimen_autohinter"), :Value)
       @fcstate.force_hintstyle = 
-        UI.QueryWidget(Id("cmb_specimen_hintstyle"), :Value);
+        UI.QueryWidget(Id("cmb_specimen_hintstyle"), :Value)
       @fcstate.lcd_filter = 
-        UI.QueryWidget(Id("cmb_specimen_lcdfilter"), :Value);
+        UI.QueryWidget(Id("cmb_specimen_lcdfilter"), :Value)
       if (event["ID"] == "cmb_specimen_lcdfilter")
         subpixel_freetype_warning
       end
       @fcstate.subpixel_layout = 
-        UI.QueryWidget(Id("cmb_specimen_subpixellayout"), :Value);
+        UI.QueryWidget(Id("cmb_specimen_subpixellayout"), :Value)
 
       @fcstate.fpl.keys.each do |generic_alias|
         @current_scripts[generic_alias] = 
@@ -427,7 +427,7 @@ module FontsConfig
 
         File.open("#{@tmp_dir}/#{generic_alias}.png", "w") do |png|
           specimen_write(pattern, @current_scripts[generic_alias], png,
-                         SPECIMEN_SIZE, SPECIMEN_SIZE);
+                         SPECIMEN_SIZE, SPECIMEN_SIZE)
         end
 
         if (UI.TextMode)

@@ -109,15 +109,17 @@ VALUE method_fc_is_family_installed(VALUE self, VALUE str_family)
 {
   FcPattern *font;
   char *family;
-  VALUE res;
 
   family = StringValueCStr(str_family);
   font = find(family);
 
-  res = font ? Qtrue : Qfalse;
+  if (font)
+  {
+    FcPatternDestroy(font);
+    return Qtrue;
+  }
 
-  FcPatternDestroy(font);
-  return res;
+  return Qfalse;
 }
 
 VALUE method_fc_match_family(VALUE self, VALUE str_family) 

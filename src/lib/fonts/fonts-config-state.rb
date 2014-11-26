@@ -106,9 +106,9 @@ module FontsConfig
         "bw_fonts" => {
           "name" => N_("Black and White Rendering"),
           "fpl" =>  {
-            "sans-serif" => [],
-            "serif" => [],
-            "monospace" => [],
+            "sans-serif" => [ "Liberation Sans" ],
+            "serif" => [ "Liberation Serif" ],
+            "monospace" => [ "Liberation Mono" ],
           },
           "search_metric_compatible" => true,
           "really_force_fpl" => false,
@@ -389,7 +389,7 @@ module FontsConfig
       SCR.Write(
         path(SC_PATH + ".EMBEDDED_BITMAPS_LANGUAGES"),
         temp 
-      );
+      )
 
       SCR.Write(
         path(SC_PATH + ".USE_LCDFILTER"),

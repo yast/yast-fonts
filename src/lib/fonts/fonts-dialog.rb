@@ -1,3 +1,6 @@
+require "fileutils"
+require "tmpdir"
+
 require "yast"
 
 require "fonts/fonts-config-state"
@@ -8,6 +11,7 @@ require "fonts/rich-text-dialog"
 
 require "yast/ft2_rendering"
 require "yast/fontconfig_setting"
+require "yast/font_specimen"
 
 module FontsConfig
   class FontsConfigDialog
@@ -16,11 +20,22 @@ module FontsConfig
     include I18n
     include Ft2Rendering
     include FontconfigSetting
+    include FontSpecimen
+    include FileUtils
+
+    SPECIMEN_SIZE = 250
 
     def initialize
       @fcstate = FontsConfigState.new
-      @current_fpl = @fcstate.fpl.keys[0];
-      @current_family = nil;
+      @current_fpl = @fcstate.fpl.keys[0]
+      @current_family = nil
+      @current_families = Hash.new
+      @current_scripts = Hash.new
+      @fcstate.fpl.keys.each do |generic_alias|
+        @current_families[generic_alias] = nil
+        @current_scripts[generic_alias] = nil
+      end
+      @tmp_dir = Dir.mktmpdir("yast-fonts-")
     end
 
     def self.run
@@ -117,6 +132,7 @@ module FontsConfig
     def handle_lcdfilter_combo(key, map)
       @fcstate.lcd_filter =
         UI.QueryWidget(Id("cmb_lcd_filter"), :Value)
+      subpixel_freetype_warning
       initialize_lcdfilter_combo("")
       return nil
     end
@@ -136,8 +152,8 @@ module FontsConfig
 
     def initialize_genericaliases_table(key)
       items = []
-      @fcstate.fpl.keys.each do |a|
-        items.push(Item(a)); 
+      @fcstate.fpl.keys.each do |generic_alias|
+        items.push(Item(generic_alias)) 
       end
       UI.ChangeWidget(Id("tbl_generic_aliases"), 
                       :Items, items)
@@ -155,7 +171,7 @@ module FontsConfig
       @fcstate.fpl[@current_fpl].each do |f|
         indication = family_installed?(f) ?
                        _("installed") : _("not installed")
-        items.push(Item(f, indication));
+        items.push(Item(f, indication))
       end
       UI.ChangeWidget(Id("tbl_family_list"), :Items, 
                       items)
@@ -273,7 +289,9 @@ module FontsConfig
       if event && event["EventType"] == "MenuEvent" && 
            FontsConfigState::preset?(event["ID"])
         @fcstate.load_preset(event["ID"])
-        if CWMTab.CurrentTab == "algorithms"
+        if CWMTab.CurrentTab == "specimens"
+          initialize_specimen_widget("")
+        elsif CWMTab.CurrentTab == "algorithms"
           initialize_aaoff_checkbox("")
           initialize_aamonooff_checkbox("")
           initialize_ahon_checkbox("")
@@ -287,7 +305,138 @@ module FontsConfig
           initialize_searchmc_checkbox("")
           initialize_noother_checkbox("")
         end
+        subpixel_freetype_warning
+        installation_summary_check
       end
+      return nil
+    end
+
+    def graphic_match_preview(script, generic_alias)
+        if (script)
+          text = "<p><b>Family:</b> #{@current_families[generic_alias]}</b></p>" \
+                 "<p><b>Specimen for #{script}</b></p>" \
+                 "<center>" \
+                 "<img src=\"#{@tmp_dir}/#{generic_alias}.png\"/>" \
+                 "</center>"
+        else
+          # unlikely
+          text = "<b>No script found for " \
+                 "#{@current_families[generic_alias]}.</b>"
+        end
+        UI.ChangeWidget(Id("rt_specimen_#{generic_alias}"), :Value, text)
+    end
+
+    def text_match_preview(family, generic_alias)
+      scripts = font_scripts(family)
+      text = "<p><b>Family:</b> #{family}</p>" \
+             "<p><b>Scripts</b><ul>"
+      scripts.each do |script, coverage|
+        text << "<li>#{script} (#{coverage})</li>"
+      end
+      text << "</ul></p>"
+      UI.ChangeWidget(Id("rt_specimen_#{generic_alias}"), :Value, text)
+    end
+
+    def create_pattern_string(generic_alias)
+      pattern = @current_families[generic_alias]
+      if @fcstate.force_aa_off || 
+         (@fcstate.force_aa_off_mono && generic_alias == "monospace")
+        pattern << ":antialias=0" 
+      end
+      if @fcstate.force_ah_on
+        pattern << ":autohint=1"  
+      end
+      if @fcstate.force_hintstyle != FontsConfigState::HINT_STYLES[0]
+        pattern << ":hintstyle=#{@fcstate.force_hintstyle}" 
+      end
+      if @fcstate.lcd_filter !=  FontsConfigState::LCD_FILTERS[0]
+        pattern << ":lcdfilter=#{@fcstate.lcd_filter}" 
+      end
+      if @fcstate.subpixel_layout != FontsConfigState::SUBPIXEL_LAYOUTS[0]
+        pattern << ":rgba=#{@fcstate.subpixel_layout}" 
+      end
+      return pattern
+    end
+
+    def initialize_specimen_widget(key)
+      @fcstate.fpl.keys.each do |generic_alias|
+        @current_families[generic_alias] = 
+          installed_families_from(@fcstate.fpl[generic_alias])[0]
+        @current_families[generic_alias] ||= match_family(generic_alias)
+        scripts = font_scripts(@current_families[generic_alias])
+        @current_scripts[generic_alias] = scripts.keys[0] 
+
+        if (@current_scripts[generic_alias])
+          items = scripts.map do |script, coverage|
+            Item(Id("#{script}"), "#{script} (#{coverage} %)")
+          end
+          UI.ChangeWidget(Id("cmb_specimen_scripts_#{generic_alias}"),
+                          :Items, items)
+
+          pattern = create_pattern_string(generic_alias)
+
+          File.open("#{@tmp_dir}/#{generic_alias}.png", "w") do |png|
+            specimen_write(pattern, @current_scripts[generic_alias], png,
+                           SPECIMEN_SIZE, SPECIMEN_SIZE)
+          end
+        else
+           UI.ChangeWidget(Id("cmb_specimen_scripts_#{generic_alias}"),
+                           :Items, [])
+        end
+       
+        if (UI.TextMode)
+          text_match_preview(@current_families[generic_alias], generic_alias)
+        else
+          graphic_match_preview(@current_scripts[generic_alias], generic_alias)
+        end
+      end
+
+      UI.ChangeWidget(Id("chkb_specimen_antialiasing"), :Value, 
+                      @fcstate.force_aa_off ? true : false )
+      UI.ChangeWidget(Id("chkb_specimen_autohinter"), :Value, 
+                      @fcstate.force_ah_on ? true : false )
+      UI.ChangeWidget(Id("cmb_specimen_hintstyle"), :Value, 
+                      @fcstate.force_hintstyle)
+      UI.ChangeWidget(Id("cmb_specimen_lcdfilter"), :Value, 
+                      @fcstate.lcd_filter)
+      UI.ChangeWidget(Id("cmb_specimen_subpixellayout"), :Value, 
+                      @fcstate.subpixel_layout)
+    end
+
+    def handle_specimen_widget(widget, event)
+      @fcstate.force_aa_off = 
+        UI.QueryWidget(Id("chkb_specimen_antialiasing"), :Value)
+      @fcstate.force_ah_on = 
+        UI.QueryWidget(Id("chkb_specimen_autohinter"), :Value)
+      @fcstate.force_hintstyle = 
+        UI.QueryWidget(Id("cmb_specimen_hintstyle"), :Value)
+      @fcstate.lcd_filter = 
+        UI.QueryWidget(Id("cmb_specimen_lcdfilter"), :Value)
+      if (event["ID"] == "cmb_specimen_lcdfilter")
+        subpixel_freetype_warning
+      end
+      @fcstate.subpixel_layout = 
+        UI.QueryWidget(Id("cmb_specimen_subpixellayout"), :Value)
+
+      @fcstate.fpl.keys.each do |generic_alias|
+        @current_scripts[generic_alias] = 
+          UI.QueryWidget(Id("cmb_specimen_scripts_#{generic_alias}"), :Value)
+        
+        pattern = create_pattern_string(generic_alias)
+
+        File.open("#{@tmp_dir}/#{generic_alias}.png", "w") do |png|
+          specimen_write(pattern, @current_scripts[generic_alias], png,
+                         SPECIMEN_SIZE, SPECIMEN_SIZE)
+        end
+
+        if (UI.TextMode)
+          text_match_preview(@current_families[generic_alias], generic_alias)
+        else
+          graphic_match_preview(@current_scripts[generic_alias], 
+                                generic_alias)
+        end
+      end
+
       return nil
     end
 
@@ -304,34 +453,50 @@ module FontsConfig
     def installation_summary_check
       installed = Hash.new
       not_installed_for_aliases = []
-      @fcstate.fpl.keys.each do |a|
-        installed[a] = 
-          installed_families_from(@fcstate.fpl[a])
-        if (installed[a].empty? &&
-             !@fcstate.fpl[a].empty?)
-          not_installed_for_aliases << a
+      @fcstate.fpl.keys.each do |generic_alias|
+        installed[generic_alias] = 
+          installed_families_from(@fcstate.fpl[generic_alias])
+        if (installed[generic_alias].empty? &&
+             !@fcstate.fpl[generic_alias].empty?)
+          not_installed_for_aliases << generic_alias
         end
       end
       unless not_installed_for_aliases.empty? then
-        text = _("Family preference list for %s\n" +
+        text = _("Family preference list for %s\n" \
                "do not contain any installed family.\n\n") %
                not_installed_for_aliases.join(", ") +
-               _("Please make sure to install at least one for each\n" +
-                 "alias later, otherwise this preference setting has " +
-                 "no effect.")
+               _("Please make sure to install at least one for each\n" \
+                 "alias, otherwise this preference setting has " \
+                 "no effect.\n\n") +
+               _("Fonts can be installed e. g. via fontinfo.opensuse.org. \n" \
+                 "If you install them when this yast module is running,\n" \
+                 "reread the profile to see results.\n")
         summary = ""
-        summary += "<table>"
-        @fcstate.fpl.keys.each do |a|
-          summary += "<tr><td><h3>#{a}</h3></td></tr>"
-          @fcstate.fpl[a].each do |f|
-            indication = family_installed?(f) ? 
-                         "<font color=\"green\">installed</font>" :
-                         "<font color=\"red\">not installed</font>";
-            summary += "<tr><td>#{f}</td><td>#{indication}</td></tr>"
+        if (UI.TextMode)
+          # <table> do not work for text mode
+          @fcstate.fpl.keys.each do |generic_alias|
+            summary << "<h3>#{generic_alias}</h3><ul>"
+            @fcstate.fpl[generic_alias].each do |f|
+              indication = family_installed?(f) ?
+                           "installed" : "not installed"
+              summary << "<li>#{f} (#{indication})</li>"
+            end
+            summary << "</ul>"
           end
-          summary += "<tr></tr>"
+        else
+          summary << "<table>"
+          @fcstate.fpl.keys.each do |generic_alias|
+            summary << "<tr><td><h3>#{generic_alias}</h3></td></tr>"
+            @fcstate.fpl[generic_alias].each do |f|
+              indication = family_installed?(f) ? 
+                           "<font color=\"green\">installed</font>" :
+                           "<font color=\"red\">not installed</font>"
+              summary << "<tr><td>#{f}</td><td>#{indication}</td></tr>"
+            end
+            summary << "<tr></tr>"
+          end
+          summary << "</table>"
         end
-        summary += "</table>"
 
         fpl_inst_summary_dialog = RichTextDialog.new
         fpl_inst_summary_dialog.run(text, summary)
@@ -344,7 +509,7 @@ module FontsConfig
            !have_subpixel_rendering))
         Yast.import "Popup"
         text = _("You have set LCD filter type (%s).") % @fcstate.lcd_filter +
-               _(" This needs subpixel rendering capabality\ncompiled" +
+               _(" This needs subpixel rendering capabality\ncompiled" \
                  " in FreeType library.") +
                _(" Unfortunately, we can not ship it due patent reasons.\n") +
                "\n" +
@@ -363,6 +528,21 @@ module FontsConfig
       end
 
       return true
+    end
+
+    def specimen_alias_widget(generic_alias)
+      VBox(
+        HBox(Left(
+               Label(Id("lbl_specimen_#{generic_alias}"), "Match for #{generic_alias}")
+             ),
+             Right( UI.TextMode ? Label("") :
+               ComboBox(Id("cmb_specimen_scripts_#{generic_alias}"), Opt(:notify, :immediate), "", [])
+             )
+        ),
+        RichText(Id("rt_specimen_#{generic_alias}"),
+                 Opt(:hstretch, :vstretch),
+                 "")
+      )
     end
 
     def widgets
@@ -392,7 +572,7 @@ module FontsConfig
         },
         "chkb_ah_on" => {
           "widget"        => :checkbox,
-          "label"         => _("Force Auto&hinting On"),
+          "label"         => _("Force A&utohinting On"),
           "init"          => fun_ref(method(:initialize_ahon_checkbox), 
                                      "void (string)"),
           "opt"           => [ :notify, :immediate ],
@@ -406,7 +586,7 @@ module FontsConfig
           "init"          => fun_ref(method(:initialize_hintstyle_combo), 
                                      "void (string)"),
           "opt"           => [ :hstretch, :notify, :immediate ],
-          "label"         => _("Force Hint &Style"),
+          "label"         => _("Force Hint St&yle"),
           "handle_events" => [ "cmb_hintstyle" ],
           "handle"        => fun_ref(method(:handle_hintstyle_combo),
                                      "symbol (string, map)"),
@@ -425,7 +605,7 @@ module FontsConfig
                       HBox(
                         HSpacing(3),
                         Left(RadioButton(Id("rbtn_ebl_all"), Opt(:notify, :immediate),
-                                         _("&All Languages")))
+                                         _("All Lan&guages")))
                       ),
                       HBox(
                         HSpacing(3),
@@ -548,11 +728,51 @@ module FontsConfig
                                      "symbol (string, map)"),
           "no_help"       => true
         },
+        "cstm_specimen_widget" => {
+          "widget"        => :custom,
+          "custom_widget" =>
+            VBox(
+              HBox(
+                 * @fcstate.fpl.keys.map do |generic_alias|
+                     specimen_alias_widget(generic_alias)
+                 end
+              ), UI.TextMode ? Label("") :
+              HBox(
+                CheckBox(Id("chkb_specimen_antialiasing"), Opt(:notify, :immediate),
+                          _("Turn &Antialiasing Off")),
+                HStretch(),
+                CheckBox(Id("chkb_specimen_autohinter"), Opt(:notify, :immediate),
+                          _("Force A&utohinting On")),
+                HStretch(),
+                ComboBox(Id("cmb_specimen_hintstyle"), Opt(:notify, :immediate), 
+                         _("Force Hint St&yle"), FontsConfigState::HINT_STYLES),
+                HStretch(),
+                ComboBox(Id("cmb_specimen_lcdfilter"), Opt(:notify, :immediate), 
+                         _("LCD &Filter"), FontsConfigState::LCD_FILTERS),
+                HStretch(),
+                ComboBox(Id("cmb_specimen_subpixellayout"), Opt(:notify, :immediate), 
+                         _("Subpixel &Layout"), FontsConfigState::SUBPIXEL_LAYOUTS),
+              ) 
+            ),
+          "init"          => fun_ref(method(:initialize_specimen_widget),
+                                     "symbol (string)"),
+          "handle_events" => [ "chkb_specimen_antialiasing", 
+                               "chkb_specimen_autohinter",
+                               "cmb_specimen_hintstyle",
+                               "cmb_specimen_lcdfilter",
+                               "cmb_specimen_subpixellayout",
+                               * @fcstate.fpl.keys.map do |generic_alias|
+                                   "cmb_specimen_scripts_#{generic_alias}"
+                                 end ],
+          "handle"        => fun_ref(method(:handle_specimen_widget),
+                                     "symbol (string, map)"),
+          "help"          => help.match_preview
+        }
       }
 
       tabs_description = {
         "algorithms" => {
-          "header"       => _("&Rendering"),
+          "header"       => _("&Rendering Details"),
           "contents"     => 
             VBox(
               Frame(
@@ -612,14 +832,20 @@ module FontsConfig
             "chkb_no_other"
           ]
         },
+        "specimens" => {
+          "header"       => _("Match &Preview"),
+          "contents"     => VBox("cstm_specimen_widget"),
+          "widget_names" => ["cstm_specimen_widget", 
+                             * widgets_description["cstm_specimen_widget"]["handle_events"]]
+        }
       }
 
       widgets_description["tabs_fonts_configuration"] = CWMTab.CreateWidget(
           {
-            "tab_order"    => ["algorithms", "families"],
+            "tab_order"    => ["specimens", "families", "algorithms"],
             "tabs"         => tabs_description,
             "widget_descr" => widgets_description,
-            "initial_tab"  => "families"
+            "initial_tab"  => "specimens"
           }
         )
 
@@ -680,17 +906,12 @@ module FontsConfig
         }
       )
      
+      remove_entry_secure(@tmp_dir)
  
       case ret
         when :next
           if (root_user?)
             y2milestone("saving configuration")
-
-            y2milestone("performing installation summary check")
-            installation_summary_check
-
-            y2milestone("issue freetype subpixel rendering warning if applicable")
-            subpixel_freetype_warning
 
             Progress.New(
               _("Writing Font Configuration"),
@@ -744,43 +965,74 @@ module FontsConfig
             :help => presets[preset]["help"]
         }
       end.join + "</ul>" +
-      _("Every single item there just fills appropriate setting in both tabs. ") +
-      _("That setting can be later arbitrarily customized in depth by respective ") +
-      _("individual fields of both tabs.</p>")
+      _("Every single item there just fills appropriate setting in both tabs. " \
+        "That setting can be later arbitrarily customized in depth by respective " \
+        "individual fields of both tabs.</p>")
+    end
+
+    def match_preview
+      _("<h2>Match Preview Tab</h2>") +
+      _("<p>In this paragraph, <i>current setting</i> means setting " \
+        "of the system plus changes made in currently running fonts module.</p>") +
+      _("<p>Matches to system generic aliases can be seen in this initial tab. ") +
+      _("In other words, for every alias () you can see family name, which" \
+        " resolves to given alias according to <i>current setting.</i></p>") %
+          @fcstate.fpl.keys.join(", ") +
+      _("<p>In adition to that, graphical mode allows to display " \
+        "font specimen of the matched font rendered (again) taking " \
+        "<i>current setting</i> into account. ") +
+      _("In the corresponding combo box, script coverage of matched font " \
+        "can be seen and specimen string for given script can be chosen.</p>") +
+      _("<p>At the bottom, there are crucial rendering options duplicated " \
+        "from Rendered Details Tab, " \
+        "which can be used to see changes in the rendering on the fly.</p>")
     end
 
     def antialiasing
-      _("<h2 id=\"tab_help\">Rendering Tab</h2>") +
-      _("<p>This tab controls <b>how</b> fonts are rendered.") +
-      _(" It allows you to amend font rendering algorithms to be used and change their options.</p>") +
+      _("<h2 id=\"tab_help\">Rendering Details Tab</h2>") +
+      _("<p>This tab controls <b>how</b> fonts are rendered." \
+        " It allows you to amend font rendering algorithms to be used " \
+        "and change their options.</p>") +
       _("<h3>Antialiasing</h3>") +
-      _("<p>By default, all outline fonts are smoothed by method called <i>antialiasing.</i>") +
-      _(" Black and white rendering can be forced for all fonts or for monospaced only.</p>") +
+      _("<p>By default, all outline fonts are smoothed by method called " \
+        "<i>antialiasing.</i>") +
+      _(" Black and white rendering can be forced for all fonts or for " \
+        "monospaced only.</p>") +
       _("<p>See: %s<\p>") % "<i>Wikipedia: Font Rasterization</i>"
     end
 
     def hinting
       _("<h3>Hinting</h3>") +
-      _("<p>Hinting instructions helps rasterizer to fit glyphs stems to the grid.</p>") +
-      _("<p>In the default setting, FreeType's autohinter can be used depending on font type and quality of own instructions.") +
-      _(" Use of autohinter can be forced by <b>Force Autohinting On</b> option.</p>") +
+      _("<p>Hinting instructions helps rasterizer to fit glyphs stems " \
+        "to the grid.</p>") +
+      _("<p>In the default setting, FreeType's autohinter can be used " \
+        "depending on font type and quality of own instructions." \
+        " Use of autohinter can be forced by <b>Force Autohinting On</b> " \
+        "option.</p>") +
       _("<p>For each hinting algorithm, hint style (hinting level) is chosen.") +
-      _(" It is possible to set hint style globally by <b>Force Hint Style</b> option.</p>") +
+      _(" It is possible to set hint style globally by <b>Force Hint Style</b> " \
+        "option.</p>") +
       _("<p>See: %s<\p>") % "<i>Wikipedia: Font Rasterization, Font hinting</i>"
     end
 
     def embedded_bitmaps
       _("<h3>Embedded Bitmaps</h3>") +
-      _("<p>Some outline fonts contain so called bitmap strikes, i. e. bitmap version of given font for certain sizes.") +
-      _(" In this section it can be turned off entirely, on only for fonts which cover specified languages, or on for every font.")
+      _("<p>Some outline fonts contain so called bitmap strikes, i. e. bitmap" \
+        " version of given font for certain sizes." \
+        " In this section it can be turned off entirely, on only for fonts which" \
+        " cover specified languages, or on for every font.")
     end
 
     def subpixel_rendering  
       _("<h3>Subpixel Rendering</h3>") +
-      _("<p>Subpixel rendering multiples resolution in one direction by using colour primaries (subpixels) of an LCD display.</p>") +
-      _("<p>Choose LCD filter, which should be used, and subpixel layout corresponding to display and its rotation.</p>") +
-      _("<p>Note, that due to patent reasons, FreeType2 has subpixel rendering turned off by default.") + 
-      _(" Without FreeType2's subpixel rendering support compiled in, setting in this section has no effect.</p>") +
+      _("<p>Subpixel rendering multiples resolution in one direction by using " \
+        "colour primaries (subpixels) of an LCD display.</p>") +
+      _("<p>Choose LCD filter, which should be used, and subpixel layout " \
+        "corresponding to display and its rotation.</p>") +
+      _("<p>Note, that due to patent reasons, FreeType2 has subpixel " \
+         "rendering turned off by default.") +
+      _(" Without FreeType2's subpixel rendering support compiled in, " \
+        "setting in this section has no effect.</p>") +
       _("<p>See: %s<\p>") % "<i>Wikipedia: Subpixel rendering</i>"
     end
 
@@ -788,30 +1040,34 @@ module FontsConfig
       _("<h2>Prefered Families Tab</h2>") +
       _("<p>This tab controls <b>which</b> fonts are rendered.</p>") +
       _("<h3>Preference Lists</h3>") +
-      _("<p>Family preference lists (FPL) for generic aliases (%s) can be defined.") % @fcstate.fpl.keys.join(', ') +
-      _(" These are sorted lists of family names, with most prefered family first.") +
+      _("<p>Family preference lists (FPL) for generic aliases (%s) " \
+        "can be defined.") % @fcstate.fpl.keys.join(', ') +
+      _(" These are sorted lists of family names, with most prefered " \
+        "family first.") +
       _(" There is default (system-wide) FPL yet defined for each generic alias.") +
       _(" FPLs defined in this dialog will be prepended to them.<\p>") +
-      _("<p>System will look for the first <b>installed</b> family in the list,") +
-      _(" other query elements taking into account of course. Available font packages for SUSE distributions can be") +
-      _(" browsed and installed from <b>fontinfo.opensuse.org.</b></p>")
+      _("<p>System will look for the first <b>installed</b> family in the list," \
+        " other query elements taking into account of course. Available font" \
+        " packages for SUSE distributions can be" \
+        " browsed and installed from <b>fontinfo.opensuse.org.</b></p>")
     end
 
     def forcing_family_preferences
       _("<h3>Forcing Family Preferences</h3>") +
-      _("<p>In some circumstances, FPLs defined in this dialog are not taken into account.") +
-      _(" Following two options strenghten their role.</p>") +
+      _("<p>In some circumstances, FPLs defined in this dialog are " \
+        "not taken into account." \
+        " Following two options strenghten their role.</p>") +
       _("<h4>Search Metric Compatible</h4>") +
-      _("<p>Two fonts are metric compatible, when all corresponding letters are of the") +
-      _(" same size. That implies, document displayed using these fonts has the same") + 
-      _(" same size too, same line wraps etc.</p>") +
-      _("<p>Via default setting, fontconfig substitutes metric compatible fonts preferably,") + 
-      _(" and FPLs defined in this dialog can be circumvented by this rule.</p>") +
+      _("<p>Two fonts are metric compatible, when all corresponding letters" \
+        " are of the same size. That implies, document displayed using these" \
+        " fonts has the same same size too, same line wraps etc.</p>") +
+      _("<p>Via default setting, fontconfig substitutes metric compatible fonts preferably," \
+        " and FPLs defined in this dialog can be circumvented by this rule.</p>") +
       _("<p>Where metric compatibility do not matter, this option can be unchecked.</p>") +
       _("<h4>Really do not use other fonts</h4>") +
-      _("<p>When checked, this option introduces very strong position for here") +
-      _(" defined preference lists. It pushes families from there before") +
-      _(" document or GUI requests, if they cover required charset.</p>")
+      _("<p>When checked, this option introduces very strong position for here" \
+        " defined preference lists. It pushes families from there before" \
+        " document or GUI requests, if they cover required charset.</p>")
     end
   end
 end

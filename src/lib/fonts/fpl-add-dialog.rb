@@ -37,15 +37,15 @@ module FontsConfig
               end
 
       dialog_content = VBox(
-                        MinSize(40, 16,
-                                Table(Id("tbl_family_names"),
-                                      Opt(:keepSorting, :notify, :immediate),
-                                      Header(_("Installed Families"), 
-                                             _("Font Format")),
-                                      items)),
                         InputField(Id("txt_family_name"), 
                                    Opt(:notify, :immediate, :hstretch),
                                    _("&Filter"), ""),
+                        MinSize(40, 16,
+                                Table(Id("tbl_family_names"),
+                                      Opt(:notify, :immediate),
+                                      Header(_("Installed Families"), 
+                                             _("Font Format")),
+                                      items)),
                         HBox(PushButton(Id("btn_cancel"), _("&Cancel")),
                              PushButton(Id("btn_add"), _("&Add"))),
                        )
@@ -75,7 +75,7 @@ module FontsConfig
             return family != "" ? family : nil
           when "txt_family_name"
             substring = UI.QueryWidget(Id("txt_family_name"), :Value)
-            filtered_families = @available_families.select{|f| f[/#{substring}/]}
+            filtered_families = @available_families.select{|f| f[/#{substring}/i]}
             items = filtered_families.map do |family|
                     pattern = parse_pattern(family)
                     Item(Id(pattern["family"]), pattern["family"], pattern["fontformat"])

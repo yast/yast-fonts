@@ -1,6 +1,6 @@
 require 'mkmf'
 
-$LDFLAGS << ' -lfont-specimen -lfontconfig -lfreetype -lpng -lharfbuzz'
+$LDFLAGS << ' -lfont-specimen'
 
 extension_name = 'font_specimen'
 

@@ -27,8 +27,7 @@ module FontsConfig
       "rgb",
       "vrgb",
       "bgr",
-      "vbgr",
-      "unknown"
+      "vbgr"
     ]
 
     # in case of changing profiles, please reflect

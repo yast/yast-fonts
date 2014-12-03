@@ -125,15 +125,12 @@ module FontsConfig
                       FontsConfigState::LCD_FILTERS)
       UI.ChangeWidget(Id("cmb_lcd_filter"), :Value, 
                       @fcstate.lcd_filter)
-      UI.ChangeWidget(Id("cmb_subpixel_layout"), :Enabled,
-           @fcstate.lcd_filter != FontsConfigState::LCD_FILTERS[0])
     end
 
     def handle_lcdfilter_combo(key, map)
       @fcstate.lcd_filter =
         UI.QueryWidget(Id("cmb_lcd_filter"), :Value)
       subpixel_freetype_warning
-      initialize_lcdfilter_combo("")
       return nil
     end
 
@@ -142,11 +139,15 @@ module FontsConfig
                       FontsConfigState::SUBPIXEL_LAYOUTS)
       UI.ChangeWidget(Id("cmb_subpixel_layout"), :Value, 
                       @fcstate.subpixel_layout)
+      UI.ChangeWidget(Id("cmb_lcd_filter"), :Enabled,
+           @fcstate.subpixel_layout != FontsConfigState::SUBPIXEL_LAYOUTS[0])
     end
 
     def handle_subpixellayout_combo(key, map)
       @fcstate.subpixel_layout =
         UI.QueryWidget(Id("cmb_subpixel_layout"), :Value)
+      UI.ChangeWidget(Id("cmb_lcd_filter"), :Enabled,
+           @fcstate.subpixel_layout != FontsConfigState::SUBPIXEL_LAYOUTS[0])
       return nil
     end
 
@@ -401,6 +402,8 @@ module FontsConfig
                       @fcstate.lcd_filter)
       UI.ChangeWidget(Id("cmb_specimen_subpixellayout"), :Value, 
                       @fcstate.subpixel_layout)
+      UI.ChangeWidget(Id("cmb_specimen_lcdfilter"), :Enabled,
+           @fcstate.subpixel_layout != FontsConfigState::SUBPIXEL_LAYOUTS[0])
     end
 
     def handle_specimen_widget(widget, event)
@@ -436,6 +439,9 @@ module FontsConfig
                                 generic_alias)
         end
       end
+
+      UI.ChangeWidget(Id("cmb_specimen_lcdfilter"), :Enabled,
+           @fcstate.subpixel_layout != FontsConfigState::SUBPIXEL_LAYOUTS[0])
 
       return nil
     end
@@ -504,7 +510,7 @@ module FontsConfig
     end
 
     def subpixel_freetype_warning
-      if (@fcstate.lcd_filter != FontsConfigState::LCD_FILTERS[0] &&
+      if (@fcstate.subpixel_layout != FontsConfigState::SUBPIXEL_LAYOUTS[0] &&
           (have_freetype &&
            !have_subpixel_rendering))
         Yast.import "Popup"
@@ -650,7 +656,7 @@ module FontsConfig
           "init"          => fun_ref(method(:initialize_subpixellayout_combo), 
                                      "void (string)"),
           "opt"           => [ :hstretch, :notify, :immediate ],
-          "label"         => _("Subpixel &Layout"),
+          "label"         => _("&Layout"),
           "handle_events" => [ "cmb_subpixel_layout" ],
           "handle"        => fun_ref(method(:handle_subpixellayout_combo),
                                      "symbol (string, map)"),
@@ -747,11 +753,10 @@ module FontsConfig
                 ComboBox(Id("cmb_specimen_hintstyle"), Opt(:notify, :immediate), 
                          _("Force Hint St&yle"), FontsConfigState::HINT_STYLES),
                 HStretch(),
+                ComboBox(Id("cmb_specimen_subpixellayout"), Opt(:notify, :immediate), 
+                         _("Subpixel &Rendering"), FontsConfigState::SUBPIXEL_LAYOUTS),
                 ComboBox(Id("cmb_specimen_lcdfilter"), Opt(:notify, :immediate), 
                          _("LCD &Filter"), FontsConfigState::LCD_FILTERS),
-                HStretch(),
-                ComboBox(Id("cmb_specimen_subpixellayout"), Opt(:notify, :immediate), 
-                         _("Subpixel &Layout"), FontsConfigState::SUBPIXEL_LAYOUTS),
               ) 
             ),
           "init"          => fun_ref(method(:initialize_specimen_widget),
@@ -793,8 +798,8 @@ module FontsConfig
               Frame(
                 _("Subpixel Rendering"),
                 VBox(
+                  Left("cmb_subpixel_layout"),
                   Left("cmb_lcd_filter"),
-                  Left("cmb_subpixel_layout")
                 ),
               ),
               VStretch()
@@ -805,8 +810,8 @@ module FontsConfig
             "chkb_ah_on",
             "cmb_hintstyle",
             "cstm_embedded_bitmaps",
+            "cmb_subpixel_layout",
             "cmb_lcd_filter",
-            "cmb_subpixel_layout"
           ],
         },
         "families"   => {

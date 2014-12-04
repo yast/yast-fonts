@@ -28,6 +28,9 @@ module FontsConfig
             end
           end
         end
+        BLACKLIST.each do |black_family|
+          @available_families.delete_if{|f| f =~ /#{black_family}/}
+        end
         @available_families.each do |family|
           pattern = parse_pattern(family)
           scripts = font_scripts(pattern["family"]).

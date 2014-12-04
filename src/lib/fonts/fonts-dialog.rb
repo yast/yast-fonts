@@ -312,12 +312,13 @@ module FontsConfig
       return nil
     end
 
-    def graphic_match_preview(script, generic_alias)
+    def graphic_match_preview(script, generic_alias, specimen_ok)
         if (script)
           text = "<p><b>Family:</b> #{@current_families[generic_alias]}</b></p>" \
                  "<p><b>Specimen for #{script}</b></p>" \
-                 "<center>" \
-                 "<img src=\"#{@tmp_dir}/#{generic_alias}.png\"/>" \
+                 "<center>" +
+                 (specimen_ok ? "<img src=\"#{@tmp_dir}/#{generic_alias}.png\"/>" 
+                              : "<p>No specimen available for this font and script.</p>") +
                  "</center>"
         else
           # unlikely
@@ -376,9 +377,11 @@ module FontsConfig
 
           pattern = create_pattern_string(generic_alias)
 
+          specimen_ok = true
           File.open("#{@tmp_dir}/#{generic_alias}.png", "w") do |png|
-            specimen_write(pattern, @current_scripts[generic_alias], png,
-                           SPECIMEN_SIZE, SPECIMEN_SIZE)
+            specimen_ok = 
+              specimen_write(pattern, @current_scripts[generic_alias], png,
+                             SPECIMEN_SIZE, SPECIMEN_SIZE)
           end
         else
            UI.ChangeWidget(Id("cmb_specimen_scripts_#{generic_alias}"),
@@ -388,7 +391,8 @@ module FontsConfig
         if (UI.TextMode)
           text_match_preview(@current_families[generic_alias], generic_alias)
         else
-          graphic_match_preview(@current_scripts[generic_alias], generic_alias)
+          graphic_match_preview(@current_scripts[generic_alias], 
+                                generic_alias, specimen_ok)
         end
       end
 
@@ -427,16 +431,18 @@ module FontsConfig
         
         pattern = create_pattern_string(generic_alias)
 
+        specimen_ok = true
         File.open("#{@tmp_dir}/#{generic_alias}.png", "w") do |png|
-          specimen_write(pattern, @current_scripts[generic_alias], png,
-                         SPECIMEN_SIZE, SPECIMEN_SIZE)
+          specimen_ok = 
+            specimen_write(pattern, @current_scripts[generic_alias], png,
+                           SPECIMEN_SIZE, SPECIMEN_SIZE)
         end
 
         if (UI.TextMode)
           text_match_preview(@current_families[generic_alias], generic_alias)
         else
           graphic_match_preview(@current_scripts[generic_alias], 
-                                generic_alias)
+                                generic_alias, specimen_ok)
         end
       end
 

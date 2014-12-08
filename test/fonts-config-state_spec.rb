@@ -17,6 +17,7 @@ describe FontsConfig::FontsConfigState do
 
   def test_read(preset)
     directory = File.expand_path("../data/sysconfig-examples/#{preset}", __FILE__)
+    old_scr_handle = Yast::WFM.SCRGetDefault
     scr_handle = Yast::WFM.SCROpen("chroot=#{directory}:scr", false)
     raise "Error creating the chrooted scr instance!" if scr_handle < 0
     Yast::WFM.SCRSetDefault(scr_handle)
@@ -25,15 +26,18 @@ describe FontsConfig::FontsConfigState do
     fcstate.read
     ret = preset.nil? ? true : preset_loaded?(fcstate, preset)
 
+    Yast::WFM.SCRSetDefault(old_scr_handle)
     Yast::WFM.SCRClose(scr_handle) 
     return ret
   end
 
   def test_write(preset)
     directory = File.expand_path("../data/sysconfig-examples/#{preset}", __FILE__)
+    old_scr_handle = Yast::WFM.SCRGetDefault
     scr_handle = Yast::WFM.SCROpen("chroot=#{directory}:scr", false)
     raise "Error creating the chrooted scr instance!" if scr_handle < 0
     Yast::WFM.SCRSetDefault(scr_handle)
+
 
     fcstate = FontsConfig::FontsConfigState.new
     fcstate.load_preset(preset)
@@ -41,6 +45,7 @@ describe FontsConfig::FontsConfigState do
     fcstate.read
     ret = preset_loaded?(fcstate, preset)
 
+    Yast::WFM.SCRSetDefault(old_scr_handle)
     Yast::WFM.SCRClose(scr_handle) 
     return ret
   end

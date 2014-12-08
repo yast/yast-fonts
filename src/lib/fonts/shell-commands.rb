@@ -28,6 +28,10 @@ module FontsConfig
       return fonts_config_file("sysconfig file")
     end
 
+    def self.have_fonts_config?
+      return File.executable?(FONTS_CONFIG_CMD)
+    end
+
   private
     def self.fonts_config_file(file_id)
       return nil unless File.executable?(FONTS_CONFIG_CMD)

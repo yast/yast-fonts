@@ -532,14 +532,7 @@ module FontsConfig
     end
 
     def root_user?
-      if (Process.euid != 0)
-        Yast.import "Popup"
-        text = _("root user privileges are required to save and apply font settings.")
-        Popup.Error(text)
-        return false
-      end
-
-      return true
+      return Process.euid == 0 ? true : false;
     end
 
     def specimen_alias_widget(generic_alias)
@@ -884,6 +877,8 @@ module FontsConfig
       Yast.import "Progress"
 
       widgets_description = widgets
+      sysconfig_file = FontsConfigCommand::sysconfig_file
+      local_family_list_file = FontsConfigCommand::local_family_list_file
 
       y2milestone("module started")
       Wizard.CreateDialog
@@ -893,15 +888,29 @@ module FontsConfig
         " ",
         1,
         [ _("Read sysconfig file") ],
-        [ _("Reading /etc/sysconfig/fonts-config...") ],
+        [ _("Reading #{sysconfig_file}...") ],
         ""
       )
 
       Progress.NextStage
-      y2milestone("reading /etc/sysconfig/fonts-config")
+      y2milestone("reading #{sysconfig_file}")
       @fcstate.read
       y2milestone("read: " + @fcstate.to_s)
       Progress.Finish
+
+      if (root_user?)
+        # disable /etc/fonts/conf.d/58-family-prefer-local.conf for
+        # dialog run to not confuse FcMatch() issued for preview
+        # when no family for certain generic alias is listed in 
+        # family preference list
+        y2milestone("disabling #{local_family_list_file}")
+        mv(local_family_list_file, "#{local_family_list_file}.yast-fonts.disable")
+      else
+        Yast.import "Popup"
+        text = _("root user privileges are required to save and apply font settings.\n"\
+                 "Also preview may display wrong families.")
+        Popup.Warning(text)
+      end
 
       y2milestone("running dialog")
       ret = CWM.ShowAndRun(
@@ -923,20 +932,23 @@ module FontsConfig
         when :next
           if (root_user?)
             y2milestone("saving configuration")
-
+            y2milestone("removing unneded "\
+                        "#{local_family_list_file}.yast-fonts.disable,"\
+                        " new file list will be written")
+            rm("#{local_family_list_file}.yast-fonts.disable")
             Progress.New(
               _("Writing Font Configuration"),
               " ",
               2,
               [ _("Write sysconfig file"),
                 _("Run fonts-config") ],
-              [ _("Writing sysconfig file..."),
+              [ _("Writing #{sysconfig_file}..."),
                 _("Running fonts-config...") ],
               ""
             )
 
             Progress.NextStage 
-            y2milestone("writing /etc/sysconfig/fonts-config")
+            y2milestone("writing #{sysconfig_file}")
             @fcstate.write
             y2milestone("written: " + @fcstate.to_s)
             Progress.NextStage
@@ -944,9 +956,17 @@ module FontsConfig
             FontsConfigCommand::run_fonts_config
             Progress.Finish
             y2milestone("module finished")
-         end
-       when :abort
-         y2milestone("aborted, do not save configuration")
+          else
+            Yast.import "Popup"
+            text = _("root user privileges are required to save and apply font settings. ")
+            Popup.Error(text)
+          end
+        when :abort
+          y2milestone("aborted, do not save configuration")
+          if (root_user?)
+            y2milestone("enabling #{local_family_list_file} again")
+            mv("#{local_family_list_file}.yast-fonts.disable", local_family_list_file)
+          end
       end
       Wizard.CloseDialog
     end

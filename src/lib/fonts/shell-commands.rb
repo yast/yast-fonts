@@ -36,7 +36,7 @@ module FontsConfig
     def self.fonts_config_file(file_id)
       return nil unless File.executable?(FONTS_CONFIG_CMD)
 
-      cmd = "#{FONTS_CONFIG_CMD} --info | grep 'local family list' | sed 's/.*: //' | tr -d '\n'"
+      cmd = "#{FONTS_CONFIG_CMD} --info | grep '#{file_id}' | sed 's/.*: //' | tr -d '\n'"
       result = Yast::SCR.Execute(BASH_SCR_PATH, cmd)
       if (!result["exit"].zero? || result["stdout"].length == 0)
         Yast.import "Popup"

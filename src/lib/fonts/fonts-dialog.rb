@@ -907,11 +907,17 @@ module FontsConfig
         # dialog run to not confuse FcMatch() issued for preview
         # when no family for certain generic alias is listed in 
         # family preference list
-        y2milestone("disabling #{local_family_list_file}")
-        mv(local_family_list_file, "#{local_family_list_file}.yast-fonts.disable")
+        if (File.exists?(local_family_list_file))
+          y2milestone("disabling #{local_family_list_file}")
+          mv(local_family_list_file, 
+             "#{local_family_list_file}.yast-fonts.disable")
+        else
+          y2milestone("#{local_family_list_file} do not exist")
+        end
       else
         Yast.import "Popup"
-        text = _("root user privileges are required to save and apply font settings.\n"\
+        text = _("root user privileges are required to save "\
+                 "and apply font settings.\n"\
                  "Also preview may display wrong families.")
         Popup.Warning(text)
       end
@@ -936,10 +942,6 @@ module FontsConfig
         when :next
           if (root_user?)
             y2milestone("saving configuration")
-            y2milestone("removing unneded "\
-                        "#{local_family_list_file}.yast-fonts.disable,"\
-                        " new file list will be written")
-            rm("#{local_family_list_file}.yast-fonts.disable")
             Progress.New(
               _("Writing Font Configuration"),
               " ",
@@ -960,16 +962,26 @@ module FontsConfig
             FontsConfigCommand::run_fonts_config
             Progress.Finish
             y2milestone("module finished")
+            if (File.exists?("#{local_family_list_file}.yast-fonts.disable"))
+              y2milestone("removing unneded "\
+                          "#{local_family_list_file}.yast-fonts.disable,"\
+                          " new file list will be written")
+              rm("#{local_family_list_file}.yast-fonts.disable")
+            end
           else
             Yast.import "Popup"
-            text = _("root user privileges are required to save and apply font settings. ")
+            text = _("root user privileges are required "\
+                     "to save and apply font settings. ")
             Popup.Error(text)
           end
         when :abort
           y2milestone("aborted, do not save configuration")
           if (root_user?)
-            y2milestone("enabling #{local_family_list_file} again")
-            mv("#{local_family_list_file}.yast-fonts.disable", local_family_list_file)
+            if (File.exists?("#{local_family_list_file}.yast-fonts.disable"))
+              y2milestone("enabling #{local_family_list_file} again")
+              mv("#{local_family_list_file}.yast-fonts.disable", 
+                 local_family_list_file)
+            end
           end
       end
       Wizard.CloseDialog

@@ -17,7 +17,7 @@
 
 
 Name:           yast2-fonts
-Version:        3.1.9
+Version:        3.1.10
 Release:        0
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
@@ -25,7 +25,7 @@ Source0:        %{name}-%{version}.tar.bz2
 
 Requires:       yast2 >= 3.0.5
 Requires:       yast2-ruby-bindings >= 1.2.0
-Requires:       fonts-config
+Requires:       fonts-config >= 20141207
 Requires:       fontconfig
 
 BuildRequires:  update-desktop-files

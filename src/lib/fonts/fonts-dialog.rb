@@ -368,47 +368,49 @@ module FontsConfig
         scripts = font_scripts(@current_families[generic_alias])
         @current_scripts[generic_alias] = scripts.keys[0] 
 
-        if (@current_scripts[generic_alias])
-          items = scripts.map do |script, coverage|
-            Item(Id("#{script}"), "#{script} (#{coverage} %)")
-          end
-          UI.ChangeWidget(Id("cmb_specimen_scripts_#{generic_alias}"),
-                          :Items, items)
-
-          pattern = create_pattern_string(generic_alias)
-
-          specimen_ok = true
-          File.open("#{@tmp_dir}/#{generic_alias}.png", "w") do |png|
-            specimen_ok = 
-              specimen_write(pattern, @current_scripts[generic_alias], png,
-                             SPECIMEN_SIZE, SPECIMEN_SIZE)
-          end
-        else
-           UI.ChangeWidget(Id("cmb_specimen_scripts_#{generic_alias}"),
-                           :Items, [])
-        end
-       
         if (UI.TextMode)
           text_match_preview(@current_families[generic_alias], generic_alias)
         else
+          if (@current_scripts[generic_alias])
+            items = scripts.map do |script, coverage|
+              Item(Id("#{script}"), "#{script} (#{coverage} %)")
+            end
+            UI.ChangeWidget(Id("cmb_specimen_scripts_#{generic_alias}"),
+                            :Items, items)
+
+            pattern = create_pattern_string(generic_alias)
+
+            specimen_ok = true
+            File.open("#{@tmp_dir}/#{generic_alias}.png", "w") do |png|
+              specimen_ok = 
+                specimen_write(pattern, @current_scripts[generic_alias], png,
+                               SPECIMEN_SIZE, SPECIMEN_SIZE)
+            end
+          else
+             UI.ChangeWidget(Id("cmb_specimen_scripts_#{generic_alias}"),
+                             :Items, [])
+          end
+       
           graphic_match_preview(@current_families[generic_alias],
                                 @current_scripts[generic_alias], 
                                 generic_alias, specimen_ok)
         end
       end
 
-      UI.ChangeWidget(Id("chkb_specimen_antialiasing"), :Value, 
-                      @fcstate.force_aa_off ? true : false )
-      UI.ChangeWidget(Id("chkb_specimen_autohinter"), :Value, 
-                      @fcstate.force_ah_on ? true : false )
-      UI.ChangeWidget(Id("cmb_specimen_hintstyle"), :Value, 
-                      @fcstate.force_hintstyle)
-      UI.ChangeWidget(Id("cmb_specimen_lcdfilter"), :Value, 
-                      @fcstate.lcd_filter)
-      UI.ChangeWidget(Id("cmb_specimen_subpixellayout"), :Value, 
-                      @fcstate.subpixel_layout)
-      UI.ChangeWidget(Id("cmb_specimen_lcdfilter"), :Enabled,
-           @fcstate.subpixel_layout != FontsConfigState::SUBPIXEL_LAYOUTS[0])
+      if (!UI.TextMode)
+        UI.ChangeWidget(Id("chkb_specimen_antialiasing"), :Value, 
+                        @fcstate.force_aa_off ? true : false )
+        UI.ChangeWidget(Id("chkb_specimen_autohinter"), :Value, 
+                        @fcstate.force_ah_on ? true : false )
+        UI.ChangeWidget(Id("cmb_specimen_hintstyle"), :Value, 
+                        @fcstate.force_hintstyle)
+        UI.ChangeWidget(Id("cmb_specimen_lcdfilter"), :Value, 
+                        @fcstate.lcd_filter)
+        UI.ChangeWidget(Id("cmb_specimen_subpixellayout"), :Value, 
+                        @fcstate.subpixel_layout)
+        UI.ChangeWidget(Id("cmb_specimen_lcdfilter"), :Enabled,
+             @fcstate.subpixel_layout != FontsConfigState::SUBPIXEL_LAYOUTS[0])
+      end
     end
 
     def handle_specimen_widget(widget, event)

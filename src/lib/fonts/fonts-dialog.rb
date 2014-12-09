@@ -312,9 +312,9 @@ module FontsConfig
       return nil
     end
 
-    def graphic_match_preview(script, generic_alias, specimen_ok)
+    def graphic_match_preview(family, script, generic_alias, specimen_ok)
         if (script)
-          text = "<p><b>Family:</b> #{@current_families[generic_alias]}</b></p>" \
+          text = "<p><b>Family:</b> #{family}</b></p>" \
                  "<p><b>Specimen for #{script}</b></p>" \
                  "<center>" +
                  (specimen_ok ? "<img src=\"#{@tmp_dir}/#{generic_alias}.png\"/>" 
@@ -391,7 +391,8 @@ module FontsConfig
         if (UI.TextMode)
           text_match_preview(@current_families[generic_alias], generic_alias)
         else
-          graphic_match_preview(@current_scripts[generic_alias], 
+          graphic_match_preview(@current_families[generic_alias],
+                                @current_scripts[generic_alias], 
                                 generic_alias, specimen_ok)
         end
       end
@@ -441,7 +442,8 @@ module FontsConfig
         if (UI.TextMode)
           text_match_preview(@current_families[generic_alias], generic_alias)
         else
-          graphic_match_preview(@current_scripts[generic_alias], 
+          graphic_match_preview(@current_families[generic_alias],
+                                @current_scripts[generic_alias], 
                                 generic_alias, specimen_ok)
         end
       end

@@ -71,7 +71,7 @@ FcPattern *find(char *str_pattern)
   FcPattern *pattern, *result;
   FcFontSet *fontset;
 
-  FcInit();
+  FcInitReinitialize();
   objectset = FcObjectSetBuild(FC_FAMILY, NULL);
   pattern = FcNameParse((FcChar8 *)str_pattern);
   fontset = FcFontList (NULL, pattern, objectset);
@@ -92,7 +92,7 @@ FcPattern *match(char *str_pattern)
   FcPattern *pattern, *font;
   FcResult r;
   
-  FcInit(); 
+  FcInitReinitialize(); 
   pattern = FcNameParse((FcChar8 *)str_pattern);
   FcConfigSubstitute(NULL, pattern, FcMatchPattern);
   FcDefaultSubstitute(pattern);

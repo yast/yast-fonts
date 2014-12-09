@@ -39,7 +39,7 @@ BuildRequires:  fontconfig-devel
 BuildRequires:  font-specimen-devel
 BuildRequires:  ruby-devel
 # for testing
-BuildRequires:  rubygem-rspec
+BuildRequires:  rubygem(rspec)
 BuildRequires:  dejavu-fonts
 BuildRequires:  fonts-config
 

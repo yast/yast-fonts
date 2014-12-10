@@ -24,6 +24,10 @@ module FontsConfig
     include FileUtils
 
     SPECIMEN_SIZE = 250
+    # This path is constant enough to have it hardcoded
+    # here. fonts-config/FontsConfigCommand
+    # could provide it, yes.
+    FONTCONFIG_PATH = "/etc/fonts"
 
     def initialize
       @fcstate = FontsConfigState.new
@@ -36,6 +40,7 @@ module FontsConfig
         @current_scripts[generic_alias] = nil
       end
       @tmp_dir = Dir.mktmpdir("yast-fonts-")
+      @fontconfig_path = FONTCONFIG_PATH
     end
 
     def self.run
@@ -870,6 +875,34 @@ module FontsConfig
       widgets_description
     end
 
+    # create copy of system settings; remove fonts-config generated
+    # config files to have such fontconfig setup as fonts-config 
+    # wouldn't never run; point fontconfig to this configuration
+    def create_default_fontconfig
+      family_list_file = FontsConfigCommand::local_family_list_file
+      rendering_file = FontsConfigCommand::rendering_config
+      metric_bw_symlink = FontsConfigCommand::metric_compatibility_bw_symlink
+      metric_file = FontsConfigCommand::metric_compatibility_config
+      metric_symlink = FontsConfigCommand::metric_compatibility_symlink
+
+      mkdir_p("#{@tmp_dir}#{@fontconfig_path}")
+      Dir.glob("#{@fontconfig_path}/*") {|f|
+        cp_r(File.expand_path(f), "#{@tmp_dir}#{@fontconfig_path}")
+      }
+
+      puts family_list_file
+      rm("#{@tmp_dir}#{family_list_file}")
+      rm("#{@tmp_dir}#{rendering_file}")
+      rm("#{@tmp_dir}#{metric_bw_symlink}")
+      ln_sf("#{metric_file}", "#{@tmp_dir}#{metric_symlink}")
+
+      ENV['FONTCONFIG_PATH'] = "#{@tmp_dir}#{@fontconfig_path}"
+    end
+
+    def disable_default_fontconfig
+      ENV['FONTCONFIG_PATH'] = nil
+    end
+
     def run_dialog
       Yast.import "UI"
       Yast.import "CWM"
@@ -882,7 +915,6 @@ module FontsConfig
 
       widgets_description = widgets
       sysconfig_file = FontsConfigCommand::sysconfig_file
-      local_family_list_file = FontsConfigCommand::local_family_list_file
 
       y2milestone("module started")
       Wizard.CreateDialog
@@ -902,25 +934,8 @@ module FontsConfig
       y2milestone("read: " + @fcstate.to_s)
       Progress.Finish
 
-      if (root_user?)
-        # disable /etc/fonts/conf.d/58-family-prefer-local.conf for
-        # dialog run to not confuse FcMatch() issued for preview
-        # when no family for certain generic alias is listed in 
-        # family preference list
-        if (File.exists?(local_family_list_file))
-          y2milestone("disabling #{local_family_list_file}")
-          mv(local_family_list_file, 
-             "#{local_family_list_file}.yast-fonts.disable")
-        else
-          y2milestone("#{local_family_list_file} do not exist")
-        end
-      else
-        Yast.import "Popup"
-        text = _("root user privileges are required to save "\
-                 "and apply font settings.\n"\
-                 "Also preview may display wrong families.")
-        Popup.Warning(text)
-      end
+      y2milestone("creating temporary default fontconfig in #{@tmp_dir}")
+      create_default_fontconfig
 
       y2milestone("running dialog")
       ret = CWM.ShowAndRun(
@@ -935,7 +950,9 @@ module FontsConfig
           "back_button"        => "",
         }
       )
-     
+
+      y2milestone("disabling temporary default fontconfig")
+      disable_default_fontconfig     
       remove_entry_secure(@tmp_dir)
  
       case ret
@@ -962,12 +979,6 @@ module FontsConfig
             FontsConfigCommand::run_fonts_config
             Progress.Finish
             y2milestone("module finished")
-            if (File.exists?("#{local_family_list_file}.yast-fonts.disable"))
-              y2milestone("removing unneded "\
-                          "#{local_family_list_file}.yast-fonts.disable,"\
-                          " new file list will be written")
-              rm("#{local_family_list_file}.yast-fonts.disable")
-            end
           else
             Yast.import "Popup"
             text = _("root user privileges are required "\
@@ -976,13 +987,6 @@ module FontsConfig
           end
         when :abort
           y2milestone("aborted, do not save configuration")
-          if (root_user?)
-            if (File.exists?("#{local_family_list_file}.yast-fonts.disable"))
-              y2milestone("enabling #{local_family_list_file} again")
-              mv("#{local_family_list_file}.yast-fonts.disable", 
-                 local_family_list_file)
-            end
-          end
       end
       Wizard.CloseDialog
     end

@@ -24,6 +24,46 @@ describe FontsConfig::FontsConfigCommand do
     end
   end
 
+  describe "#rendering_config" do
+    it "returns non-empty string" do
+      if (FontsConfig::FontsConfigCommand::have_fonts_config?)
+        rendering_config = FontsConfig::FontsConfigCommand::rendering_config
+        expect(rendering_config).to be_a(String)
+        expect(rendering_config.length > 0).to be true
+      end
+    end
+  end
+
+  describe "#metric_compatibility_config" do
+    it "returns non-empty string" do
+      if (FontsConfig::FontsConfigCommand::have_fonts_config?)
+        metric_config = FontsConfig::FontsConfigCommand::metric_compatibility_config
+        expect(metric_config).to be_a(String)
+        expect(metric_config.length > 0).to be true
+      end
+    end
+  end
+
+  describe "#metric_compatibility_symlink" do
+    it "returns non-empty string" do
+      if (FontsConfig::FontsConfigCommand::have_fonts_config?)
+        metric_symlink = FontsConfig::FontsConfigCommand::metric_compatibility_symlink
+        expect(metric_symlink).to be_a(String)
+        expect(metric_symlink.length > 0).to be true
+      end
+    end
+  end
+
+  describe "#metric_compatibility_bw_symlink" do
+    it "returns non-empty string" do
+      if (FontsConfig::FontsConfigCommand::have_fonts_config?)
+        metric_bw_symlink = FontsConfig::FontsConfigCommand::metric_compatibility_bw_symlink
+        expect(metric_bw_symlink).to be_a(String)
+        expect(metric_bw_symlink.length > 0).to be true
+      end
+    end
+  end
+
   describe "#sysconfig_file" do
     it "returns non-empty string" do
       if (FontsConfig::FontsConfigCommand::have_fonts_config?)

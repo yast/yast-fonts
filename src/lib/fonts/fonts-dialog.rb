@@ -890,9 +890,9 @@ module FontsConfig
         cp_r(File.expand_path(f), "#{@tmp_dir}#{@fontconfig_path}")
       }
 
-      rm("#{@tmp_dir}#{family_list_file}")
-      rm("#{@tmp_dir}#{rendering_file}")
-      rm("#{@tmp_dir}#{metric_bw_symlink}")
+      rm_f("#{@tmp_dir}#{family_list_file}")
+      rm_f("#{@tmp_dir}#{rendering_file}")
+      rm_f("#{@tmp_dir}#{metric_bw_symlink}")
       ln_sf("#{metric_file}", "#{@tmp_dir}#{metric_symlink}")
 
       ENV['FONTCONFIG_PATH'] = "#{@tmp_dir}#{@fontconfig_path}"

@@ -890,7 +890,6 @@ module FontsConfig
         cp_r(File.expand_path(f), "#{@tmp_dir}#{@fontconfig_path}")
       }
 
-      puts family_list_file
       rm("#{@tmp_dir}#{family_list_file}")
       rm("#{@tmp_dir}#{rendering_file}")
       rm("#{@tmp_dir}#{metric_bw_symlink}")

@@ -319,24 +319,25 @@ module FontsConfig
 
     def graphic_match_preview(family, script, generic_alias, specimen_ok)
         if (script)
-          text = "<p><b>Family:</b> #{family}</b></p>" \
-                 "<p><b>Specimen for #{script}</b></p>" \
+          text = _("<p><b>Family:</b> %s</b></p>") % family +
+                 _("<p><b>Specimen for %s</b></p>") % script +
                  "<center>" +
                  (specimen_ok ? "<img src=\"#{@tmp_dir}/#{generic_alias}.png\"/>" 
-                              : "<p>No specimen available for this font and script.</p>") +
+                              : _("<p>No specimen available " \
+                                  "for this font and script.</p>")) +
                  "</center>"
         else
           # unlikely
-          text = "<b>No script found for " \
-                 "#{@current_families[generic_alias]}.</b>"
+          text = _("<b>No script found for %s.</b>") % 
+                   @current_families[generic_alias]
         end
         UI.ChangeWidget(Id("rt_specimen_#{generic_alias}"), :Value, text)
     end
 
     def text_match_preview(family, generic_alias)
       scripts = font_scripts(family)
-      text = "<p><b>Family:</b> #{family}</p>" \
-             "<p><b>Scripts</b><ul>"
+      text = _("<p><b>Family:</b> %s</p>") % family +
+             _("<p><b>Scripts</b><ul>") +
       scripts.each do |script, coverage|
         text << "<li>#{script} (#{coverage})</li>"
       end

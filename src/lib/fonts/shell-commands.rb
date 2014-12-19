@@ -52,14 +52,15 @@ module FontsConfig
     def self.fonts_config_file(file_id)
       return nil unless File.executable?(FONTS_CONFIG_CMD)
 
-      cmd = "#{FONTS_CONFIG_CMD} --info | grep '#{file_id}:' | sed 's/.*: //' | tr -d '\n'"
+      cmd = "#{FONTS_CONFIG_CMD} --info"
       result = Yast::SCR.Execute(BASH_SCR_PATH, cmd)
-      if (!result["exit"].zero? || result["stdout"].length == 0)
+      file = result["stdout"].lines.select{|l| l =~ /#{file_id}/}[0].gsub(/.*: /, '').gsub(/\n/, '')
+      if (!result["exit"].zero? || file.length == 0)
         Yast.import "Popup"
         Yast::Popup.Error(cmd + " run failed:" + result["stdout"])
         return nil
       end
-      return result["stdout"]
+      return file
     end
   end
 end

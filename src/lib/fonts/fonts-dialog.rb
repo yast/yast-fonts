@@ -1012,8 +1012,8 @@ module FontsConfig
       _("<p><b>Presets</b> button serves a possibility to choose predefined profiles: <ul>") +
       presets.keys.drop(1).map do |preset|
         _("<li><b>%{name}: </b>%{help}</li>") % {
-            :name => presets[preset]["name"],
-            :help => presets[preset]["help"]
+            :name => _(presets[preset]["name"]),
+            :help => _(presets[preset]["help"])
         }
       end.join + "</ul>" +
       _("Every single item there just fills appropriate setting in both tabs. " \

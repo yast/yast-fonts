@@ -35,7 +35,7 @@ module FontsConfig
     # otherwise testsuite will fail
     PRESETS = {
         "unset" => {
-          "name" => _("Unset"),
+          "name" => "Unset",
           "fpl" => {
             "sans-serif" => nil,
             "serif" => nil,
@@ -55,7 +55,7 @@ module FontsConfig
           "help" => nil,
         },
         "bitmap_fonts" => {
-          "name" => _("Bitmap Fonts"),
+          "name" => N_("Bitmap Fonts"),
           "fpl" =>  {
             "sans-serif" => [
               "Adobe Helvetica",
@@ -100,10 +100,10 @@ module FontsConfig
           "ebl" => [ ],
           "lcd_filter" => LCD_FILTERS[0],
           "subpixel_layout" => SUBPIXEL_LAYOUTS[0],
-          "help" => _("Unlike 'outline fonts' (fonts described mathematically via curves; chosen in the rest of profiles), 'bitmap fonts' represents group of fonts, which contain bitmap for each glyph and size. Thus, only several sizes exist for each font. They are very fast to render, because there's no need to compute the bitmap and are considered more readable especially on small sizes (even, some outline fonts contains so called 'embedded bitmaps', bitmap versions of itself, for small sizes). Bitmap fonts are rendered black and white, not smoothed.")
+          "help" => N_("Unlike 'outline fonts' (fonts described mathematically via curves; chosen in the rest of profiles), 'bitmap fonts' represents group of fonts, which contain bitmap for each glyph and size. Thus, only several sizes exist for each font. They are very fast to render, because there's no need to compute the bitmap and are considered more readable especially on small sizes (even, some outline fonts contains so called 'embedded bitmaps', bitmap versions of itself, for small sizes). Bitmap fonts are rendered black and white, not smoothed.")
         },
         "bw_fonts" => {
-          "name" => _("Black and White Rendering"),
+          "name" => N_("Black and White Rendering"),
           "fpl" =>  {
             "sans-serif" => [ "Liberation Sans" ],
             "serif" => [ "Liberation Serif" ],
@@ -120,10 +120,10 @@ module FontsConfig
           "ebl" => [ "ja", "ko", "zh" ],
           "lcd_filter" => LCD_FILTERS[0],
           "subpixel_layout" => SUBPIXEL_LAYOUTS[0],
-          "help" => _("Fonts rendered without antialiasing (grayscale smoothing), black and white. In contrast with smoothed fonts, they are much more readable without any drawback of smoothing (fuzzy or uneven stems etc.). In connection with good hinted fonts (e. g. Liberation 1 fonts), this setting can give bitmap quality fonts while maintaining scalability. Default family preference list is used."),
+          "help" => N_("Fonts rendered without antialiasing (grayscale smoothing), black and white. In contrast with smoothed fonts, they are much more readable without any drawback of smoothing (fuzzy or uneven stems etc.). In connection with good hinted fonts (e. g. Liberation 1 fonts), this setting can give bitmap quality fonts while maintaining scalability. Default family preference list is used."),
         },
         "bw_mono_fonts" => {
-          "name" => _("Black and White Rendering for Monospace Fonts"),
+          "name" => N_("Black and White Rendering for Monospace Fonts"),
           "fpl" =>  {
             "sans-serif" => [],
             "serif" => [],
@@ -140,10 +140,10 @@ module FontsConfig
           "ebl" => [ "ja", "ko", "zh" ],
           "lcd_filter" => LCD_FILTERS[0],
           "subpixel_layout" => SUBPIXEL_LAYOUTS[0],
-          "help" => _("Monospace fonts rendered not smoothed, other fonts (sans-serif, sans and unspecified) will use default setting. Default family preference list is used."),
+          "help" => N_("Monospace fonts rendered not smoothed, other fonts (sans-serif, sans and unspecified) will use default setting. Default family preference list is used."),
         },
         "default" => {
-          "name" => _("Default"),
+          "name" => N_("Default"),
           "fpl" =>  {
             "sans-serif" => [],
             "serif" => [],
@@ -160,10 +160,10 @@ module FontsConfig
           "ebl" => [ "ja", "ko", "zh" ],
           "lcd_filter" => LCD_FILTERS[0],
           "subpixel_layout" => SUBPIXEL_LAYOUTS[0],
-          "help" => _("Fonts are smoothed with antialiasing. Unlike black and white rendered fonts, this setting can produce 'beautiful' fonts sometimes to the detriment of readability. TrueType fonts, which are known to have good hinting instructions are rendered with bytecode interpreter, otherwise freetype autohinter is used on the 'hintslight' hinting level. Using font native hinting instructions produces glyphs displayed with thiner stems. Default family preference list is used (nowdays TrueType fonts with good instructions are prefered)."),
+          "help" => N_("Fonts are smoothed with antialiasing. Unlike black and white rendered fonts, this setting can produce 'beautiful' fonts sometimes to the detriment of readability. TrueType fonts, which are known to have good hinting instructions are rendered with bytecode interpreter, otherwise freetype autohinter is used on the 'hintslight' hinting level. Using font native hinting instructions produces glyphs displayed with thiner stems. Default family preference list is used (nowdays TrueType fonts with good instructions are prefered)."),
         },
         "cff_fonts" => {
-          "name" => _("CFF Fonts"),
+          "name" => N_("CFF Fonts"),
           "fpl" =>  {
             "sans-serif" => [
               "Source Sans Pro",
@@ -202,10 +202,10 @@ module FontsConfig
           "ebl" => [ "ja", "ko", "zh" ],
           "lcd_filter" => LCD_FILTERS[0],
           "subpixel_layout" => SUBPIXEL_LAYOUTS[0],
-          "help" => _("Given Adobe's contribution to freetype library, CFF fonts can be considered good compromise between readability and smoothness of rendered glyphs."),
+          "help" => N_("Given Adobe's contribution to freetype library, CFF fonts can be considered good compromise between readability and smoothness of rendered glyphs."),
         },
         "autohinter" => {
-          "name" => _("Exclusive Autohinter Rendering"),
+          "name" => N_("Exclusive Autohinter Rendering"),
           "fpl" =>  {
             "sans-serif" => [],
             "serif" => [],
@@ -222,10 +222,10 @@ module FontsConfig
           "ebl" => [ "ja", "ko", "zh" ],
           "lcd_filter" => LCD_FILTERS[0],
           "subpixel_layout" => SUBPIXEL_LAYOUTS[0],
-          "help" => _("Unlike in default profile, even for good hinted fonts, freetype's autohinter is used (on the 'hintslight' level). That leads to thicker, but sometimes fuzzier (and therefore less readable), glyphs. Default family preference list is used."),
+          "help" => N_("Unlike in default profile, even for good hinted fonts, freetype's autohinter is used (on the 'hintslight' level). That leads to thicker, but sometimes fuzzier (and therefore less readable), glyphs. Default family preference list is used."),
         },
         "subpixel_rendering" => {
-          "name" => _("Subpixel Rendering"),
+          "name" => N_("Subpixel Rendering"),
           "fpl" =>  {
             "sans-serif" => [
               "Arial",
@@ -250,7 +250,7 @@ module FontsConfig
           "ebl" => [ "ja", "ko", "zh" ],
           "lcd_filter" => LCD_FILTERS[1],
           "subpixel_layout" => SUBPIXEL_LAYOUTS[1],
-          "help" => _("Use subpixel rendering capability of LCD monitor. Requires subpixel rendering enabled FreeType library."),
+          "help" => N_("Use subpixel rendering capability of LCD monitor. Requires subpixel rendering enabled FreeType library."),
         },
       }
 

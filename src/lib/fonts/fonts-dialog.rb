@@ -964,7 +964,7 @@ module FontsConfig
               2,
               [ _("Write sysconfig file"),
                 _("Run fonts-config") ],
-              [ _("Writing #{sysconfig_file}..."),
+              [ _("Writing %s...") %  sysconfig_file,
                 _("Running fonts-config...") ],
               ""
             )

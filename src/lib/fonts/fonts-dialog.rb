@@ -337,7 +337,7 @@ module FontsConfig
     def text_match_preview(family, generic_alias)
       scripts = font_scripts(family)
       text = _("<p><b>Family:</b> %s</p>") % family +
-             _("<p><b>Scripts</b><ul>") +
+             _("<p><b>Scripts</b><ul>")
       scripts.each do |script, coverage|
         text << "<li>#{script} (#{coverage})</li>"
       end

@@ -878,13 +878,13 @@ module FontsConfig
 
     # create copy of system settings; remove fonts-config generated
     # config files to have such fontconfig setup as fonts-config 
-    # wouldn't never run; point fontconfig to this configuration
+    # would never run; point fontconfig to this configuration
     def create_default_fontconfig
-      family_list_file = FontsConfigCommand::local_family_list_file
-      rendering_file = FontsConfigCommand::rendering_config
-      metric_bw_symlink = FontsConfigCommand::metric_compatibility_bw_symlink
-      metric_file = FontsConfigCommand::metric_compatibility_config
-      metric_symlink = FontsConfigCommand::metric_compatibility_symlink
+      family_list_file = FontsConfigCommand.local_family_list_file
+      rendering_file = FontsConfigCommand.rendering_config
+      metric_bw_symlink = FontsConfigCommand.metric_compatibility_bw_symlink
+      metric_file = FontsConfigCommand.metric_compatibility_config
+      metric_symlink = FontsConfigCommand.metric_compatibility_symlink
 
       mkdir_p("#{@tmp_dir}#{@fontconfig_path}")
       Dir.glob("#{@fontconfig_path}/*") {|f|

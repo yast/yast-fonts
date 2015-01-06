@@ -403,6 +403,7 @@ module FontsConfig
         end
       end
 
+      # folowing widgets exist only in graphical mode
       if (!UI.TextMode)
         UI.ChangeWidget(Id("chkb_specimen_antialiasing"), :Value, 
                         @fcstate.force_aa_off ? true : false )
@@ -420,6 +421,16 @@ module FontsConfig
     end
 
     def handle_specimen_widget(widget, event)
+      # Text mode has read-only preview tab, that can be changed
+      # only via Presets button (initialize_specimen_widget is
+      # called there) so following is not be needed
+      # (handle_specimen_widget should not be called at all).
+      # But it can help in the future when some modifying
+      # widget would be added.
+      if (UI.TextMode)
+        return nil # nothing to do nowadays
+      end
+
       @fcstate.force_aa_off = 
         UI.QueryWidget(Id("chkb_specimen_antialiasing"), :Value)
       @fcstate.force_ah_on = 
@@ -447,13 +458,9 @@ module FontsConfig
                            SPECIMEN_SIZE, SPECIMEN_SIZE)
         end
 
-        if (UI.TextMode)
-          text_match_preview(@current_families[generic_alias], generic_alias)
-        else
-          graphic_match_preview(@current_families[generic_alias],
-                                @current_scripts[generic_alias], 
-                                generic_alias, specimen_ok)
-        end
+        graphic_match_preview(@current_families[generic_alias],
+                              @current_scripts[generic_alias],
+                              generic_alias, specimen_ok)
       end
 
       UI.ChangeWidget(Id("cmb_specimen_lcdfilter"), :Enabled,
@@ -770,7 +777,8 @@ module FontsConfig
             ),
           "init"          => fun_ref(method(:initialize_specimen_widget),
                                      "symbol (string)"),
-          "handle_events" => [ "chkb_specimen_antialiasing", 
+          "handle_events" => UI.TextMode ? [] :
+                             [ "chkb_specimen_antialiasing",
                                "chkb_specimen_autohinter",
                                "cmb_specimen_hintstyle",
                                "cmb_specimen_lcdfilter",

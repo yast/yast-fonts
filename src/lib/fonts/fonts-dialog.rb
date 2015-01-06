@@ -542,7 +542,7 @@ module FontsConfig
     end
 
     def root_user?
-      return Process.euid == 0 ? true : false;
+      Process.euid == 0
     end
 
     def specimen_alias_widget(generic_alias)

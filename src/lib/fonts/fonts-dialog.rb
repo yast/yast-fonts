@@ -24,6 +24,10 @@ module FontsConfig
     include FileUtils
 
     SPECIMEN_SIZE = 250
+    # This path is constant enough to have it hardcoded
+    # here. fonts-config/FontsConfigCommand
+    # could provide it, yes.
+    FONTCONFIG_PATH = "/etc/fonts"
 
     def initialize
       @fcstate = FontsConfigState.new
@@ -36,6 +40,7 @@ module FontsConfig
         @current_scripts[generic_alias] = nil
       end
       @tmp_dir = Dir.mktmpdir("yast-fonts-")
+      @fontconfig_path = FONTCONFIG_PATH
     end
 
     def self.run
@@ -125,15 +130,12 @@ module FontsConfig
                       FontsConfigState::LCD_FILTERS)
       UI.ChangeWidget(Id("cmb_lcd_filter"), :Value, 
                       @fcstate.lcd_filter)
-      UI.ChangeWidget(Id("cmb_subpixel_layout"), :Enabled,
-           @fcstate.lcd_filter != FontsConfigState::LCD_FILTERS[0])
     end
 
     def handle_lcdfilter_combo(key, map)
       @fcstate.lcd_filter =
         UI.QueryWidget(Id("cmb_lcd_filter"), :Value)
       subpixel_freetype_warning
-      initialize_lcdfilter_combo("")
       return nil
     end
 
@@ -142,11 +144,15 @@ module FontsConfig
                       FontsConfigState::SUBPIXEL_LAYOUTS)
       UI.ChangeWidget(Id("cmb_subpixel_layout"), :Value, 
                       @fcstate.subpixel_layout)
+      UI.ChangeWidget(Id("cmb_lcd_filter"), :Enabled,
+           @fcstate.subpixel_layout != FontsConfigState::SUBPIXEL_LAYOUTS[0])
     end
 
     def handle_subpixellayout_combo(key, map)
       @fcstate.subpixel_layout =
         UI.QueryWidget(Id("cmb_subpixel_layout"), :Value)
+      UI.ChangeWidget(Id("cmb_lcd_filter"), :Enabled,
+           @fcstate.subpixel_layout != FontsConfigState::SUBPIXEL_LAYOUTS[0])
       return nil
     end
 
@@ -311,25 +317,27 @@ module FontsConfig
       return nil
     end
 
-    def graphic_match_preview(script, generic_alias)
+    def graphic_match_preview(family, script, generic_alias, specimen_ok)
         if (script)
-          text = "<p><b>Family:</b> #{@current_families[generic_alias]}</b></p>" \
-                 "<p><b>Specimen for #{script}</b></p>" \
-                 "<center>" \
-                 "<img src=\"#{@tmp_dir}/#{generic_alias}.png\"/>" \
+          text = _("<p><b>Family:</b> %s</b></p>") % family +
+                 _("<p><b>Specimen for %s</b></p>") % script +
+                 "<center>" +
+                 (specimen_ok ? "<img src=\"#{@tmp_dir}/#{generic_alias}.png\"/>" 
+                              : _("<p>No specimen available " \
+                                  "for this font and script.</p>")) +
                  "</center>"
         else
           # unlikely
-          text = "<b>No script found for " \
-                 "#{@current_families[generic_alias]}.</b>"
+          text = _("<b>No script found for %s.</b>") % 
+                   @current_families[generic_alias]
         end
         UI.ChangeWidget(Id("rt_specimen_#{generic_alias}"), :Value, text)
     end
 
     def text_match_preview(family, generic_alias)
       scripts = font_scripts(family)
-      text = "<p><b>Family:</b> #{family}</p>" \
-             "<p><b>Scripts</b><ul>"
+      text = _("<p><b>Family:</b> %s</p>") % family +
+             _("<p><b>Scripts</b><ul>")
       scripts.each do |script, coverage|
         text << "<li>#{script} (#{coverage})</li>"
       end
@@ -338,7 +346,7 @@ module FontsConfig
     end
 
     def create_pattern_string(generic_alias)
-      pattern = @current_families[generic_alias]
+      pattern = @current_families[generic_alias].dup
       if @fcstate.force_aa_off || 
          (@fcstate.force_aa_off_mono && generic_alias == "monospace")
         pattern << ":antialias=0" 
@@ -366,44 +374,63 @@ module FontsConfig
         scripts = font_scripts(@current_families[generic_alias])
         @current_scripts[generic_alias] = scripts.keys[0] 
 
-        if (@current_scripts[generic_alias])
-          items = scripts.map do |script, coverage|
-            Item(Id("#{script}"), "#{script} (#{coverage} %)")
-          end
-          UI.ChangeWidget(Id("cmb_specimen_scripts_#{generic_alias}"),
-                          :Items, items)
-
-          pattern = create_pattern_string(generic_alias)
-
-          File.open("#{@tmp_dir}/#{generic_alias}.png", "w") do |png|
-            specimen_write(pattern, @current_scripts[generic_alias], png,
-                           SPECIMEN_SIZE, SPECIMEN_SIZE)
-          end
-        else
-           UI.ChangeWidget(Id("cmb_specimen_scripts_#{generic_alias}"),
-                           :Items, [])
-        end
-       
         if (UI.TextMode)
           text_match_preview(@current_families[generic_alias], generic_alias)
         else
-          graphic_match_preview(@current_scripts[generic_alias], generic_alias)
+          if (@current_scripts[generic_alias])
+            items = scripts.map do |script, coverage|
+              Item(Id("#{script}"), "#{script} (#{coverage} %)")
+            end
+            UI.ChangeWidget(Id("cmb_specimen_scripts_#{generic_alias}"),
+                            :Items, items)
+
+            pattern = create_pattern_string(generic_alias)
+
+            specimen_ok = true
+            File.open("#{@tmp_dir}/#{generic_alias}.png", "w") do |png|
+              specimen_ok = 
+                specimen_write(pattern, @current_scripts[generic_alias], png,
+                               SPECIMEN_SIZE, SPECIMEN_SIZE)
+            end
+          else
+             UI.ChangeWidget(Id("cmb_specimen_scripts_#{generic_alias}"),
+                             :Items, [])
+          end
+       
+          graphic_match_preview(@current_families[generic_alias],
+                                @current_scripts[generic_alias], 
+                                generic_alias, specimen_ok)
         end
       end
 
-      UI.ChangeWidget(Id("chkb_specimen_antialiasing"), :Value, 
-                      @fcstate.force_aa_off ? true : false )
-      UI.ChangeWidget(Id("chkb_specimen_autohinter"), :Value, 
-                      @fcstate.force_ah_on ? true : false )
-      UI.ChangeWidget(Id("cmb_specimen_hintstyle"), :Value, 
-                      @fcstate.force_hintstyle)
-      UI.ChangeWidget(Id("cmb_specimen_lcdfilter"), :Value, 
-                      @fcstate.lcd_filter)
-      UI.ChangeWidget(Id("cmb_specimen_subpixellayout"), :Value, 
-                      @fcstate.subpixel_layout)
+      # folowing widgets exist only in graphical mode
+      if (!UI.TextMode)
+        UI.ChangeWidget(Id("chkb_specimen_antialiasing"), :Value, 
+                        @fcstate.force_aa_off ? true : false )
+        UI.ChangeWidget(Id("chkb_specimen_autohinter"), :Value, 
+                        @fcstate.force_ah_on ? true : false )
+        UI.ChangeWidget(Id("cmb_specimen_hintstyle"), :Value, 
+                        @fcstate.force_hintstyle)
+        UI.ChangeWidget(Id("cmb_specimen_lcdfilter"), :Value, 
+                        @fcstate.lcd_filter)
+        UI.ChangeWidget(Id("cmb_specimen_subpixellayout"), :Value, 
+                        @fcstate.subpixel_layout)
+        UI.ChangeWidget(Id("cmb_specimen_lcdfilter"), :Enabled,
+             @fcstate.subpixel_layout != FontsConfigState::SUBPIXEL_LAYOUTS[0])
+      end
     end
 
     def handle_specimen_widget(widget, event)
+      # Text mode has read-only preview tab, that can be changed
+      # only via Presets button (initialize_specimen_widget is
+      # called there) so following is not be needed
+      # (handle_specimen_widget should not be called at all).
+      # But it can help in the future when some modifying
+      # widget would be added.
+      if (UI.TextMode)
+        return nil # nothing to do nowadays
+      end
+
       @fcstate.force_aa_off = 
         UI.QueryWidget(Id("chkb_specimen_antialiasing"), :Value)
       @fcstate.force_ah_on = 
@@ -424,18 +451,20 @@ module FontsConfig
         
         pattern = create_pattern_string(generic_alias)
 
+        specimen_ok = true
         File.open("#{@tmp_dir}/#{generic_alias}.png", "w") do |png|
-          specimen_write(pattern, @current_scripts[generic_alias], png,
-                         SPECIMEN_SIZE, SPECIMEN_SIZE)
+          specimen_ok = 
+            specimen_write(pattern, @current_scripts[generic_alias], png,
+                           SPECIMEN_SIZE, SPECIMEN_SIZE)
         end
 
-        if (UI.TextMode)
-          text_match_preview(@current_families[generic_alias], generic_alias)
-        else
-          graphic_match_preview(@current_scripts[generic_alias], 
-                                generic_alias)
-        end
+        graphic_match_preview(@current_families[generic_alias],
+                              @current_scripts[generic_alias],
+                              generic_alias, specimen_ok)
       end
+
+      UI.ChangeWidget(Id("cmb_specimen_lcdfilter"), :Enabled,
+           @fcstate.subpixel_layout != FontsConfigState::SUBPIXEL_LAYOUTS[0])
 
       return nil
     end
@@ -504,7 +533,7 @@ module FontsConfig
     end
 
     def subpixel_freetype_warning
-      if (@fcstate.lcd_filter != FontsConfigState::LCD_FILTERS[0] &&
+      if (@fcstate.subpixel_layout != FontsConfigState::SUBPIXEL_LAYOUTS[0] &&
           (have_freetype &&
            !have_subpixel_rendering))
         Yast.import "Popup"
@@ -520,14 +549,7 @@ module FontsConfig
     end
 
     def root_user?
-      if (Process.euid != 0)
-        Yast.import "Popup"
-        text = _("root user privileges are required to save and apply font settings.")
-        Popup.Error(text)
-        return false
-      end
-
-      return true
+      Process.euid == 0
     end
 
     def specimen_alias_widget(generic_alias)
@@ -650,7 +672,7 @@ module FontsConfig
           "init"          => fun_ref(method(:initialize_subpixellayout_combo), 
                                      "void (string)"),
           "opt"           => [ :hstretch, :notify, :immediate ],
-          "label"         => _("Subpixel &Layout"),
+          "label"         => _("&Layout"),
           "handle_events" => [ "cmb_subpixel_layout" ],
           "handle"        => fun_ref(method(:handle_subpixellayout_combo),
                                      "symbol (string, map)"),
@@ -747,16 +769,16 @@ module FontsConfig
                 ComboBox(Id("cmb_specimen_hintstyle"), Opt(:notify, :immediate), 
                          _("Force Hint St&yle"), FontsConfigState::HINT_STYLES),
                 HStretch(),
+                ComboBox(Id("cmb_specimen_subpixellayout"), Opt(:notify, :immediate), 
+                         _("Subpixel &Rendering"), FontsConfigState::SUBPIXEL_LAYOUTS),
                 ComboBox(Id("cmb_specimen_lcdfilter"), Opt(:notify, :immediate), 
                          _("LCD &Filter"), FontsConfigState::LCD_FILTERS),
-                HStretch(),
-                ComboBox(Id("cmb_specimen_subpixellayout"), Opt(:notify, :immediate), 
-                         _("Subpixel &Layout"), FontsConfigState::SUBPIXEL_LAYOUTS),
               ) 
             ),
           "init"          => fun_ref(method(:initialize_specimen_widget),
                                      "symbol (string)"),
-          "handle_events" => [ "chkb_specimen_antialiasing", 
+          "handle_events" => UI.TextMode ? [] :
+                             [ "chkb_specimen_antialiasing",
                                "chkb_specimen_autohinter",
                                "cmb_specimen_hintstyle",
                                "cmb_specimen_lcdfilter",
@@ -793,8 +815,8 @@ module FontsConfig
               Frame(
                 _("Subpixel Rendering"),
                 VBox(
+                  Left("cmb_subpixel_layout"),
                   Left("cmb_lcd_filter"),
-                  Left("cmb_subpixel_layout")
                 ),
               ),
               VStretch()
@@ -805,8 +827,8 @@ module FontsConfig
             "chkb_ah_on",
             "cmb_hintstyle",
             "cstm_embedded_bitmaps",
+            "cmb_subpixel_layout",
             "cmb_lcd_filter",
-            "cmb_subpixel_layout"
           ],
         },
         "families"   => {
@@ -862,6 +884,33 @@ module FontsConfig
       widgets_description
     end
 
+    # create copy of system settings; remove fonts-config generated
+    # config files to have such fontconfig setup as fonts-config 
+    # would never run; point fontconfig to this configuration
+    def create_default_fontconfig
+      family_list_file = FontsConfigCommand.local_family_list_file
+      rendering_file = FontsConfigCommand.rendering_config
+      metric_bw_symlink = FontsConfigCommand.metric_compatibility_bw_symlink
+      metric_file = FontsConfigCommand.metric_compatibility_config
+      metric_symlink = FontsConfigCommand.metric_compatibility_symlink
+
+      mkdir_p("#{@tmp_dir}#{@fontconfig_path}")
+      Dir.glob("#{@fontconfig_path}/*") {|f|
+        cp_r(File.expand_path(f), "#{@tmp_dir}#{@fontconfig_path}")
+      }
+
+      rm_f("#{@tmp_dir}#{family_list_file}")
+      rm_f("#{@tmp_dir}#{rendering_file}")
+      rm_f("#{@tmp_dir}#{metric_bw_symlink}")
+      ln_sf("#{metric_file}", "#{@tmp_dir}#{metric_symlink}")
+
+      ENV['FONTCONFIG_PATH'] = "#{@tmp_dir}#{@fontconfig_path}"
+    end
+
+    def disable_default_fontconfig
+      ENV['FONTCONFIG_PATH'] = nil
+    end
+
     def run_dialog
       Yast.import "UI"
       Yast.import "CWM"
@@ -873,6 +922,7 @@ module FontsConfig
       Yast.import "Progress"
 
       widgets_description = widgets
+      sysconfig_file = FontsConfigCommand::sysconfig_file
 
       y2milestone("module started")
       Wizard.CreateDialog
@@ -882,15 +932,18 @@ module FontsConfig
         " ",
         1,
         [ _("Read sysconfig file") ],
-        [ _("Reading /etc/sysconfig/fonts-config...") ],
+        [ _("Reading #{sysconfig_file}...") ],
         ""
       )
 
       Progress.NextStage
-      y2milestone("reading /etc/sysconfig/fonts-config")
+      y2milestone("reading #{sysconfig_file}")
       @fcstate.read
       y2milestone("read: " + @fcstate.to_s)
       Progress.Finish
+
+      y2milestone("creating temporary default fontconfig in #{@tmp_dir}")
+      create_default_fontconfig
 
       y2milestone("running dialog")
       ret = CWM.ShowAndRun(
@@ -905,27 +958,28 @@ module FontsConfig
           "back_button"        => "",
         }
       )
-     
+
+      y2milestone("disabling temporary default fontconfig")
+      disable_default_fontconfig     
       remove_entry_secure(@tmp_dir)
  
       case ret
         when :next
           if (root_user?)
             y2milestone("saving configuration")
-
             Progress.New(
               _("Writing Font Configuration"),
               " ",
               2,
               [ _("Write sysconfig file"),
                 _("Run fonts-config") ],
-              [ _("Writing sysconfig file..."),
+              [ _("Writing %s...") %  sysconfig_file,
                 _("Running fonts-config...") ],
               ""
             )
 
             Progress.NextStage 
-            y2milestone("writing /etc/sysconfig/fonts-config")
+            y2milestone("writing #{sysconfig_file}")
             @fcstate.write
             y2milestone("written: " + @fcstate.to_s)
             Progress.NextStage
@@ -933,9 +987,14 @@ module FontsConfig
             FontsConfigCommand::run_fonts_config
             Progress.Finish
             y2milestone("module finished")
-         end
-       when :abort
-         y2milestone("aborted, do not save configuration")
+          else
+            Yast.import "Popup"
+            text = _("root user privileges are required "\
+                     "to save and apply font settings. ")
+            Popup.Error(text)
+          end
+        when :abort
+          y2milestone("aborted, do not save configuration")
       end
       Wizard.CloseDialog
     end
@@ -961,8 +1020,8 @@ module FontsConfig
       _("<p><b>Presets</b> button serves a possibility to choose predefined profiles: <ul>") +
       presets.keys.drop(1).map do |preset|
         _("<li><b>%{name}: </b>%{help}</li>") % {
-            :name => presets[preset]["name"],
-            :help => presets[preset]["help"]
+            :name => _(presets[preset]["name"]),
+            :help => _(presets[preset]["help"])
         }
       end.join + "</ul>" +
       _("Every single item there just fills appropriate setting in both tabs. " \

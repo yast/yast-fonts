@@ -27,8 +27,7 @@ module FontsConfig
       "rgb",
       "vrgb",
       "bgr",
-      "vbgr",
-      "unknown"
+      "vbgr"
     ]
 
     # in case of changing profiles, please reflect
@@ -36,7 +35,7 @@ module FontsConfig
     # otherwise testsuite will fail
     PRESETS = {
         "unset" => {
-          "name" => N_("Unset"),
+          "name" => "Unset",
           "fpl" => {
             "sans-serif" => nil,
             "serif" => nil,

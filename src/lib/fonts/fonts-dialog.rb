@@ -55,27 +55,27 @@ module FontsConfig
     end
 
   private
-    def initialize_aaoff_checkbox(key)
-      UI.ChangeWidget(Id("chkb_aa_off"), :Value,
-                      @fcstate.force_aa_off)
+    def initialize_antialias_checkbox(key)
+      UI.ChangeWidget(Id("chkb_aa"), :Value,
+                      !@fcstate.force_aa_off)
     end
 
-    def handle_aaoff_checkbox(key, map)
+    def handle_antialias_checkbox(key, map)
       @fcstate.force_aa_off =
-        UI.QueryWidget(Id("chkb_aa_off"), :Value)
-      UI.ChangeWidget(Id("chkb_aa_mono_off"), :Enabled, !@fcstate.force_aa_off)
+        !UI.QueryWidget(Id("chkb_aa"), :Value)
+      UI.ChangeWidget(Id("chkb_aa_mono"), :Enabled, !@fcstate.force_aa_off)
       return nil
     end
 
-    def initialize_aamonooff_checkbox(key)
-      UI.ChangeWidget(Id("chkb_aa_mono_off"), :Value,
-                      @fcstate.force_aa_off_mono)
-      UI.ChangeWidget(Id("chkb_aa_mono_off"), :Enabled, !@fcstate.force_aa_off_mono)
+    def initialize_antialias_mono_checkbox(key)
+      UI.ChangeWidget(Id("chkb_aa_mono"), :Value,
+                      !@fcstate.force_aa_off_mono)
+      UI.ChangeWidget(Id("chkb_aa_mono"), :Enabled, !@fcstate.force_aa_off)
     end
 
-    def handle_aaoffmono_checkbox(key, map)
+    def handle_antialias_mono_checkbox(key, map)
       @fcstate.force_aa_off_mono =
-        UI.QueryWidget(Id("chkb_aa_mono_off"), :Value)
+        !UI.QueryWidget(Id("chkb_aa_mono"), :Value)
       return nil
     end
 
@@ -298,8 +298,8 @@ module FontsConfig
         if CWMTab.CurrentTab == "specimens"
           initialize_specimen_widget("")
         elsif CWMTab.CurrentTab == "algorithms"
-          initialize_aaoff_checkbox("")
-          initialize_aamonooff_checkbox("")
+          initialize_antialias_checkbox("")
+          initialize_antialias_mono_checkbox("")
           initialize_ahon_checkbox("")
           initialize_hintstyle_combo("")
           initialize_lcdfilter_combo("")
@@ -406,7 +406,7 @@ module FontsConfig
       # folowing widgets exist only in graphical mode
       if (!UI.TextMode)
         UI.ChangeWidget(Id("chkb_specimen_antialiasing"), :Value, 
-                        @fcstate.force_aa_off ? true : false )
+                        @fcstate.force_aa_off ? false : true )
         UI.ChangeWidget(Id("chkb_specimen_autohinter"), :Value, 
                         @fcstate.force_ah_on ? true : false )
         UI.ChangeWidget(Id("cmb_specimen_hintstyle"), :Value, 
@@ -432,7 +432,7 @@ module FontsConfig
       end
 
       @fcstate.force_aa_off = 
-        UI.QueryWidget(Id("chkb_specimen_antialiasing"), :Value)
+        !UI.QueryWidget(Id("chkb_specimen_antialiasing"), :Value)
       @fcstate.force_ah_on = 
         UI.QueryWidget(Id("chkb_specimen_autohinter"), :Value)
       @fcstate.force_hintstyle = 
@@ -570,25 +570,25 @@ module FontsConfig
     def widgets
       help = FontsConfigDialogHelp.new
       widgets_description = {
-        "chkb_aa_off" => {
+        "chkb_aa" => {
           "widget"        => :checkbox,
-          "label"         => _("Turn &Antialiasing Off"),
-          "init"          => fun_ref(method(:initialize_aaoff_checkbox), 
+          "label"         => _("Font &Antialiasing"),
+          "init"          => fun_ref(method(:initialize_antialias_checkbox), 
                                      "void (string)"),
           "opt"           => [ :notify, :immediate ],
-          "handle_events" => [ "chkb_aa_off" ],
-          "handle"        => fun_ref(method(:handle_aaoff_checkbox),
+          "handle_events" => [ "chkb_aa" ],
+          "handle"        => fun_ref(method(:handle_antialias_checkbox),
                                      "symbol (string, map)"),
           "help"          => help.antialiasing,
         },
-        "chkb_aa_mono_off" => {
+        "chkb_aa_mono" => {
           "widget"        => :checkbox,
-          "label"         => _("Turn Antialiasing Off for &Monospaced Fonts"),
-          "init"          => fun_ref(method(:initialize_aamonooff_checkbox), 
+          "label"         => _("Antialias Also &Monospaced Fonts"),
+          "init"          => fun_ref(method(:initialize_antialias_mono_checkbox), 
                                      "void (string)"),
           "opt"           => [ :notify, :immediate ],
-          "handle_events" => [ "chkb_aa_mono_off" ],
-          "handle"        => fun_ref(method(:handle_aaoffmono_checkbox),
+          "handle_events" => [ "chkb_aa_mono" ],
+          "handle"        => fun_ref(method(:handle_antialias_mono_checkbox),
                                      "symbol (string, map)"),
           "no_help"       => true
         },
@@ -761,7 +761,7 @@ module FontsConfig
               ), UI.TextMode ? Label("") :
               HBox(
                 CheckBox(Id("chkb_specimen_antialiasing"), Opt(:notify, :immediate),
-                          _("Turn &Antialiasing Off")),
+                          _("Font &Antialiasing")),
                 HStretch(),
                 CheckBox(Id("chkb_specimen_autohinter"), Opt(:notify, :immediate),
                           _("Force A&utohinting On")),
@@ -800,8 +800,8 @@ module FontsConfig
               Frame(
                 _("Antialiasing"),
                 VBox(
-                  Left("chkb_aa_off"),
-                  Left("chkb_aa_mono_off")
+                  Left("chkb_aa"),
+                  Left(HBox(HSpacing(4), "chkb_aa_mono"))
                 ),
               ),
               Frame(
@@ -822,8 +822,8 @@ module FontsConfig
               VStretch()
             ),
           "widget_names" => [
-            "chkb_aa_off",
-            "chkb_aa_mono_off",
+            "chkb_aa",
+            "chkb_aa_mono",
             "chkb_ah_on",
             "cmb_hintstyle",
             "cstm_embedded_bitmaps",

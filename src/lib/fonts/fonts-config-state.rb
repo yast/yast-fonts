@@ -121,10 +121,10 @@ module FontsConfig
           "ebl" => [ "ja", "ko", "zh" ],
           "lcd_filter" => LCD_FILTERS[0],
           "subpixel_layout" => SUBPIXEL_LAYOUTS[0],
-          "help" => N_("Fonts rendered without antialiasing (grayscale smoothing), black and white. In contrast with smoothed fonts, they are much more readable without any drawback of smoothing (fuzzy or uneven stems etc.). In connection with good hinted fonts (e. g. Liberation 1 fonts), this setting can give bitmap quality fonts while maintaining scalability. Default family preference list is used."),
+          "help" => N_("Fonts rendered without antialiasing (grayscale smoothing), black and white. In contrast with smoothed fonts, they are much more readable without any drawback of smoothing (fuzzy or uneven stems etc.). In connection with good hinted fonts (e. g. Liberation 1 fonts), this setting can give bitmap quality fonts while maintaining scalability."),
         },
         "bw_mono_fonts" => {
-          "name" => N_("Black and White Rendering for Monospace Fonts"),
+          "name" => N_("Black and White Rendering for Monospaced Fonts"),
           "fpl" =>  {
             "sans-serif" => [],
             "serif" => [],
@@ -141,7 +141,7 @@ module FontsConfig
           "ebl" => [ "ja", "ko", "zh" ],
           "lcd_filter" => LCD_FILTERS[0],
           "subpixel_layout" => SUBPIXEL_LAYOUTS[0],
-          "help" => N_("Monospace fonts rendered not smoothed, other fonts (sans-serif, sans and unspecified) will use default setting. Default family preference list is used."),
+          "help" => N_("Monospaced fonts rendered not smoothed, other fonts (sans-serif, sans and unspecified) will use default setting. Default family preference list is used."),
         },
         "default" => {
           "name" => N_("Default"),
@@ -161,7 +161,7 @@ module FontsConfig
           "ebl" => [ "ja", "ko", "zh" ],
           "lcd_filter" => LCD_FILTERS[0],
           "subpixel_layout" => SUBPIXEL_LAYOUTS[0],
-          "help" => N_("Fonts are smoothed with antialiasing. Unlike black and white rendered fonts, this setting can produce 'beautiful' fonts sometimes to the detriment of readability. TrueType fonts, which are known to have good hinting instructions are rendered with bytecode interpreter, otherwise freetype autohinter is used on the 'hintslight' hinting level. Using font native hinting instructions produces glyphs displayed with thiner stems. Default family preference list is used (nowdays TrueType fonts with good instructions are prefered)."),
+          "help" => N_("Fonts are smoothed with antialiasing. Unlike black and white rendered fonts, this setting can produce 'beautiful' fonts sometimes to the detriment of readability. TrueType fonts, which are known to have good hinting instructions are rendered with bytecode interpreter, otherwise FreeType autohinter is used on the 'hintslight' hinting level. Using font native hinting instructions produces glyphs displayed with thiner stems. Default family preference list is used (nowdays TrueType fonts with good instructions are prefered)."),
         },
         "cff_fonts" => {
           "name" => N_("CFF Fonts"),
@@ -203,7 +203,7 @@ module FontsConfig
           "ebl" => [ "ja", "ko", "zh" ],
           "lcd_filter" => LCD_FILTERS[0],
           "subpixel_layout" => SUBPIXEL_LAYOUTS[0],
-          "help" => N_("Given Adobe's contribution to freetype library, CFF fonts can be considered good compromise between readability and smoothness of rendered glyphs."),
+          "help" => N_("Given Adobe's contribution to FreeType library, CFF fonts can be considered good compromise between readability and smoothness of rendered glyphs."),
         },
         "autohinter" => {
           "name" => N_("Exclusive Autohinter Rendering"),
@@ -223,7 +223,7 @@ module FontsConfig
           "ebl" => [ "ja", "ko", "zh" ],
           "lcd_filter" => LCD_FILTERS[0],
           "subpixel_layout" => SUBPIXEL_LAYOUTS[0],
-          "help" => N_("Unlike in default profile, even for good hinted fonts, freetype's autohinter is used (on the 'hintslight' level). That leads to thicker, but sometimes fuzzier (and therefore less readable), glyphs. Default family preference list is used."),
+          "help" => N_("Unlike in default profile, even for good hinted fonts, FreeType's autohinter is used (on the 'hintslight' level). That leads to thicker, but sometimes fuzzier (and therefore less readable), glyphs. Default family preference list is used."),
         },
         "subpixel_rendering" => {
           "name" => N_("Subpixel Rendering"),
@@ -277,6 +277,7 @@ module FontsConfig
   
     # create list of preset [key, name] pairs
     def self.preset_list
+      textdomain "fonts"
       PRESETS.keys.drop(1).map do |preset|
          [ preset, _(PRESETS[preset]["name"]) ]
        end

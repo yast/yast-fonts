@@ -557,7 +557,7 @@ module FontsConfig
     def specimen_alias_widget(generic_alias)
       VBox(
         HBox(Left(
-               Label(Id("lbl_specimen_#{generic_alias}"), "Match for #{generic_alias}")
+               Label(Id("lbl_specimen_#{generic_alias}"), _("Match for %s") % generic_alias)
              ),
              Right( UI.TextMode ? Label("") :
                ComboBox(Id("cmb_specimen_scripts_#{generic_alias}"), Opt(:notify, :immediate), "", [])
@@ -743,7 +743,7 @@ module FontsConfig
         },
         "chkb_no_other" => {
           "widget"        => :checkbox,
-          "label"         => _("Really do not use o&ther fonts"),
+          "label"         => _("Never use o&ther fonts"),
           "opt"           => [ :notify, :immediate ],
           "init"          => fun_ref(method(:initialize_noother_checkbox), 
                                      "void (string)"),
@@ -934,7 +934,7 @@ module FontsConfig
         " ",
         1,
         [ _("Read sysconfig file") ],
-        [ _("Reading #{sysconfig_file}...") ],
+        [ _("Reading %s...") % sysconfig_file ],
         ""
       )
 
@@ -1008,6 +1008,8 @@ module FontsConfig
     include I18n
 
     def initialize
+      textdomain "fonts"
+
       Yast.import "UI"
       @fcstate = FontsConfigState.new
       @fcstate.load_preset("default")
@@ -1026,9 +1028,9 @@ module FontsConfig
             :help => _(presets[preset]["help"])
         }
       end.join + "</ul>" +
-      _("Every single item there just fills appropriate setting in both tabs. " \
+      _("Every single menu item there just fills appropriate setting in all tabs. " \
         "That setting can be later arbitrarily customized in depth by respective " \
-        "individual fields of both tabs.</p>")
+        "individual fields of corresponding tabs.</p>")
     end
 
     def match_preview
@@ -1036,9 +1038,9 @@ module FontsConfig
       _("<p>In this paragraph, <i>current setting</i> means setting " \
         "of the system plus changes made in currently running fonts module.</p>") +
       _("<p>Matches to system generic aliases can be seen in this initial tab. ") +
-      _("In other words, for every alias () you can see family name, which" \
-        " resolves to given alias according to <i>current setting.</i></p>") %
-          @fcstate.fpl.keys.join(", ") +
+      _("In other words, for every alias (%s) you can see family name, which" \
+        " resolves to given alias according to <i>current setting.</i></p>" \
+        "") % @fcstate.fpl.keys.join(", ") +
       _("<p>In adition to that, graphical mode allows to display " \
         "font specimen of the matched font rendered (again) taking " \
         "<i>current setting</i> into account. ") +
@@ -1090,9 +1092,9 @@ module FontsConfig
         "colour primaries (subpixels) of an LCD display.</p>") +
       _("<p>Choose LCD filter, which should be used, and subpixel layout " \
         "corresponding to display and its rotation.</p>") +
-      _("<p>Note, that due to patent reasons, FreeType2 has subpixel " \
+      _("<p>Note, that due to patent reasons, FreeType has subpixel " \
          "rendering turned off by default.") +
-      _(" Without FreeType2's subpixel rendering support compiled in, " \
+      _(" Without FreeType's subpixel rendering support compiled in, " \
         "setting in this section has no effect.</p>") +
       _("<p>See: %s<\p>") % "<i>Wikipedia: Subpixel rendering</i>"
     end
@@ -1101,12 +1103,12 @@ module FontsConfig
       _("<h2>Prefered Families Tab</h2>") +
       _("<p>This tab controls <b>which</b> fonts are rendered.</p>") +
       _("<h3>Preference Lists</h3>") +
-      _("<p>Family preference lists (FPL) for generic aliases (%s) " \
+      _("<p>Here, Family Preference Lists (FPL) for generic aliases (%s) " \
         "can be defined.") % @fcstate.fpl.keys.join(', ') +
       _(" These are sorted lists of family names, with most prefered " \
         "family first.") +
       _(" There is default (system-wide) FPL yet defined for each generic alias.") +
-      _(" FPLs defined in this dialog will be prepended to them.<\p>") +
+      _(" FPLs defined in this dialog will be prepended to them.</p>") +
       _("<p>System will look for the first <b>installed</b> family in the list," \
         " other query elements taking into account of course. Available font" \
         " packages for SUSE distributions can be" \
@@ -1122,10 +1124,10 @@ module FontsConfig
       _("<p>Two fonts are metric compatible, when all corresponding letters" \
         " are of the same size. That implies, document displayed using these" \
         " fonts has the same same size too, same line wraps etc.</p>") +
-      _("<p>Via default setting, fontconfig substitutes metric compatible fonts preferably," \
+      _("<p>Via default setting, system substitutes metric compatible fonts preferably," \
         " and FPLs defined in this dialog can be circumvented by this rule.</p>") +
-      _("<p>Where metric compatibility do not matter, this option can be unchecked.</p>") +
-      _("<h4>Really do not use other fonts</h4>") +
+      _("<p>Where metric compatibility does not matter, this option can be unchecked.</p>") +
+      _("<h4>Never use other fonts</h4>") +
       _("<p>When checked, this option introduces very strong position for here" \
         " defined preference lists. It pushes families from there before" \
         " document or GUI requests, if they cover required charset.</p>")

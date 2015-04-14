@@ -30,6 +30,8 @@ module FontsConfig
     FONTCONFIG_PATH = "/etc/fonts"
 
     def initialize
+      textdomain "fonts"
+
       @fcstate = FontsConfigState.new
       @current_fpl = @fcstate.fpl.keys[0]
       @current_family = nil

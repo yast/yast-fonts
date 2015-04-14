@@ -7,6 +7,7 @@ module FontsConfig
     include I18n
 
     def initialize
+      textdomain "fonts"
     end
 
     def run(text, summary)

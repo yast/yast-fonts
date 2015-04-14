@@ -4,6 +4,7 @@ module FontsConfig
   class FontsConfigState
     include Yast
     extend Yast::I18n
+    include Yast::I18n
 
     SC_PATH = ".sysconfig.fonts-config"
 
@@ -270,6 +271,7 @@ module FontsConfig
     attr_accessor :subpixel_layout
 
     def initialize
+      textdomain "fonts"
       load_preset("unset")
     end
   

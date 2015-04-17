@@ -893,7 +893,7 @@ module FontsConfig
       family_list_file = FontsConfigCommand.local_family_list_file
       rendering_file = FontsConfigCommand.rendering_config
       metric_bw_symlink = FontsConfigCommand.metric_compatibility_bw_symlink
-      metric_file = FontsConfigCommand.metric_compatibility_config
+      metric_avail = FontsConfigCommand.metric_compatibility_avail
       metric_symlink = FontsConfigCommand.metric_compatibility_symlink
 
       mkdir_p("#{@tmp_dir}#{@fontconfig_path}")
@@ -904,7 +904,7 @@ module FontsConfig
       rm_f("#{@tmp_dir}#{family_list_file}")
       rm_f("#{@tmp_dir}#{rendering_file}")
       rm_f("#{@tmp_dir}#{metric_bw_symlink}")
-      ln_sf("#{metric_file}", "#{@tmp_dir}#{metric_symlink}")
+      ln_sf("#{metric_avail}", "#{@tmp_dir}#{metric_symlink}")
 
       ENV['FONTCONFIG_PATH'] = "#{@tmp_dir}#{@fontconfig_path}"
     end

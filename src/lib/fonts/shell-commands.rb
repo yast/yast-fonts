@@ -28,8 +28,8 @@ module FontsConfig
       return fonts_config_file("rendering config")
     end
 
-    def self.metric_compatibility_config
-      return fonts_config_file("metric compatibility config")
+    def self.metric_compatibility_avail
+      return fonts_config_file("metric compatibility avail")
     end
 
     def self.metric_compatibility_symlink

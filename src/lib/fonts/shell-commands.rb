@@ -4,13 +4,14 @@ require "yast/path"
 module FontsConfig
   BASH_SCR_PATH = Yast::Path.new(".target.bash_output")
   FONTS_CONFIG_CMD = "/usr/sbin/fonts-config"
+  XDG_PREFIX = ENV['HOME'] + '/.config/'
 
   class FontsConfigCommand
     
-    def self.run_fonts_config
+    def self.run_fonts_config(args)
       return false unless File.executable?(FONTS_CONFIG_CMD)
 
-      cmd = FONTS_CONFIG_CMD
+      cmd = FONTS_CONFIG_CMD + " " + args
       result = Yast::SCR.Execute(BASH_SCR_PATH, cmd)
       unless (result["exit"].zero?)   
         Yast.import "Popup"
@@ -42,6 +43,10 @@ module FontsConfig
 
     def self.sysconfig_file
       return fonts_config_file("sysconfig file")
+    end
+
+    def self.user_sysconfig_file
+      return XDG_PREFIX + fonts_config_file("user sysconfig file")
     end
 
     def self.have_fonts_config?

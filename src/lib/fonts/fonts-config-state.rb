@@ -5,8 +5,7 @@ module FontsConfig
     include Yast
     extend Yast::I18n
     include Yast::I18n
-
-    SC_PATH = ".sysconfig.fonts-config"
+    include FileUtils
 
     HINT_STYLES = [
       "none",
@@ -270,7 +269,24 @@ module FontsConfig
     attr_accessor :lcd_filter
     attr_accessor :subpixel_layout
 
-    def initialize
+    def initialize(root_user = 1)
+      @root_user = root_user
+      if (root_user)
+        # system mode
+        # (yes, root user can't change his font setting via this module :))
+        @agent_path = ".sysconfig.fonts-config" 
+      else
+        # user mode
+        # ~/.config/fontconfig/fonts-config
+        @agent_path = ".userconfig.fonts-config"
+        @agent_file_path = FontsConfigCommand.user_sysconfig_file
+ 
+        if (File.exists?(@agent_file_path))
+          SCR.RegisterAgent(path(@agent_path),
+                            term(:ag_ini, term(:SysConfigFile, @agent_file_path)))
+        end
+      end
+
       textdomain "fonts"
       load_preset("unset")
     end
@@ -321,56 +337,63 @@ module FontsConfig
    end
 
    def write
+      if (!@root_user && !File.exists?(@agent_file_path))
+        mkdir_p(File.dirname(@agent_file_path))
+        touch(@agent_file_path)
+        SCR.RegisterAgent(path(@agent_path),
+                          term(:ag_ini, term(:SysConfigFile, @agent_file_path)))
+      end
+
       temp = @fpl["sans-serif"].join(':')
       SCR.Write(
-        path(SC_PATH + ".PREFER_SANS_FAMILIES"),
+        path(@agent_path + ".PREFER_SANS_FAMILIES"),
         temp
       )
 
       temp = @fpl["serif"].join(':')
       SCR.Write(
-        path(SC_PATH + ".PREFER_SERIF_FAMILIES"),
+        path(@agent_path + ".PREFER_SERIF_FAMILIES"),
         temp
       )
 
       temp = @fpl["monospace"].join(':')
       SCR.Write(
-        path(SC_PATH + ".PREFER_MONO_FAMILIES"),
+        path(@agent_path + ".PREFER_MONO_FAMILIES"),
         temp
       )
         
       temp = @search_metric_compatible ? "yes" : "no"
       SCR.Write(
-        path(SC_PATH + ".SEARCH_METRIC_COMPATIBLE"),
+        path(@agent_path + ".SEARCH_METRIC_COMPATIBLE"),
         temp
       )
 
       temp = @really_force_fpl ? "yes" : "no"
       SCR.Write(
-        path(SC_PATH + ".FORCE_FAMILY_PREFERENCE_LISTS"),
+        path(@agent_path + ".FORCE_FAMILY_PREFERENCE_LISTS"),
         temp
       )
 
       temp = @force_aa_off ? "yes" : "no"
       SCR.Write(
-        path(SC_PATH + ".FORCE_BW"),
+        path(@agent_path + ".FORCE_BW"),
         temp
       )
       
       temp = @force_aa_off_mono ? "yes" : "no"
       SCR.Write(
-        path(SC_PATH + ".FORCE_BW_MONOSPACE"),
+        path(@agent_path + ".FORCE_BW_MONOSPACE"),
         temp
       )
     
       temp = @force_ah_on ? "yes" : "no"
       SCR.Write(
-        path(SC_PATH + ".FORCE_AUTOHINT"),
+        path(@agent_path + ".FORCE_AUTOHINT"),
         temp
       )
 
       SCR.Write(
-        path(SC_PATH + ".FORCE_HINTSTYLE"),
+        path(@agent_path + ".FORCE_HINTSTYLE"),
         @force_hintstyle
       )
 
@@ -379,7 +402,7 @@ module FontsConfig
       # the list is empty -- empty string would mean 'ALL')
       temp = !@embedded_bitmaps || (!@all_ebl && @ebl.empty?) ? "no" : "yes"
       SCR.Write(
-        path(SC_PATH + ".USE_EMBEDDED_BITMAPS"),
+        path(@agent_path + ".USE_EMBEDDED_BITMAPS"),
         temp
       )
 
@@ -389,23 +412,23 @@ module FontsConfig
         temp = @ebl.join(':')
       end
       SCR.Write(
-        path(SC_PATH + ".EMBEDDED_BITMAPS_LANGUAGES"),
+        path(@agent_path + ".EMBEDDED_BITMAPS_LANGUAGES"),
         temp 
       )
 
       SCR.Write(
-        path(SC_PATH + ".USE_LCDFILTER"),
+        path(@agent_path + ".USE_LCDFILTER"),
         @lcd_filter
       )
 
       SCR.Write(
-        path(SC_PATH + ".USE_RGBA"),
+        path(@agent_path + ".USE_RGBA"),
         @subpixel_layout
       )
 
       # flush
       SCR.Write(
-        path(SC_PATH),
+        path(@agent_path),
         nil
       )
    end
@@ -416,57 +439,57 @@ module FontsConfig
       load_preset("default")
 
       temp = SCR.Read(
-              path(SC_PATH + ".PREFER_SANS_FAMILIES")
+              path(@agent_path + ".PREFER_SANS_FAMILIES")
              )
       @fpl["sans-serif"] = temp.split(':') unless temp.nil?
 
       temp = SCR.Read(
-              path(SC_PATH + ".PREFER_SERIF_FAMILIES")
+              path(@agent_path + ".PREFER_SERIF_FAMILIES")
              )
       @fpl["serif"] = temp.split(':') unless temp.nil?
 
       temp = SCR.Read(
-              path(SC_PATH + ".PREFER_MONO_FAMILIES")
+              path(@agent_path + ".PREFER_MONO_FAMILIES")
              )
       @fpl["monospace"] = temp.split(':') unless temp.nil?
 
       temp = SCR.Read(
-               path(SC_PATH + ".SEARCH_METRIC_COMPATIBLE"),
+               path(@agent_path + ".SEARCH_METRIC_COMPATIBLE"),
              )
       @search_metric_compatible = temp == "yes" unless temp.nil?
 
       temp = SCR.Read(
-               path(SC_PATH + ".FORCE_FAMILY_PREFERENCE_LISTS"),
+               path(@agent_path + ".FORCE_FAMILY_PREFERENCE_LISTS"),
              )
       @really_force_fpl = temp == "yes" unless temp.nil?
 
       temp = SCR.Read(
-               path(SC_PATH + ".FORCE_BW"),
+               path(@agent_path + ".FORCE_BW"),
              )
       @force_aa_off = temp == "yes" unless temp.nil?
 
       temp = SCR.Read(
-               path(SC_PATH + ".FORCE_BW_MONOSPACE"),
+               path(@agent_path + ".FORCE_BW_MONOSPACE"),
              )
       @force_aa_off_mono = temp == "yes" unless temp.nil?
 
       temp = SCR.Read(
-               path(SC_PATH + ".FORCE_AUTOHINT"),
+               path(@agent_path + ".FORCE_AUTOHINT"),
              )
       @force_ah_on = temp == "yes" unless temp.nil?
 
       temp = SCR.Read(
-               path(SC_PATH + ".FORCE_HINTSTYLE"),
+               path(@agent_path + ".FORCE_HINTSTYLE"),
              )
       @force_hintstyle = temp unless temp.nil?
 
       temp = SCR.Read(
-               path(SC_PATH + ".USE_EMBEDDED_BITMAPS")
+               path(@agent_path + ".USE_EMBEDDED_BITMAPS")
              )
       @embedded_bitmaps = temp == "yes" unless temp.nil?
 
       temp = SCR.Read(
-              path(SC_PATH + ".EMBEDDED_BITMAPS_LANGUAGES")
+              path(@agent_path + ".EMBEDDED_BITMAPS_LANGUAGES")
              )
       unless temp.nil?
         if (temp == "")
@@ -479,15 +502,15 @@ module FontsConfig
       end
 
       temp = SCR.Read(
-               path(SC_PATH + ".USE_LCDFILTER"),
+               path(@agent_path + ".USE_LCDFILTER"),
             )
       @lcd_filter = temp unless temp.nil?
 
       temp = SCR.Read(
-               path(SC_PATH + ".USE_RGBA"),
+               path(@agent_path + ".USE_RGBA"),
              )
       @subpixel_layout = temp unless temp.nil?
-   end
+    end
   end
 end
 

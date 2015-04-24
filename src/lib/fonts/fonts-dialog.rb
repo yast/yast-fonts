@@ -32,7 +32,7 @@ module FontsConfig
     def initialize
       textdomain "fonts"
 
-      @fcstate = FontsConfigState.new
+      @fcstate = FontsConfigState.new(root_user?)
       @current_fpl = @fcstate.fpl.keys[0]
       @current_family = nil
       @current_families = Hash.new
@@ -954,10 +954,13 @@ module FontsConfig
           "widget_descr"       => widgets_description,
           "contents"           => VBox(HBox(HStretch(), "btn_presets"),
                                   "tabs_fonts_configuration"),
-          "caption"            => _("Font Configuration"),
+          "caption"            => _("Font Configuration") +  
+                                  (root_user? ? "" : _(" (User Mode)")),
           "next_button"        => Label.OKButton,
           "abort_button"       => Label.AbortButton,
-          "back_button"        => "",
+          # misuse back_button a bit
+          "back_button"        => (root_user? || !File.exists?(FontsConfigCommand.user_sysconfig_file) ? 
+                                     nil : "&Use system settings"),
         }
       )
 
@@ -967,36 +970,38 @@ module FontsConfig
  
       case ret
         when :next
-          if (root_user?)
-            y2milestone("saving configuration")
-            Progress.New(
-              _("Writing Font Configuration"),
-              " ",
-              2,
-              [ _("Write sysconfig file"),
-                _("Run fonts-config") ],
-              [ _("Writing %s...") %  sysconfig_file,
-                _("Running fonts-config...") ],
-              ""
-            )
+          y2milestone("saving configuration")
+          Progress.New(
+            _("Writing Font Configuration"),
+            " ",
+            2,
+            [ _("Write sysconfig file"),
+              _("Run fonts-config") ],
+            [ _("Writing %s...") %  sysconfig_file,
+              _("Running fonts-config...") ],
+            ""
+          )
 
-            Progress.NextStage 
-            y2milestone("writing #{sysconfig_file}")
-            @fcstate.write
-            y2milestone("written: " + @fcstate.to_s)
-            Progress.NextStage
-            y2milestone("running fonts-config")
-            FontsConfigCommand::run_fonts_config
-            Progress.Finish
-            y2milestone("module finished")
-          else
-            Yast.import "Popup"
-            text = _("root user privileges are required "\
-                     "to save and apply font settings. ")
-            Popup.Error(text)
-          end
+          Progress.NextStage 
+          y2milestone("writing #{sysconfig_file}")
+          @fcstate.write
+          y2milestone("written: " + @fcstate.to_s)
+          Progress.NextStage
+          y2milestone("running fonts-config")
+          FontsConfigCommand::run_fonts_config(root_user? ? "" : "--user")
+          Progress.Finish
+          y2milestone("module finished")
         when :abort
           y2milestone("aborted, do not save configuration")
+        when :back
+          # we are in user mode
+          Yast.import "Popup"
+          text = _("This will irrecoverably remove user setting done previously " +
+                   "with this module.")
+          if (Popup.YesNo(text))
+            FontsConfigCommand::run_fonts_config("--remove-user-setting")
+            y2milestone("remove user setting")
+          end
       end
       Wizard.CloseDialog
     end
@@ -1019,8 +1024,23 @@ module FontsConfig
       Yast.import "String"
       presets = FontsConfigState::PRESETS
       _("<h1>Font Configuraution Module</h1>") +
-      _("<p>Module to control system wide font rendering setting.") +
-      _(" Help for <i>Presets</i> button and for the current tab follows.</p>") +
+      _("<p>Module to control <b>system wide</b> or <b>user</b> font rendering setting.</p>") +
+      _("<i>Distribution default</i> is font setting shipped on media and " +
+        "it is that one almost same for years (not counting decisions of individual DE). ") +
+      _("This setting can be changed:<ul>") +
+      _("<li>system wide when module is run with <tt>root</tt> credentials "+
+        "to create <i>system setting.</i> ") +
+      _("System, where font module never run or <b>Default</b> preset was chosen, " + 
+        "uses distribution default.</li>") +
+      _("<li>for <i>user setting</i> when module is run as ordindary user. ") +
+      _("User, which never run this module or chooses to <b>Use system settings</b>, ") +
+      _("uses system settings. User, which chooses <b>Default</b> preset, ") +
+      _("uses distribution default.</li></ul>") +
+      _("<p><b>NOTE:</b> ") + 
+      _("In general, it is not recommended to combine font module user mode with other font setting. ") +
+      _("Nevertheless, setting in <tt>~/.config/fontconfig/fonts.conf</tt> " +
+        "should always have precendence before arbitrary font module setting.</p>") +
+      _("<p>Help for <i>Presets</i> button and for the current tab follows.</p>") +
       _("<p><b>Presets</b> button serves a possibility to choose predefined profiles: <ul>") +
       presets.keys.drop(1).map do |preset|
         _("<li><b>%{name}: </b>%{help}</li>") % {

@@ -271,7 +271,12 @@ module FontsConfig
 
     def initialize(root_user = 1)
       @root_user = root_user
-      if (root_user)
+      textdomain "fonts"
+      load_preset("unset")
+    end
+  
+    def initialize_agent
+      if (@root_user)
         # system mode
         # (yes, root user can't change his font setting via this module :))
         @agent_path = ".sysconfig.fonts-config" 
@@ -286,11 +291,15 @@ module FontsConfig
                             term(:ag_ini, term(:SysConfigFile, @agent_file_path)))
         end
       end
-
-      textdomain "fonts"
-      load_preset("unset")
     end
-  
+
+    def finalize_agent
+      if (!@root_user)
+        SCR.UnregisterAgent(path(".userconfig.fonts-config"))
+      end
+      @agent_path = ""
+    end
+
     # create list of preset [key, name] pairs
     def self.preset_list
       textdomain "fonts"
@@ -340,9 +349,9 @@ module FontsConfig
       if (!@root_user && !File.exists?(@agent_file_path))
         mkdir_p(File.dirname(@agent_file_path))
         touch(@agent_file_path)
-        SCR.RegisterAgent(path(@agent_path),
-                          term(:ag_ini, term(:SysConfigFile, @agent_file_path)))
       end
+
+      initialize_agent
 
       temp = @fpl["sans-serif"].join(':')
       SCR.Write(
@@ -431,12 +440,15 @@ module FontsConfig
         path(@agent_path),
         nil
       )
+
+      finalize_agent
    end
 
    def read
       # use values from "default" profile in case
       # some sysconfig variables are missing
       load_preset("default")
+      initialize_agent
 
       temp = SCR.Read(
               path(@agent_path + ".PREFER_SANS_FAMILIES")
@@ -510,6 +522,8 @@ module FontsConfig
                path(@agent_path + ".USE_RGBA"),
              )
       @subpixel_layout = temp unless temp.nil?
+
+      finalize_agent
     end
   end
 end

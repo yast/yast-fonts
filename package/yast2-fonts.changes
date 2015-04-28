@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Apr 28 12:51:52 UTC 2015 - pgajdos@suse.com
+
+- user mode
+- 3.1.13
+
+-------------------------------------------------------------------
 Wed Dec 10 10:11:43 UTC 2014 - pgajdos@suse.com
 
 - use _raw_ default fontconfig plus rendring/family list changes 

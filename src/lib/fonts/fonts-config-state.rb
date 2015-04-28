@@ -269,7 +269,7 @@ module FontsConfig
     attr_accessor :lcd_filter
     attr_accessor :subpixel_layout
 
-    def initialize(root_user = 1)
+    def initialize(root_user = true)
       @root_user = root_user
       textdomain "fonts"
       load_preset("unset")

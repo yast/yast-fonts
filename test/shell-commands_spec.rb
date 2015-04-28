@@ -6,9 +6,13 @@ require "yast/path"
 
 describe FontsConfig::FontsConfigCommand do
   describe "#run_fonts_config" do    
-    it "error popup when not run under root" do
+    it "returns false for system mode" do
       if (FontsConfig::FontsConfigCommand::have_fonts_config?)
         expect(FontsConfig::FontsConfigCommand::run_fonts_config("")).to be false
+      end
+    end
+    it "returns true for user mode" do
+      if (FontsConfig::FontsConfigCommand::have_fonts_config?)
         expect(FontsConfig::FontsConfigCommand::run_fonts_config("--user")).to be true
       end
     end
@@ -35,12 +39,12 @@ describe FontsConfig::FontsConfigCommand do
     end
   end
 
-  describe "#metric_compatibility_config" do
+  describe "#metric_compatibility_avail" do
     it "returns existing file name" do
       if (FontsConfig::FontsConfigCommand::have_fonts_config?)
-        metric_config = FontsConfig::FontsConfigCommand::metric_compatibility_config
-        expect(metric_config).to be_a(String)
-        expect(File.exist?(metric_config)).to be true
+        metric_avail = FontsConfig::FontsConfigCommand::metric_compatibility_avail
+        expect(metric_avail).to be_a(String)
+        expect(File.exist?(metric_avail)).to be true
       end
     end
   end

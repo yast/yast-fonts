@@ -8,7 +8,8 @@ describe FontsConfig::FontsConfigCommand do
   describe "#run_fonts_config" do    
     it "error popup when not run under root" do
       if (FontsConfig::FontsConfigCommand::have_fonts_config?)
-        expect(FontsConfig::FontsConfigCommand::run_fonts_config).to be false
+        expect(FontsConfig::FontsConfigCommand::run_fonts_config("")).to be false
+        expect(FontsConfig::FontsConfigCommand::run_fonts_config("--user")).to be true
       end
     end
   end

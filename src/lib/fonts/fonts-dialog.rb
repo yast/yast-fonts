@@ -960,7 +960,7 @@ module FontsConfig
           "abort_button"       => Label.AbortButton,
           # misuse back_button a bit
           "back_button"        => (root_user? || !File.exists?(FontsConfigCommand.user_sysconfig_file) ? 
-                                     nil : "&Use system settings"),
+                                     nil : _("&Use system settings")),
         }
       )
 
@@ -1033,9 +1033,8 @@ module FontsConfig
       _("System, where font module never run or <b>Default</b> preset was chosen, " + 
         "uses distribution default.</li>") +
       _("<li>for <i>user setting</i> when module is run as ordindary user. ") +
-      _("User, which never run this module or chooses to <b>Use system settings</b>, ") +
-      _("uses system settings. User, which chooses <b>Default</b> preset, ") +
-      _("uses distribution default.</li></ul>") +
+      _("User, which never run this module or chooses to <b>Use system settings</b>, uses system settings. ") +
+      _("User, which chooses <b>Default</b> preset, uses distribution default.</li></ul>") +
       _("<p><b>NOTE:</b> ") + 
       _("In general, it is not recommended to combine font module user mode with other font setting. ") +
       _("Nevertheless, setting in <tt>~/.config/fontconfig/fonts.conf</tt> " +

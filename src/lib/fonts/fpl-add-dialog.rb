@@ -17,6 +17,8 @@ module FontsConfig
     ]
 
     def initialize(fcstate)
+      textdomain "fonts"
+
       @fcstate = fcstate
       @available_families = installed_families(["family", "fontformat"])
       # delete families, that are part of list for some alias

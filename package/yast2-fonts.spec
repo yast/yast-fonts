@@ -17,7 +17,7 @@
 
 
 Name:           yast2-fonts
-Version:        3.1.12
+Version:        3.1.13
 Release:        0
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
@@ -25,7 +25,7 @@ Source0:        %{name}-%{version}.tar.bz2
 
 Requires:       yast2 >= 3.0.5
 Requires:       yast2-ruby-bindings >= 1.2.0
-Requires:       fonts-config >= 20141207
+Requires:       fonts-config >= 20150424
 Requires:       fontconfig
 
 BuildRequires:  update-desktop-files
@@ -41,7 +41,7 @@ BuildRequires:  ruby-devel
 # for testing
 BuildRequires:  rubygem(rspec)
 BuildRequires:  dejavu-fonts
-BuildRequires:  fonts-config
+BuildRequires:  fonts-config >= 20150424
 
 Summary:        YaST2 - Fonts Configuration
 Group:          System/YaST
@@ -57,12 +57,12 @@ as well as set rendering algorithms to be used.
 %setup -n %{name}-%{version}
 
 %build
-# build FreeType2 ruby binding
+# build ruby bindings
 rake compile
 
 %install
 rake install DESTDIR="%{buildroot}"
-# install FreeType2 ruby binding
+# install ruby bindings
 mkdir -p  %{buildroot}%{_libdir}/ruby/vendor_ruby/%{rb_ver}/%{rb_arch}/yast
 for ext in `ls src/ext`; do
   install -m 755 src/ext/$ext/$ext.so %{buildroot}%{_libdir}/ruby/vendor_ruby/%{rb_ver}/%{rb_arch}/yast

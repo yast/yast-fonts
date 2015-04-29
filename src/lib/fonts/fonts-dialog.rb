@@ -30,7 +30,9 @@ module FontsConfig
     FONTCONFIG_PATH = "/etc/fonts"
 
     def initialize
-      @fcstate = FontsConfigState.new
+      textdomain "fonts"
+
+      @fcstate = FontsConfigState.new(root_user?)
       @current_fpl = @fcstate.fpl.keys[0]
       @current_family = nil
       @current_families = Hash.new
@@ -55,31 +57,31 @@ module FontsConfig
     end
 
   private
-    def initialize_aaoff_checkbox(key)
-      UI.ChangeWidget(Id("chkb_aa_off"), :Value,
-                      @fcstate.force_aa_off)
+    def initialize_antialias_checkbox(key = nil)
+      UI.ChangeWidget(Id("chkb_antialias"), :Value,
+                      !@fcstate.force_aa_off)
     end
 
-    def handle_aaoff_checkbox(key, map)
+    def handle_antialias_checkbox(key, map)
       @fcstate.force_aa_off =
-        UI.QueryWidget(Id("chkb_aa_off"), :Value)
-      UI.ChangeWidget(Id("chkb_aa_mono_off"), :Enabled, !@fcstate.force_aa_off)
+        !UI.QueryWidget(Id("chkb_antialias"), :Value)
+      UI.ChangeWidget(Id("chkb_antialias_mono"), :Enabled, !@fcstate.force_aa_off)
       return nil
     end
 
-    def initialize_aamonooff_checkbox(key)
-      UI.ChangeWidget(Id("chkb_aa_mono_off"), :Value,
-                      @fcstate.force_aa_off_mono)
-      UI.ChangeWidget(Id("chkb_aa_mono_off"), :Enabled, !@fcstate.force_aa_off_mono)
+    def initialize_antialias_mono_checkbox(key = nil)
+      UI.ChangeWidget(Id("chkb_antialias_mono"), :Value,
+                      !@fcstate.force_aa_off_mono)
+      UI.ChangeWidget(Id("chkb_antialias_mono"), :Enabled, !@fcstate.force_aa_off)
     end
 
-    def handle_aaoffmono_checkbox(key, map)
+    def handle_antialias_mono_checkbox(key, map)
       @fcstate.force_aa_off_mono =
-        UI.QueryWidget(Id("chkb_aa_mono_off"), :Value)
+        !UI.QueryWidget(Id("chkb_antialias_mono"), :Value)
       return nil
     end
 
-    def initialize_ahon_checkbox(key)
+    def initialize_ahon_checkbox(key = nil)
       UI.ChangeWidget(Id("chkb_ah_on"), :Value,
                       @fcstate.force_ah_on)
     end
@@ -90,7 +92,7 @@ module FontsConfig
       return nil
     end
 
-    def initialize_searchmc_checkbox(key)
+    def initialize_searchmc_checkbox(key = nil)
       UI.ChangeWidget(Id("chkb_search_mc"), :Value,
                       @fcstate.search_metric_compatible)
     end
@@ -101,7 +103,7 @@ module FontsConfig
       return nil
     end
 
-    def initialize_noother_checkbox(key)
+    def initialize_noother_checkbox(key = nil)
       UI.ChangeWidget(Id("chkb_no_other"), :Value,
                       @fcstate.really_force_fpl)
     end
@@ -112,7 +114,7 @@ module FontsConfig
       return nil
     end
 
-    def initialize_hintstyle_combo(key)
+    def initialize_hintstyle_combo(key = nil)
       UI.ChangeWidget(Id("cmb_hintstyle"), :Items, 
                       FontsConfigState::HINT_STYLES)
       UI.ChangeWidget(Id("cmb_hintstyle"), :Value, 
@@ -125,7 +127,7 @@ module FontsConfig
       return nil
     end
 
-    def initialize_lcdfilter_combo(key)
+    def initialize_lcdfilter_combo(key = nil)
       UI.ChangeWidget(Id("cmb_lcd_filter"), :Items, 
                       FontsConfigState::LCD_FILTERS)
       UI.ChangeWidget(Id("cmb_lcd_filter"), :Value, 
@@ -139,7 +141,7 @@ module FontsConfig
       return nil
     end
 
-    def initialize_subpixellayout_combo(key)
+    def initialize_subpixellayout_combo(key = nil)
       UI.ChangeWidget(Id("cmb_subpixel_layout"), :Items, 
                       FontsConfigState::SUBPIXEL_LAYOUTS)
       UI.ChangeWidget(Id("cmb_subpixel_layout"), :Value, 
@@ -156,7 +158,7 @@ module FontsConfig
       return nil
     end
 
-    def initialize_genericaliases_table(key)
+    def initialize_genericaliases_table(key = nil)
       items = []
       @fcstate.fpl.keys.each do |generic_alias|
         items.push(Item(generic_alias)) 
@@ -172,7 +174,7 @@ module FontsConfig
        return nil
     end
 
-    def initialize_familylist_widget(key)
+    def initialize_familylist_widget(key = nil)
       items = []
       @fcstate.fpl[@current_fpl].each do |f|
         indication = family_installed?(f) ?
@@ -241,7 +243,7 @@ module FontsConfig
           UI.ChangeWidget(Id("txt_add_manual"), :Value, "")
       end
 
-      initialize_familylist_widget("")
+      initialize_familylist_widget
       return nil
     end
 
@@ -287,7 +289,7 @@ module FontsConfig
           @fcstate.all_ebl = false
       end
  
-      initialize_embeddedbitmaps_widget("")
+      initialize_embeddedbitmaps_widget
       return nil
     end
 
@@ -296,20 +298,20 @@ module FontsConfig
            FontsConfigState::preset?(event["ID"])
         @fcstate.load_preset(event["ID"])
         if CWMTab.CurrentTab == "specimens"
-          initialize_specimen_widget("")
+          initialize_specimen_widget
         elsif CWMTab.CurrentTab == "algorithms"
-          initialize_aaoff_checkbox("")
-          initialize_aamonooff_checkbox("")
-          initialize_ahon_checkbox("")
-          initialize_hintstyle_combo("")
-          initialize_lcdfilter_combo("")
-          initialize_subpixellayout_combo("")
-          initialize_embeddedbitmaps_widget("")
+          initialize_antialias_checkbox
+          initialize_antialias_mono_checkbox
+          initialize_ahon_checkbox
+          initialize_hintstyle_combo
+          initialize_lcdfilter_combo
+          initialize_subpixellayout_combo
+          initialize_embeddedbitmaps_widget
         else
-          initialize_genericaliases_table("")
-          initialize_familylist_widget("")
-          initialize_searchmc_checkbox("")
-          initialize_noother_checkbox("")
+          initialize_genericaliases_table
+          initialize_familylist_widget
+          initialize_searchmc_checkbox
+          initialize_noother_checkbox
         end
         subpixel_freetype_warning
         installation_summary_check
@@ -366,7 +368,7 @@ module FontsConfig
       return pattern
     end
 
-    def initialize_specimen_widget(key)
+    def initialize_specimen_widget(key = nil)
       @fcstate.fpl.keys.each do |generic_alias|
         @current_families[generic_alias] = 
           installed_families_from(@fcstate.fpl[generic_alias])[0]
@@ -406,7 +408,7 @@ module FontsConfig
       # folowing widgets exist only in graphical mode
       if (!UI.TextMode)
         UI.ChangeWidget(Id("chkb_specimen_antialiasing"), :Value, 
-                        @fcstate.force_aa_off ? true : false )
+                        @fcstate.force_aa_off ? false : true )
         UI.ChangeWidget(Id("chkb_specimen_autohinter"), :Value, 
                         @fcstate.force_ah_on ? true : false )
         UI.ChangeWidget(Id("cmb_specimen_hintstyle"), :Value, 
@@ -432,7 +434,7 @@ module FontsConfig
       end
 
       @fcstate.force_aa_off = 
-        UI.QueryWidget(Id("chkb_specimen_antialiasing"), :Value)
+        !UI.QueryWidget(Id("chkb_specimen_antialiasing"), :Value)
       @fcstate.force_ah_on = 
         UI.QueryWidget(Id("chkb_specimen_autohinter"), :Value)
       @fcstate.force_hintstyle = 
@@ -555,7 +557,7 @@ module FontsConfig
     def specimen_alias_widget(generic_alias)
       VBox(
         HBox(Left(
-               Label(Id("lbl_specimen_#{generic_alias}"), "Match for #{generic_alias}")
+               Label(Id("lbl_specimen_#{generic_alias}"), _("Match for %s") % generic_alias)
              ),
              Right( UI.TextMode ? Label("") :
                ComboBox(Id("cmb_specimen_scripts_#{generic_alias}"), Opt(:notify, :immediate), "", [])
@@ -570,25 +572,25 @@ module FontsConfig
     def widgets
       help = FontsConfigDialogHelp.new
       widgets_description = {
-        "chkb_aa_off" => {
+        "chkb_antialias" => {
           "widget"        => :checkbox,
-          "label"         => _("Turn &Antialiasing Off"),
-          "init"          => fun_ref(method(:initialize_aaoff_checkbox), 
+          "label"         => _("Font &Antialiasing"),
+          "init"          => fun_ref(method(:initialize_antialias_checkbox), 
                                      "void (string)"),
           "opt"           => [ :notify, :immediate ],
-          "handle_events" => [ "chkb_aa_off" ],
-          "handle"        => fun_ref(method(:handle_aaoff_checkbox),
+          "handle_events" => [ "chkb_antialias" ],
+          "handle"        => fun_ref(method(:handle_antialias_checkbox),
                                      "symbol (string, map)"),
           "help"          => help.antialiasing,
         },
-        "chkb_aa_mono_off" => {
+        "chkb_antialias_mono" => {
           "widget"        => :checkbox,
-          "label"         => _("Turn Antialiasing Off for &Monospaced Fonts"),
-          "init"          => fun_ref(method(:initialize_aamonooff_checkbox), 
+          "label"         => _("Antialias Also &Monospaced Fonts"),
+          "init"          => fun_ref(method(:initialize_antialias_mono_checkbox), 
                                      "void (string)"),
           "opt"           => [ :notify, :immediate ],
-          "handle_events" => [ "chkb_aa_mono_off" ],
-          "handle"        => fun_ref(method(:handle_aaoffmono_checkbox),
+          "handle_events" => [ "chkb_antialias_mono" ],
+          "handle"        => fun_ref(method(:handle_antialias_mono_checkbox),
                                      "symbol (string, map)"),
           "no_help"       => true
         },
@@ -741,7 +743,7 @@ module FontsConfig
         },
         "chkb_no_other" => {
           "widget"        => :checkbox,
-          "label"         => _("Really do not use o&ther fonts"),
+          "label"         => _("Never use o&ther fonts"),
           "opt"           => [ :notify, :immediate ],
           "init"          => fun_ref(method(:initialize_noother_checkbox), 
                                      "void (string)"),
@@ -761,7 +763,7 @@ module FontsConfig
               ), UI.TextMode ? Label("") :
               HBox(
                 CheckBox(Id("chkb_specimen_antialiasing"), Opt(:notify, :immediate),
-                          _("Turn &Antialiasing Off")),
+                          _("Font &Antialiasing")),
                 HStretch(),
                 CheckBox(Id("chkb_specimen_autohinter"), Opt(:notify, :immediate),
                           _("Force A&utohinting On")),
@@ -800,8 +802,8 @@ module FontsConfig
               Frame(
                 _("Antialiasing"),
                 VBox(
-                  Left("chkb_aa_off"),
-                  Left("chkb_aa_mono_off")
+                  Left("chkb_antialias"),
+                  Left(HBox(HSpacing(4), "chkb_antialias_mono"))
                 ),
               ),
               Frame(
@@ -822,8 +824,8 @@ module FontsConfig
               VStretch()
             ),
           "widget_names" => [
-            "chkb_aa_off",
-            "chkb_aa_mono_off",
+            "chkb_antialias",
+            "chkb_antialias_mono",
             "chkb_ah_on",
             "cmb_hintstyle",
             "cstm_embedded_bitmaps",
@@ -891,7 +893,7 @@ module FontsConfig
       family_list_file = FontsConfigCommand.local_family_list_file
       rendering_file = FontsConfigCommand.rendering_config
       metric_bw_symlink = FontsConfigCommand.metric_compatibility_bw_symlink
-      metric_file = FontsConfigCommand.metric_compatibility_config
+      metric_avail = FontsConfigCommand.metric_compatibility_avail
       metric_symlink = FontsConfigCommand.metric_compatibility_symlink
 
       mkdir_p("#{@tmp_dir}#{@fontconfig_path}")
@@ -902,7 +904,7 @@ module FontsConfig
       rm_f("#{@tmp_dir}#{family_list_file}")
       rm_f("#{@tmp_dir}#{rendering_file}")
       rm_f("#{@tmp_dir}#{metric_bw_symlink}")
-      ln_sf("#{metric_file}", "#{@tmp_dir}#{metric_symlink}")
+      ln_sf("#{metric_avail}", "#{@tmp_dir}#{metric_symlink}")
 
       ENV['FONTCONFIG_PATH'] = "#{@tmp_dir}#{@fontconfig_path}"
     end
@@ -932,7 +934,7 @@ module FontsConfig
         " ",
         1,
         [ _("Read sysconfig file") ],
-        [ _("Reading #{sysconfig_file}...") ],
+        [ _("Reading %s...") % sysconfig_file ],
         ""
       )
 
@@ -952,10 +954,13 @@ module FontsConfig
           "widget_descr"       => widgets_description,
           "contents"           => VBox(HBox(HStretch(), "btn_presets"),
                                   "tabs_fonts_configuration"),
-          "caption"            => _("Font Configuration"),
+          "caption"            => _("Font Configuration") +  
+                                  (root_user? ? "" : _(" (User Mode)")),
           "next_button"        => Label.OKButton,
           "abort_button"       => Label.AbortButton,
-          "back_button"        => "",
+          # misuse back_button a bit
+          "back_button"        => (root_user? || !File.exists?(FontsConfigCommand.user_sysconfig_file) ? 
+                                     nil : _("&Use system settings")),
         }
       )
 
@@ -965,36 +970,38 @@ module FontsConfig
  
       case ret
         when :next
-          if (root_user?)
-            y2milestone("saving configuration")
-            Progress.New(
-              _("Writing Font Configuration"),
-              " ",
-              2,
-              [ _("Write sysconfig file"),
-                _("Run fonts-config") ],
-              [ _("Writing %s...") %  sysconfig_file,
-                _("Running fonts-config...") ],
-              ""
-            )
+          y2milestone("saving configuration")
+          Progress.New(
+            _("Writing Font Configuration"),
+            " ",
+            2,
+            [ _("Write sysconfig file"),
+              _("Run fonts-config") ],
+            [ _("Writing %s...") %  sysconfig_file,
+              _("Running fonts-config...") ],
+            ""
+          )
 
-            Progress.NextStage 
-            y2milestone("writing #{sysconfig_file}")
-            @fcstate.write
-            y2milestone("written: " + @fcstate.to_s)
-            Progress.NextStage
-            y2milestone("running fonts-config")
-            FontsConfigCommand::run_fonts_config
-            Progress.Finish
-            y2milestone("module finished")
-          else
-            Yast.import "Popup"
-            text = _("root user privileges are required "\
-                     "to save and apply font settings. ")
-            Popup.Error(text)
-          end
+          Progress.NextStage 
+          y2milestone("writing #{sysconfig_file}")
+          @fcstate.write
+          y2milestone("written: " + @fcstate.to_s)
+          Progress.NextStage
+          y2milestone("running fonts-config")
+          FontsConfigCommand::run_fonts_config(root_user? ? "" : "--user")
+          Progress.Finish
+          y2milestone("module finished")
         when :abort
           y2milestone("aborted, do not save configuration")
+        when :back
+          # we are in user mode
+          Yast.import "Popup"
+          text = _("This will irrecoverably remove user setting done previously " +
+                   "with this module.")
+          if (Popup.YesNo(text))
+            FontsConfigCommand::run_fonts_config("--remove-user-setting")
+            y2milestone("remove user setting")
+          end
       end
       Wizard.CloseDialog
     end
@@ -1006,6 +1013,8 @@ module FontsConfig
     include I18n
 
     def initialize
+      textdomain "fonts"
+
       Yast.import "UI"
       @fcstate = FontsConfigState.new
       @fcstate.load_preset("default")
@@ -1015,8 +1024,22 @@ module FontsConfig
       Yast.import "String"
       presets = FontsConfigState::PRESETS
       _("<h1>Font Configuraution Module</h1>") +
-      _("<p>Module to control system wide font rendering setting.") +
-      _(" Help for <i>Presets</i> button and for the current tab follows.</p>") +
+      _("<p>Module to control <b>system wide</b> or <b>user</b> font rendering setting.</p>") +
+      _("<i>Distribution default</i> is font setting shipped on media and " +
+        "it is that one almost same for years (not counting decisions of individual DE). ") +
+      _("This setting can be changed:<ul>") +
+      _("<li>system wide when module is run with <tt>root</tt> credentials "+
+        "to create <i>system setting.</i> ") +
+      _("System, where font module never run or <b>Default</b> preset was chosen, " + 
+        "uses distribution default.</li>") +
+      _("<li>for <i>user setting</i> when module is run as ordindary user. ") +
+      _("User, which never run this module or chooses to <b>Use system settings</b>, uses system settings. ") +
+      _("User, which chooses <b>Default</b> preset, uses distribution default.</li></ul>") +
+      _("<p><b>NOTE:</b> ") + 
+      _("In general, it is not recommended to combine font module user mode with other font setting. ") +
+      _("Nevertheless, setting in <tt>~/.config/fontconfig/fonts.conf</tt> " +
+        "should always have precendence before arbitrary font module setting.</p>") +
+      _("<p>Help for <i>Presets</i> button and for the current tab follows.</p>") +
       _("<p><b>Presets</b> button serves a possibility to choose predefined profiles: <ul>") +
       presets.keys.drop(1).map do |preset|
         _("<li><b>%{name}: </b>%{help}</li>") % {
@@ -1024,9 +1047,9 @@ module FontsConfig
             :help => _(presets[preset]["help"])
         }
       end.join + "</ul>" +
-      _("Every single item there just fills appropriate setting in both tabs. " \
+      _("Every single menu item there just fills appropriate setting in all tabs. " \
         "That setting can be later arbitrarily customized in depth by respective " \
-        "individual fields of both tabs.</p>")
+        "individual fields of corresponding tabs.</p>")
     end
 
     def match_preview
@@ -1034,9 +1057,9 @@ module FontsConfig
       _("<p>In this paragraph, <i>current setting</i> means setting " \
         "of the system plus changes made in currently running fonts module.</p>") +
       _("<p>Matches to system generic aliases can be seen in this initial tab. ") +
-      _("In other words, for every alias () you can see family name, which" \
-        " resolves to given alias according to <i>current setting.</i></p>") %
-          @fcstate.fpl.keys.join(", ") +
+      _("In other words, for every alias (%s) you can see family name, which" \
+        " resolves to given alias according to <i>current setting.</i></p>" \
+        "") % @fcstate.fpl.keys.join(", ") +
       _("<p>In adition to that, graphical mode allows to display " \
         "font specimen of the matched font rendered (again) taking " \
         "<i>current setting</i> into account. ") +
@@ -1088,9 +1111,9 @@ module FontsConfig
         "colour primaries (subpixels) of an LCD display.</p>") +
       _("<p>Choose LCD filter, which should be used, and subpixel layout " \
         "corresponding to display and its rotation.</p>") +
-      _("<p>Note, that due to patent reasons, FreeType2 has subpixel " \
+      _("<p>Note, that due to patent reasons, FreeType has subpixel " \
          "rendering turned off by default.") +
-      _(" Without FreeType2's subpixel rendering support compiled in, " \
+      _(" Without FreeType's subpixel rendering support compiled in, " \
         "setting in this section has no effect.</p>") +
       _("<p>See: %s<\p>") % "<i>Wikipedia: Subpixel rendering</i>"
     end
@@ -1099,12 +1122,12 @@ module FontsConfig
       _("<h2>Prefered Families Tab</h2>") +
       _("<p>This tab controls <b>which</b> fonts are rendered.</p>") +
       _("<h3>Preference Lists</h3>") +
-      _("<p>Family preference lists (FPL) for generic aliases (%s) " \
+      _("<p>Here, Family Preference Lists (FPL) for generic aliases (%s) " \
         "can be defined.") % @fcstate.fpl.keys.join(', ') +
       _(" These are sorted lists of family names, with most prefered " \
         "family first.") +
       _(" There is default (system-wide) FPL yet defined for each generic alias.") +
-      _(" FPLs defined in this dialog will be prepended to them.<\p>") +
+      _(" FPLs defined in this dialog will be prepended to them.</p>") +
       _("<p>System will look for the first <b>installed</b> family in the list," \
         " other query elements taking into account of course. Available font" \
         " packages for SUSE distributions can be" \
@@ -1120,10 +1143,10 @@ module FontsConfig
       _("<p>Two fonts are metric compatible, when all corresponding letters" \
         " are of the same size. That implies, document displayed using these" \
         " fonts has the same same size too, same line wraps etc.</p>") +
-      _("<p>Via default setting, fontconfig substitutes metric compatible fonts preferably," \
+      _("<p>Via default setting, system substitutes metric compatible fonts preferably," \
         " and FPLs defined in this dialog can be circumvented by this rule.</p>") +
-      _("<p>Where metric compatibility do not matter, this option can be unchecked.</p>") +
-      _("<h4>Really do not use other fonts</h4>") +
+      _("<p>Where metric compatibility does not matter, this option can be unchecked.</p>") +
+      _("<h4>Never use other fonts</h4>") +
       _("<p>When checked, this option introduces very strong position for here" \
         " defined preference lists. It pushes families from there before" \
         " document or GUI requests, if they cover required charset.</p>")

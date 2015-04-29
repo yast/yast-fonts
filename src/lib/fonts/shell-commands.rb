@@ -4,13 +4,14 @@ require "yast/path"
 module FontsConfig
   BASH_SCR_PATH = Yast::Path.new(".target.bash_output")
   FONTS_CONFIG_CMD = "/usr/sbin/fonts-config"
+  XDG_PREFIX = ENV['HOME'] + '/.config/'
 
   class FontsConfigCommand
     
-    def self.run_fonts_config
-      return false unless File.executable?(FONTS_CONFIG_CMD)
+    def self.run_fonts_config(args)
+      return false unless have_fonts_config?
 
-      cmd = FONTS_CONFIG_CMD
+      cmd = FONTS_CONFIG_CMD + " " + args
       result = Yast::SCR.Execute(BASH_SCR_PATH, cmd)
       unless (result["exit"].zero?)   
         Yast.import "Popup"
@@ -28,8 +29,8 @@ module FontsConfig
       return fonts_config_file("rendering config")
     end
 
-    def self.metric_compatibility_config
-      return fonts_config_file("metric compatibility config")
+    def self.metric_compatibility_avail
+      return fonts_config_file("metric compatibility avail")
     end
 
     def self.metric_compatibility_symlink
@@ -44,6 +45,10 @@ module FontsConfig
       return fonts_config_file("sysconfig file")
     end
 
+    def self.user_sysconfig_file
+      return XDG_PREFIX + fonts_config_file("user sysconfig file")
+    end
+
     def self.have_fonts_config?
       return File.executable?(FONTS_CONFIG_CMD)
     end
@@ -54,7 +59,7 @@ module FontsConfig
 
       cmd = "#{FONTS_CONFIG_CMD} --info"
       result = Yast::SCR.Execute(BASH_SCR_PATH, cmd)
-      file = result["stdout"].lines.select{|l| l =~ /#{file_id}/}[0].gsub(/.*: /, '').gsub(/\n/, '')
+      file = result["stdout"].lines.select{|l| l =~ /^\s*#{file_id}:/}[0].gsub(/.*: /, '').gsub(/\n/, '')
       if (!result["exit"].zero? || file.length == 0)
         Yast.import "Popup"
         Yast::Popup.Error(cmd + " run failed:" + result["stdout"])

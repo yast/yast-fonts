@@ -295,7 +295,7 @@ module FontsConfig
 
     def finalize_agent
       if (!@root_user)
-        SCR.UnregisterAgent(path(".userconfig.fonts-config"))
+        SCR.UnregisterAgent(path(@agent_path))
       end
       @agent_path = ""
     end

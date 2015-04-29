@@ -57,7 +57,7 @@ module FontsConfig
     end
 
   private
-    def initialize_antialias_checkbox(key)
+    def initialize_antialias_checkbox(key = nil)
       UI.ChangeWidget(Id("chkb_antialias"), :Value,
                       !@fcstate.force_aa_off)
     end
@@ -69,7 +69,7 @@ module FontsConfig
       return nil
     end
 
-    def initialize_antialias_mono_checkbox(key)
+    def initialize_antialias_mono_checkbox(key = nil)
       UI.ChangeWidget(Id("chkb_antialias_mono"), :Value,
                       !@fcstate.force_aa_off_mono)
       UI.ChangeWidget(Id("chkb_antialias_mono"), :Enabled, !@fcstate.force_aa_off)
@@ -81,7 +81,7 @@ module FontsConfig
       return nil
     end
 
-    def initialize_ahon_checkbox(key)
+    def initialize_ahon_checkbox(key = nil)
       UI.ChangeWidget(Id("chkb_ah_on"), :Value,
                       @fcstate.force_ah_on)
     end
@@ -92,7 +92,7 @@ module FontsConfig
       return nil
     end
 
-    def initialize_searchmc_checkbox(key)
+    def initialize_searchmc_checkbox(key = nil)
       UI.ChangeWidget(Id("chkb_search_mc"), :Value,
                       @fcstate.search_metric_compatible)
     end
@@ -103,7 +103,7 @@ module FontsConfig
       return nil
     end
 
-    def initialize_noother_checkbox(key)
+    def initialize_noother_checkbox(key = nil)
       UI.ChangeWidget(Id("chkb_no_other"), :Value,
                       @fcstate.really_force_fpl)
     end
@@ -114,7 +114,7 @@ module FontsConfig
       return nil
     end
 
-    def initialize_hintstyle_combo(key)
+    def initialize_hintstyle_combo(key = nil)
       UI.ChangeWidget(Id("cmb_hintstyle"), :Items, 
                       FontsConfigState::HINT_STYLES)
       UI.ChangeWidget(Id("cmb_hintstyle"), :Value, 
@@ -127,7 +127,7 @@ module FontsConfig
       return nil
     end
 
-    def initialize_lcdfilter_combo(key)
+    def initialize_lcdfilter_combo(key = nil)
       UI.ChangeWidget(Id("cmb_lcd_filter"), :Items, 
                       FontsConfigState::LCD_FILTERS)
       UI.ChangeWidget(Id("cmb_lcd_filter"), :Value, 
@@ -141,7 +141,7 @@ module FontsConfig
       return nil
     end
 
-    def initialize_subpixellayout_combo(key)
+    def initialize_subpixellayout_combo(key = nil)
       UI.ChangeWidget(Id("cmb_subpixel_layout"), :Items, 
                       FontsConfigState::SUBPIXEL_LAYOUTS)
       UI.ChangeWidget(Id("cmb_subpixel_layout"), :Value, 
@@ -158,7 +158,7 @@ module FontsConfig
       return nil
     end
 
-    def initialize_genericaliases_table(key)
+    def initialize_genericaliases_table(key = nil)
       items = []
       @fcstate.fpl.keys.each do |generic_alias|
         items.push(Item(generic_alias)) 
@@ -174,7 +174,7 @@ module FontsConfig
        return nil
     end
 
-    def initialize_familylist_widget(key)
+    def initialize_familylist_widget(key = nil)
       items = []
       @fcstate.fpl[@current_fpl].each do |f|
         indication = family_installed?(f) ?
@@ -243,7 +243,7 @@ module FontsConfig
           UI.ChangeWidget(Id("txt_add_manual"), :Value, "")
       end
 
-      initialize_familylist_widget("")
+      initialize_familylist_widget
       return nil
     end
 
@@ -289,7 +289,7 @@ module FontsConfig
           @fcstate.all_ebl = false
       end
  
-      initialize_embeddedbitmaps_widget("")
+      initialize_embeddedbitmaps_widget
       return nil
     end
 
@@ -298,20 +298,20 @@ module FontsConfig
            FontsConfigState::preset?(event["ID"])
         @fcstate.load_preset(event["ID"])
         if CWMTab.CurrentTab == "specimens"
-          initialize_specimen_widget("")
+          initialize_specimen_widget
         elsif CWMTab.CurrentTab == "algorithms"
-          initialize_antialias_checkbox("")
-          initialize_antialias_mono_checkbox("")
-          initialize_ahon_checkbox("")
-          initialize_hintstyle_combo("")
-          initialize_lcdfilter_combo("")
-          initialize_subpixellayout_combo("")
-          initialize_embeddedbitmaps_widget("")
+          initialize_antialias_checkbox
+          initialize_antialias_mono_checkbox
+          initialize_ahon_checkbox
+          initialize_hintstyle_combo
+          initialize_lcdfilter_combo
+          initialize_subpixellayout_combo
+          initialize_embeddedbitmaps_widget
         else
-          initialize_genericaliases_table("")
-          initialize_familylist_widget("")
-          initialize_searchmc_checkbox("")
-          initialize_noother_checkbox("")
+          initialize_genericaliases_table
+          initialize_familylist_widget
+          initialize_searchmc_checkbox
+          initialize_noother_checkbox
         end
         subpixel_freetype_warning
         installation_summary_check
@@ -368,7 +368,7 @@ module FontsConfig
       return pattern
     end
 
-    def initialize_specimen_widget(key)
+    def initialize_specimen_widget(key = nil)
       @fcstate.fpl.keys.each do |generic_alias|
         @current_families[generic_alias] = 
           installed_families_from(@fcstate.fpl[generic_alias])[0]

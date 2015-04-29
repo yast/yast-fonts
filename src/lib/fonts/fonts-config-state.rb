@@ -275,7 +275,7 @@ module FontsConfig
       load_preset("unset")
     end
   
-    def initialize_agent
+    def initialize_agent(write)
       if (@root_user)
         # system mode
         # (yes, root user can't change his font setting via this module :))
@@ -286,10 +286,13 @@ module FontsConfig
         @agent_path = ".userconfig.fonts-config"
         @agent_file_path = FontsConfigCommand.user_sysconfig_file
  
-        if (File.exists?(@agent_file_path))
-          SCR.RegisterAgent(path(@agent_path),
-                            term(:ag_ini, term(:SysConfigFile, @agent_file_path)))
+        if (write && !File.exists?(@agent_file_path))
+          mkdir_p(File.dirname(@agent_file_path))
+          touch(@agent_file_path)
         end
+
+        SCR.RegisterAgent(path(@agent_path),
+                          term(:ag_ini, term(:SysConfigFile, @agent_file_path)))
       end
     end
 
@@ -346,12 +349,7 @@ module FontsConfig
    end
 
    def write
-      if (!@root_user && !File.exists?(@agent_file_path))
-        mkdir_p(File.dirname(@agent_file_path))
-        touch(@agent_file_path)
-      end
-
-      initialize_agent
+      initialize_agent(true)
 
       temp = @fpl["sans-serif"].join(':')
       SCR.Write(
@@ -448,7 +446,7 @@ module FontsConfig
       # use values from "default" profile in case
       # some sysconfig variables are missing
       load_preset("default")
-      initialize_agent
+      initialize_agent(false)
 
       temp = SCR.Read(
               path(@agent_path + ".PREFER_SANS_FAMILIES")

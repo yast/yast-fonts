@@ -128,7 +128,7 @@ EMBEDDED_BITMAPS_LANGUAGES="ja:ko:zh"
 # 
 # PREFER_SANS_FAMILIES="Adobe Helvetica:B&H Lucida:Efont Biwidth:Efont Fixed:Efont Fixed Wide:Arabic Newspaper:Gnu Unifont:WenQuanYi WenQuanYi Bitmap Song"
 #
-PREFER_SANS_FAMILIES="Source Sans Pro:CMU Sans Serif:CMU Bright:Linux Biolinum O:Latin Modern Sans"
+PREFER_SANS_FAMILIES="Source Sans Pro:Source Han Sans:CMU Sans Serif:CMU Bright:Linux Biolinum O:Latin Modern Sans"
 
 ## Path:        Desktop
 ## Description: Display font configuration

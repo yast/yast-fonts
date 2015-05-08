@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri May  8 14:41:33 UTC 2015 - ancor@suse.com
+
+- more flexible dependency in package specification (bsc#929899)
+- 3.1.14
+
+-------------------------------------------------------------------
 Tue Apr 28 12:51:52 UTC 2015 - pgajdos@suse.com
 
 - user mode

@@ -32,7 +32,7 @@ BuildRequires:  update-desktop-files
 BuildRequires:  yast2-ruby-bindings >= 1.2.0
 BuildRequires:  yast2-devtools >= 1.2.0
 BuildRequires:  yast2 >= 3.0.5
-BuildRequires:  rubygem-yast-rake
+BuildRequires:  rubygem(yast-rake)
 # extensions
 BuildRequires:  freetype2-devel
 BuildRequires:  fontconfig-devel

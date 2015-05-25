@@ -247,7 +247,7 @@ module FontsConfig
       return nil
     end
 
-    def initialize_embeddedbitmaps_widget(key)
+    def initialize_embeddedbitmaps_widget(key = nil)
       UI.ChangeWidget(Id("lbl_ebl"), :Value, 
                       Languages::names(@fcstate.ebl).join(", "))
 

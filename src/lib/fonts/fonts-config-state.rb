@@ -167,6 +167,7 @@ module FontsConfig
           "fpl" =>  {
             "sans-serif" => [
               "Source Sans Pro",
+              "Source Han Sans",
               "CMU Sans Serif",
               "CMU Bright",
               "Linux Biolinum O",

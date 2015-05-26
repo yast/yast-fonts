@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon May 25 12:46:21 UTC 2015 - pgajdos@suse.com
+
+- initialize_embeddedbitmaps_widget have parameter optional 
+  [bnc#932186]
+- 3.1.15
+
+-------------------------------------------------------------------
 Fri May  8 14:41:33 UTC 2015 - ancor@suse.com
 
 - more flexible dependency in package specification (bsc#929899)

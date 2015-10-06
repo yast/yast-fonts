@@ -1,3 +1,4 @@
+require "fileutils"
 require "yast"
 
 module FontsConfig

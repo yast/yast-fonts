@@ -21,7 +21,7 @@ module FontsConfig
     include Ft2Rendering
     include FontconfigSetting
     include FontSpecimen
-    include FileUtils
+    include ::FileUtils
 
     SPECIMEN_SIZE = 250
     # This path is constant enough to have it hardcoded

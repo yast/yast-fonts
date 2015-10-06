@@ -1,3 +1,4 @@
+require "fileutils"
 require "yast"
 
 module FontsConfig
@@ -5,7 +6,7 @@ module FontsConfig
     include Yast
     extend Yast::I18n
     include Yast::I18n
-    include FileUtils
+    include ::FileUtils
 
     HINT_STYLES = [
       "none",

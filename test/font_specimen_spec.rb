@@ -7,7 +7,7 @@ require "fileutils"
 describe FontSpecimen do
   include FontSpecimen
   include FontconfigSetting
-  include FileUtils
+  include ::FileUtils
 
   def an_installed_family
     return installed_families(["family"])[0]    

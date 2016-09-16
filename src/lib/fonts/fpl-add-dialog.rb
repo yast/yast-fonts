@@ -21,8 +21,15 @@ module FontsConfig
 
       @fcstate = fcstate
       @available_families = installed_families(["family", "fontformat"])
-      # delete families, that are part of list for some alias
       if (@available_families)
+        # bsc#998300
+        # fontconfig can return families with the comma; remove
+        # the redundant part and delete duplicate families: e. g.
+        #           Source Sans Pro,Source Sans Pro Black
+        #           Source Sans Pro,Source Sans Pro Semibold
+        #               => Source Sans Pro
+        @available_families.map!{|family| family.gsub(/,.*/, '')}.uniq!.sort!
+        # delete families, that are part of list for some alias
         @fcstate.fpl.keys.each do |key|
           @fcstate.fpl[key].each do |family|
             if (@available_families.index(family))
@@ -30,6 +37,7 @@ module FontsConfig
             end
           end
         end
+        # delete blacklisted families
         BLACKLIST.each do |black_family|
           @available_families.delete_if{|f| f =~ /#{black_family}/}
         end

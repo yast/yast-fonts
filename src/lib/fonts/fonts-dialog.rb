@@ -540,7 +540,7 @@ module FontsConfig
            !have_subpixel_rendering))
         Yast.import "Popup"
         text = _("You have set LCD filter type (%s).") % @fcstate.lcd_filter +
-               _(" This needs subpixel rendering capabality\ncompiled" \
+               _(" This needs subpixel rendering capability\ncompiled" \
                  " in FreeType library.") +
                _(" Unfortunately, we can not ship it due patent reasons.\n") +
                "\n" +

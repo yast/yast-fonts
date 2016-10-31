@@ -1124,7 +1124,7 @@ module FontsConfig
       _("<h3>Preference Lists</h3>") +
       _("<p>Here, Family Preference Lists (FPL) for generic aliases (%s) " \
         "can be defined.") % @fcstate.fpl.keys.join(', ') +
-      _(" These are sorted lists of family names, with most prefered " \
+      _(" These are sorted lists of family names, with most preferred " \
         "family first.") +
       _(" There is default (system-wide) FPL yet defined for each generic alias.") +
       _(" FPLs defined in this dialog will be prepended to them.</p>") +

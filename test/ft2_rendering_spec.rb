@@ -1,3 +1,6 @@
+# encoding: utf-8
+#
+
 require_relative "spec-helper"
 require "yast/ft2_rendering"
 

@@ -1,3 +1,6 @@
+# encoding: utf-8
+#
+
 require_relative "spec-helper"
 require "yast/font_specimen"
 require "yast/fontconfig_setting"

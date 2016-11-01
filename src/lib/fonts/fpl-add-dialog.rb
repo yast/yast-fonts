@@ -1,3 +1,6 @@
+# encoding: utf-8
+#
+
 require "yast/fontconfig_setting"
 require "yast/font_specimen"
 

@@ -161,7 +161,7 @@ module FontsConfig
           "ebl" => [ "ja", "ko", "zh" ],
           "lcd_filter" => LCD_FILTERS[0],
           "subpixel_layout" => SUBPIXEL_LAYOUTS[0],
-          "help" => N_("Fonts are smoothed with antialiasing. Unlike black and white rendered fonts, this setting can produce 'beautiful' fonts sometimes to the detriment of readability. TrueType fonts, which are known to have good hinting instructions are rendered with bytecode interpreter, otherwise FreeType autohinter is used on the 'hintslight' hinting level. Using font native hinting instructions produces glyphs displayed with thiner stems. Default family preference list is used (nowdays TrueType fonts with good instructions are prefered)."),
+          "help" => N_("Fonts are smoothed with antialiasing. Unlike black and white rendered fonts, this setting can produce 'beautiful' fonts sometimes to the detriment of readability. TrueType fonts, which are known to have good hinting instructions are rendered with bytecode interpreter, otherwise FreeType autohinter is used on the 'hintslight' hinting level. Using font native hinting instructions produces glyphs displayed with thiner stems. Default family preference list is used (nowdays TrueType fonts with good instructions are preferred)."),
         },
         "cff_fonts" => {
           "name" => N_("CFF Fonts"),

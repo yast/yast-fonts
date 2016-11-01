@@ -540,7 +540,7 @@ module FontsConfig
            !have_subpixel_rendering))
         Yast.import "Popup"
         text = _("You have set LCD filter type (%s).") % @fcstate.lcd_filter +
-               _(" This needs subpixel rendering capabality\ncompiled" \
+               _(" This needs subpixel rendering capability\ncompiled" \
                  " in FreeType library.") +
                _(" Unfortunately, we can not ship it due patent reasons.\n") +
                "\n" +
@@ -1124,7 +1124,7 @@ module FontsConfig
       _("<h3>Preference Lists</h3>") +
       _("<p>Here, Family Preference Lists (FPL) for generic aliases (%s) " \
         "can be defined.") % @fcstate.fpl.keys.join(', ') +
-      _(" These are sorted lists of family names, with most prefered " \
+      _(" These are sorted lists of family names, with most preferred " \
         "family first.") +
       _(" There is default (system-wide) FPL yet defined for each generic alias.") +
       _(" FPLs defined in this dialog will be prepended to them.</p>") +

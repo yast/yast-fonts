@@ -834,7 +834,7 @@ module FontsConfig
           ],
         },
         "families"   => {
-          "header"       => _("Prefered &Families"),
+          "header"       => _("Preferred &Families"),
           "contents"     => 
             VBox(
               HBox("cstm_generic_aliases", 
@@ -1119,7 +1119,7 @@ module FontsConfig
     end
 
     def family_preferences
-      _("<h2>Prefered Families Tab</h2>") +
+      _("<h2>Preferred Families Tab</h2>") +
       _("<p>This tab controls <b>which</b> fonts are rendered.</p>") +
       _("<h3>Preference Lists</h3>") +
       _("<p>Here, Family Preference Lists (FPL) for generic aliases (%s) " \

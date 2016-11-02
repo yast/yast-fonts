@@ -13,7 +13,7 @@ VERBOSITY="0"
 ## Type:        list(none,hintnone,hintslight,hintmedium,hintfull)
 ## Default:     none
 #
-#  Preferred common hinting style.
+#  Prefered common hinting style.
 #  
 #  By default, hinslight is preferred for autohinter and hintfull for
 #  BCI. You can enforce one hinstyle here. This value is not final

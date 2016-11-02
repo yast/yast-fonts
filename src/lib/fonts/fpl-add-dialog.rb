@@ -1,3 +1,5 @@
+# encoding: utf-8
+#
 require "yast/fontconfig_setting"
 require "yast/font_specimen"
 
@@ -28,7 +30,7 @@ module FontsConfig
         #           Source Sans Pro,Source Sans Pro Black
         #           Source Sans Pro,Source Sans Pro Semibold
         #               => Source Sans Pro
-        @available_families.map!{|family| family.gsub(/,.*/, '')}.uniq!.sort!
+        @available_families.map!{|family| family.gsub(/,.*:/, ':')}.uniq!.sort!
         # delete families, that are part of list for some alias
         @fcstate.fpl.keys.each do |key|
           @fcstate.fpl[key].each do |family|

@@ -1,4 +1,7 @@
-#include "ruby.h"
+#include <ruby.h>
+#ifdef HAVE_RUBY_ENCODING_H
+#include <ruby/encoding.h>
+#endif
 #include <fontconfig.h>
 #include <string.h>
 #include <stdio.h>
@@ -28,6 +31,17 @@ void Init_fontconfig_setting() {
   rb_define_method(FontconfigSetting, "match_family",
                    method_fc_match_family, 1);
 }
+
+VALUE encoded_str_new2(const char *str, const char *encoding)
+{
+  VALUE string = rb_str_new2((const char *)str);
+#ifdef HAVE_RUBY_ENCODING_H
+  int enc = rb_enc_find_index(encoding);
+  rb_enc_associate_index(string, enc);
+#endif
+  return string;
+}
+
 
 VALUE method_fc_installed_families(VALUE self, VALUE array_elements) {
   VALUE str_family_list = rb_ary_new();
@@ -59,7 +73,7 @@ VALUE method_fc_installed_families(VALUE self, VALUE array_elements) {
         break;
     if (j < NBLACK)
       continue;
-    rb_ary_push(str_family_list, rb_str_new2(str_pattern));
+    rb_ary_push(str_family_list, encoded_str_new2(str_pattern, "UTF-8"));
   }
 
   return str_family_list;
@@ -134,7 +148,7 @@ VALUE method_fc_match_family(VALUE self, VALUE str_family)
   if (font)
   {
     FcPatternGetString(font, FC_FAMILY, 0, (FcChar8**)&family);
-    res = rb_str_new2(family);
+    res = encoded_str_new2(family, "UTF-8");
   }
   else
   {

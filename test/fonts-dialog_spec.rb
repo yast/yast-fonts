@@ -1,3 +1,6 @@
+# encoding: utf-8
+#
+
 require_relative "spec-helper"
 require "fonts/fonts-dialog"
 require "fonts/fonts-config-state"

@@ -1,3 +1,6 @@
+# encoding: utf-8
+#
+
 require "yast"
 
 module FontsConfig

@@ -1,3 +1,6 @@
+# encoding: utf-8
+#
+
 require "fileutils"
 require "tmpdir"
 

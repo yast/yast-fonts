@@ -1,3 +1,6 @@
+# encoding: utf-8
+#
+
 require 'mkmf'
 
 $LDFLAGS << ' -lfont-specimen'

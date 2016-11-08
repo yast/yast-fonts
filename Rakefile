@@ -1,6 +1,8 @@
 require "yast/rake"
 require "pathname"
 
+Yast::Tasks.submit_to :leap_42_1
+
 Yast::Tasks.configuration do |conf|
   #lets ignore license check for now
   conf.skip_license_check << /.*/

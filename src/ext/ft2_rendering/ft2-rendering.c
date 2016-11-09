@@ -1,4 +1,4 @@
-#include "ruby.h"
+#include <ruby.h>
 #include <ft2build.h>
 #include FT_LCD_FILTER_H
 

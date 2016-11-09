@@ -1,3 +1,6 @@
+# encoding: utf-8
+#
+
 require "yast/scr"
 require "yast/path"
 

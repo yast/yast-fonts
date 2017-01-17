@@ -1,15 +1,11 @@
-language: cpp
-compiler:
-    - gcc
-before_install:
-    # disable rvm, use system Ruby
-    - rvm reset
-    - wget https://raw.githubusercontent.com/yast/yast-devtools/master/travis-tools/travis_setup.sh
-    - sh ./travis_setup.sh -p "yast2 ruby2.1-dev libfont-specimen-dev fonts-liberation" -g "rake yast-rake yard rspec:3.3.0"
-    # temporary for Ubuntu 12.04; we need newer fontconfig, so allow to overwrite system one's files
-    - sudo apt-get -o Dpkg::Options::="--force-overwrite" install libfontconfig-new1-dev libfontconfig-new1 fontconfig-new-config
-script:
-    - yardoc
-    - rake test:unit
-    - sudo rake install
+sudo: required
+language: bash
+services:
+  - docker
 
+before_install:
+  - docker build -t yast-fonts-image .
+script:
+  # the "yast-travis-ruby" script is included in the base yastdevel/ruby image
+  # see https://github.com/yast/docker-yast-ruby/blob/master/yast-travis-ruby
+  - docker run -it -e TRAVIS=1 -e TRAVIS_JOB_ID="$TRAVIS_JOB_ID" yast-fonts-image yast-travis-ruby

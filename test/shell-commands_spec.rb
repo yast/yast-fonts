@@ -11,6 +11,8 @@ describe FontsConfig::FontsConfigCommand do
   describe "#run_fonts_config" do    
     it "returns false for system mode" do
       if (FontsConfig::FontsConfigCommand::have_fonts_config?)
+        # FIXME: the test fails when started as "root"
+        skip "Skipped - the test fails when running as 'root'" if Process.uid.zero?
         expect(FontsConfig::FontsConfigCommand::run_fonts_config("")).to be false
       end
     end

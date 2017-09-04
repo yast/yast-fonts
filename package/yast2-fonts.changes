@@ -4,7 +4,7 @@ Tue Nov  8 13:28:41 UTC 2016 - pgajdos@suse.com
 - fix regression introduced in 3.1.17: installed families table
   was not filled correctly
 - add UTF-8 encoding to ruby string [bsc#1006510]
-- 3.2.18
+- 3.1.18
 
 -------------------------------------------------------------------
 Wed Sep 14 16:18:31 UTC 2016 - pgajdos@suse.com

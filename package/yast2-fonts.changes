@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Feb 20 13:49:43 UTC 2018 - pgajdos@suse.com
+
+- bump version
+- 4.0.0
+
+-------------------------------------------------------------------
 Wed Nov  2 15:56:35 UTC 2016 - pgajdos@suse.com
 
 - fix regression introduced in 3.1.17: installed families table

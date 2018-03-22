@@ -1083,7 +1083,7 @@ module FontsConfig
         "<i>antialiasing.</i>") +
       _(" Black and white rendering can be forced for all fonts or for " \
         "monospaced only.</p>") +
-      _("<p>See: %s<\p>") % "<i>Wikipedia: Font Rasterization</i>"
+      _("<p>See: %s</p>") % "<i>Wikipedia: Font Rasterization</i>"
     end
 
     def hinting
@@ -1097,7 +1097,7 @@ module FontsConfig
       _("<p>For each hinting algorithm, hint style (hinting level) is chosen.") +
       _(" It is possible to set hint style globally by <b>Force Hint Style</b> " \
         "option.</p>") +
-      _("<p>See: %s<\p>") % "<i>Wikipedia: Font Rasterization, Font hinting</i>"
+      _("<p>See: %s</p>") % "<i>Wikipedia: Font Rasterization, Font hinting</i>"
     end
 
     def embedded_bitmaps
@@ -1118,7 +1118,7 @@ module FontsConfig
          "rendering turned off by default.") +
       _(" Without FreeType's subpixel rendering support compiled in, " \
         "setting in this section has no effect.</p>") +
-      _("<p>See: %s<\p>") % "<i>Wikipedia: Subpixel rendering</i>"
+      _("<p>See: %s</p>") % "<i>Wikipedia: Subpixel rendering</i>"
     end
 
     def family_preferences

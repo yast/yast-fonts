@@ -4,6 +4,6 @@
 /src/ext/*/*.so
 /src/lib/yast
 **/.*.swp
-doc/
+doc/autodocs
 /.yardoc
 *.pot

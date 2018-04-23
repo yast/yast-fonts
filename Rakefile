@@ -1,4 +1,6 @@
 require "yast/rake"
+
+Yast::Tasks.submit_to :sle15
 require "pathname"
 
 Yast::Tasks.configuration do |conf|

@@ -2,6 +2,7 @@
 Wed Oct 17 10:28:50 CEST 2018 - schubi@suse.de
 
 - Added %license tag in spec file.
+  Needed to build fix for bnc#1087957 again.
 - 4.0.1
 
 -------------------------------------------------------------------

@@ -17,7 +17,7 @@
 
 
 Name:           yast2-fonts
-Version:        4.0.0
+Version:        4.0.1
 Release:        0
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
@@ -81,7 +81,7 @@ rake test:unit
 %{yast_scrconfdir}/*.scr
 %dir %{yast_docdir}
 %doc %{yast_docdir}/CONTRIBUTING.md
-%doc %{yast_docdir}/COPYING
+%license COPYING
 %doc %{yast_docdir}/README.md
 %doc %{yast_docdir}/README.subpixel-patents
 

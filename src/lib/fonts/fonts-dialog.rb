@@ -504,7 +504,7 @@ module FontsConfig
                  "no effect.\n\n") +
                _("Fonts can be installed e. g. via fontinfo.opensuse.org. \n" \
                  "If you install them when this yast module is running,\n" \
-                 "reread the profile to see results.\n")
+                 "you must reread the profile to see the results.\n")
         summary = ""
         if (UI.TextMode)
           # <table> do not work for text mode
@@ -545,7 +545,7 @@ module FontsConfig
         text = _("You have set LCD filter type (%s).") % @fcstate.lcd_filter +
                _(" This needs subpixel rendering capability\ncompiled" \
                  " in FreeType library.") +
-               _(" Unfortunately, we can not ship it due patent reasons.\n") +
+               _(" Unfortunately, we cannot ship it due patent reasons.\n") +
                "\n" +
                _("See README.subpixel-patents from yast2-fonts package documentation.\n")
                
@@ -999,8 +999,8 @@ module FontsConfig
         when :back
           # we are in user mode
           Yast.import "Popup"
-          text = _("This will irrecoverably remove user setting done previously " +
-                   "with this module.")
+          text = _("This will permanently remove any user setting changes made with this module  " +
+                   "during this session.")
           if (Popup.YesNo(text))
             FontsConfigCommand::run_fonts_config("--remove-user-setting")
             y2milestone("remove user setting")
@@ -1026,60 +1026,60 @@ module FontsConfig
     def font_configuration_module
       Yast.import "String"
       presets = FontsConfigState::PRESETS
-      _("<h1>Font Configuraution Module</h1>") +
-      _("<p>Module to control <b>system wide</b> or <b>user</b> font rendering setting.</p>") +
-      _("<i>Distribution default</i> is font setting shipped on media and " +
-        "it is that one almost same for years (not counting decisions of individual DE). ") +
+      _("<h1>Font Configuration Module</h1>") +
+      _("<p>Module to control <b>system wide</b> or <b>user</b> font rendering settings.</p>") +
+      _("<i>Distribution default</i> is the font setting shipped on media and " +
+        "it has been almost the same one for years (not counting decisions of individual DE). ") +
       _("This setting can be changed:<ul>") +
       _("<li>system wide when module is run with <tt>root</tt> credentials "+
         "to create <i>system setting.</i> ") +
-      _("System, where font module never run or <b>Default</b> preset was chosen, " + 
-        "uses distribution default.</li>") +
-      _("<li>for <i>user setting</i> when module is run as ordindary user. ") +
-      _("User, which never run this module or chooses to <b>Use system settings</b>, uses system settings. ") +
-      _("User, which chooses <b>Default</b> preset, uses distribution default.</li></ul>") +
+      _("System, where the font module has never been run or the <b>Default</b> preset was chosen, " + 
+        "uses the distribution default.</li>") +
+      _("<li>for <i>user setting</i> when module is run as ordinary user. ") +
+      _("A User who has never run this module or chooses to <b>Use system settings</b>, uses system settings. ") +
+      _("A User who chooses the <b>Default</b> preset, uses the distribution default.</li></ul>") +
       _("<p><b>NOTE:</b> ") + 
-      _("In general, it is not recommended to combine font module user mode with other font setting. ") +
+      _("In general, it is not recommended to combine the font module user mode with other font setting. ") +
       _("Nevertheless, setting in <tt>~/.config/fontconfig/fonts.conf</tt> " +
         "should always have precendence before arbitrary font module setting.</p>") +
       _("<p>Help for <i>Presets</i> button and for the current tab follows.</p>") +
-      _("<p><b>Presets</b> button serves a possibility to choose predefined profiles: <ul>") +
+      _("<p><b>Presets</b> button provides the possibility to choose predefined profiles: <ul>") +
       presets.keys.drop(1).map do |preset|
         _("<li><b>%{name}: </b>%{help}</li>") % {
             :name => _(presets[preset]["name"]),
             :help => _(presets[preset]["help"])
         }
       end.join + "</ul>" +
-      _("Every single menu item there just fills appropriate setting in all tabs. " \
-        "That setting can be later arbitrarily customized in depth by respective " \
+      _("Every single menu item there just fills the appropriate setting in all tabs. " \
+        "That setting can be later arbitrarily customized in depth using the respective " \
         "individual fields of corresponding tabs.</p>")
     end
 
     def match_preview
       _("<h2>Match Preview Tab</h2>") +
-      _("<p>In this paragraph, <i>current setting</i> means setting " \
-        "of the system plus changes made in currently running fonts module.</p>") +
+      _("<p>In this section, <i>current setting</i> means the current system settings " \
+        "plus any changes made in the currently running fonts module.</p>") +
       _("<p>Matches to system generic aliases can be seen in this initial tab. ") +
-      _("In other words, for every alias (%s) you can see family name, which" \
-        " resolves to given alias according to <i>current setting.</i></p>" \
+      _("In other words, for every alias (%s) you can see the font family name, which" \
+        " resolves to a given alias according to the <i>current setting.</i></p>" \
         "") % @fcstate.fpl.keys.join(", ") +
-      _("<p>In adition to that, graphical mode allows to display " \
-        "font specimen of the matched font rendered (again) taking " \
+      _("<p>In addition to that, graphical mode is able to display " \
+        "the font specimen of the matched font rendered, again taking the " \
         "<i>current setting</i> into account. ") +
-      _("In the corresponding combo box, script coverage of matched font " \
-        "can be seen and specimen string for given script can be chosen.</p>") +
-      _("<p>At the bottom, there are crucial rendering options duplicated " \
-        "from Rendered Details Tab, " \
+      _("In the corresponding combo box, script coverage of the matched font " \
+        "can be seen and a specimen string for the given script can be chosen.</p>") +
+      _("<p>At the bottom, crucial rendering options are duplicated " \
+        "from the Rendered Details Tab, " \
         "which can be used to see changes in the rendering on the fly.</p>")
     end
 
     def antialiasing
       _("<h2 id=\"tab_help\">Rendering Details Tab</h2>") +
-      _("<p>This tab controls <b>how</b> fonts are rendered." \
-        " It allows you to amend font rendering algorithms to be used " \
+      _("<p>This tab controls <b>how</b> fonts are rendered. " \
+        "It allows you to amend the font rendering algorithms to be used " \
         "and change their options.</p>") +
       _("<h3>Antialiasing</h3>") +
-      _("<p>By default, all outline fonts are smoothed by method called " \
+      _("<p>By default, all outline fonts are smoothed by the method called " \
         "<i>antialiasing.</i>") +
       _(" Black and white rendering can be forced for all fonts or for " \
         "monospaced only.</p>") +
@@ -1088,10 +1088,10 @@ module FontsConfig
 
     def hinting
       _("<h3>Hinting</h3>") +
-      _("<p>Hinting instructions helps rasterizer to fit glyphs stems " \
+      _("<p>Hinting instructions helps the rasterizer fit glyphs stems " \
         "to the grid.</p>") +
       _("<p>In the default setting, FreeType's autohinter can be used " \
-        "depending on font type and quality of own instructions." \
+        "depending on the font type and the quality of its own instructions." \
         " Use of autohinter can be forced by <b>Force Autohinting On</b> " \
         "option.</p>") +
       _("<p>For each hinting algorithm, hint style (hinting level) is chosen.") +
@@ -1102,8 +1102,8 @@ module FontsConfig
 
     def embedded_bitmaps
       _("<h3>Embedded Bitmaps</h3>") +
-      _("<p>Some outline fonts contain so called bitmap strikes, i. e. bitmap" \
-        " version of given font for certain sizes." \
+      _("<p>Some outline fonts contain so-called bitmap strikes, i. e. bitmap" \
+        " versions of the given font for certain sizes." \
         " In this section it can be turned off entirely, on only for fonts which" \
         " cover specified languages, or on for every font.")
     end
@@ -1112,12 +1112,12 @@ module FontsConfig
       _("<h3>Subpixel Rendering</h3>") +
       _("<p>Subpixel rendering multiples resolution in one direction by using " \
         "colour primaries (subpixels) of an LCD display.</p>") +
-      _("<p>Choose LCD filter, which should be used, and subpixel layout " \
-        "corresponding to display and its rotation.</p>") +
-      _("<p>Note, that due to patent reasons, FreeType has subpixel " \
+      _("<p>Choose the correct LCD filter, which should be used, and subpixel layout " \
+        "corresponding to the display and its rotation.</p>") +
+      _("<p>Note that due to patent reasons, FreeType has subpixel " \
          "rendering turned off by default.") +
       _(" Without FreeType's subpixel rendering support compiled in, " \
-        "setting in this section has no effect.</p>") +
+        "settings in this section have no effect.</p>") +
       _("<p>See: %s</p>") % "<i>Wikipedia: Subpixel rendering</i>"
     end
 
@@ -1127,12 +1127,12 @@ module FontsConfig
       _("<h3>Preference Lists</h3>") +
       _("<p>Here, Family Preference Lists (FPL) for generic aliases (%s) " \
         "can be defined.") % @fcstate.fpl.keys.join(', ') +
-      _(" These are sorted lists of family names, with most preferred " \
+      _(" These are sorted lists of font family names, with the most preferred " \
         "family first.") +
       _(" There is default (system-wide) FPL yet defined for each generic alias.") +
       _(" FPLs defined in this dialog will be prepended to them.</p>") +
       _("<p>System will look for the first <b>installed</b> family in the list," \
-        " other query elements taking into account of course. Available font" \
+        " with other query elements taken into account, of course. Available font" \
         " packages for SUSE distributions can be" \
         " browsed and installed from <b>fontinfo.opensuse.org.</b></p>")
     end
@@ -1141,17 +1141,17 @@ module FontsConfig
       _("<h3>Forcing Family Preferences</h3>") +
       _("<p>In some circumstances, FPLs defined in this dialog are " \
         "not taken into account." \
-        " Following two options strenghten their role.</p>") +
+        " The following two options strengthen their role.</p>") +
       _("<h4>Search Metric Compatible</h4>") +
-      _("<p>Two fonts are metric compatible, when all corresponding letters" \
-        " are of the same size. That implies, document displayed using these" \
-        " fonts has the same same size too, same line wraps etc.</p>") +
-      _("<p>Via default setting, system substitutes metric compatible fonts preferably," \
+      _("<p>Two fonts are metric compatible when all corresponding letters" \
+        " are of the same size. That implies that a document displayed using these" \
+        " fonts has the same same size too, with the same line wraps, etc.</p>") +
+      _("<p>Via default setting, the system preferentially substitutes metric compatible fonts," \
         " and FPLs defined in this dialog can be circumvented by this rule.</p>") +
       _("<p>Where metric compatibility does not matter, this option can be unchecked.</p>") +
       _("<h4>Never use other fonts</h4>") +
-      _("<p>When checked, this option introduces very strong position for here" \
-        " defined preference lists. It pushes families from there before" \
+      _("<p>When checked, this option forces priority for the preference lists " \
+        "defined here. It pushes families from there before" \
         " document or GUI requests, if they cover required charset.</p>")
     end
   end

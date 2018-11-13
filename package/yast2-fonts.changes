@@ -3,8 +3,9 @@ Tue Nov 13 04:30 UTC 2018 - fraser_bell@opensuse.org
 
 - Change Desktop File wording style to look more consistent with
   other YaST modules
-- Bump Version and change log
+- bnc#1084864 - Bump Version and change log
 - 4.0.2
+
 
 -------------------------------------------------------------------
 Sun Nov 11 PST 2018 - fraser_bell@opensuse.org

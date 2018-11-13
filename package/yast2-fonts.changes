@@ -1,4 +1,20 @@
 -------------------------------------------------------------------
+Tue Nov 13 04:30 UTC 2018 - fraser_bell@opensuse.org
+
+- Change Desktop File wording style to look more consistent with
+  other YaST modules
+- Bump Version and change log
+- 4.0.2
+
+-------------------------------------------------------------------
+Sun Nov 11 PST 2018 - fraser_bell@opensuse.org
+
+- Changed Desktop File fonts.desktop Name= from Fonts to
+  System-Wide Fonts to satisfy [Bug 1084864] YaST module names are
+  too similar to some desktop environment configuration modules
+- Fix typos in User Help Dialogues, improve readability
+
+-------------------------------------------------------------------
 Wed Oct 17 10:28:50 CEST 2018 - schubi@suse.de
 
 - Added %license tag in spec file.

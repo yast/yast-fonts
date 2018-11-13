@@ -17,7 +17,7 @@
 
 
 Name:           yast2-fonts
-Version:        4.0.1
+Version:        4.0.2
 Release:        0
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build

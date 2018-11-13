@@ -18,6 +18,6 @@ Icon=yast-x11
 Exec=xdg-su -c "/sbin/yast2 fonts"
 
 Name=System-Wide Fonts
-GenericName=Configuring System-Wide Fonts
+GenericName=Configure system-wide fonts
 StartupNotify=true
 

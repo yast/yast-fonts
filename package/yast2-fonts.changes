@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Sat Nov 24 20:57:11 UTC 2018 - Stasiek Michalski <hellcp@mailbox.org>
+
+- Provide icon with module (boo#1109310)
+- 4.1.0
+
+-------------------------------------------------------------------
 Tue Nov 13 04:30 UTC 2018 - fraser_bell@opensuse.org
 
 - Change Desktop File wording style to look more consistent with

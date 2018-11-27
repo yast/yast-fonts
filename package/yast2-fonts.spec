@@ -84,6 +84,6 @@ rake test:unit
 %license COPYING
 %doc %{yast_docdir}/README.md
 %doc %{yast_docdir}/README.subpixel-patents
-%{_datadir}/icons/*
+%{yast_icondir}
 
 %changelog

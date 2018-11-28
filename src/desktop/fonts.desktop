@@ -14,7 +14,7 @@ X-SuSE-YaST-Geometry=
 X-SuSE-YaST-SortKey=
 X-SuSE-YaST-AutoInstResource=
 
-Icon=yast-x11
+Icon=yast-fonts
 Exec=xdg-su -c "/sbin/yast2 fonts"
 
 Name=System-Wide Fonts

@@ -17,7 +17,8 @@ X-SuSE-YaST-AutoInstResource=
 Icon=yast-fonts
 Exec=xdg-su -c "/sbin/yast2 fonts"
 
-Name=System-Wide Fonts
-GenericName=Configure system-wide fonts
+Name=YaST Fonts
+GenericName=Fonts
+Comment=Configure system-wide fonts
 StartupNotify=true
 

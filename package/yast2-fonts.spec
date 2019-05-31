@@ -12,21 +12,19 @@
 # license that conforms to the Open Source Definition (Version 1.9)
 # published by the Open Source Initiative.
 
-# Please submit bugfixes or comments via http://bugs.opensuse.org/
+# Please submit bugfixes or comments via https://bugs.opensuse.org/
 #
 
 
 Name:           yast2-fonts
 Version:        4.1.0
 Release:        0
+Summary:        YaST2 - Fonts Configuration
+Group:          System/YaST
+License:        GPL-2.0+
+Url:            https://github.com/yast/yast-fonts
 
-BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 Source0:        %{name}-%{version}.tar.bz2
-
-Requires:       yast2 >= 3.0.5
-Requires:       yast2-ruby-bindings >= 1.2.0
-Requires:       fonts-config >= 20150424
-Requires:       fontconfig
 
 BuildRequires:  update-desktop-files
 BuildRequires:  yast2-ruby-bindings >= 1.2.0
@@ -43,47 +41,43 @@ BuildRequires:  rubygem(rspec)
 BuildRequires:  dejavu-fonts
 BuildRequires:  fonts-config >= 20150424
 
-Summary:        YaST2 - Fonts Configuration
-Group:          System/YaST
-License:        GPL-2.0+
-Url:            https://github.com/yast/yast-fonts
+Requires:       yast2 >= 3.0.5
+Requires:       yast2-ruby-bindings >= 1.2.0
+Requires:       fonts-config >= 20150424
+Requires:       fontconfig
 
 %description
 Module for configuring X11 fonts able to select preferred font families
 as well as set rendering algorithms to be used.
 
-
 %prep
-%setup -n %{name}-%{version}
+%setup -q
 
 %build
 # build ruby bindings
 rake compile
 
 %install
-rake install DESTDIR="%{buildroot}"
+%yast_install
 # install ruby bindings
-mkdir -p  %{buildroot}%{_libdir}/ruby/vendor_ruby/%{rb_ver}/%{rb_arch}/yast
+mkdir -p  %{buildroot}%{rb_vendorarchdir}/yast
 for ext in `ls src/ext`; do
-  install -m 755 src/ext/$ext/$ext.so %{buildroot}%{_libdir}/ruby/vendor_ruby/%{rb_ver}/%{rb_arch}/yast
+  install -m 755 src/ext/$ext/$ext.so %{buildroot}%{rb_vendorarchdir}/yast
 done
+%yast_metainfo
 
 %check
-rake test:unit
+%yast_check
 
 %files
-%defattr(-,root,root)
-%dir %{yast_libdir}/fonts
-%{yast_libdir}/fonts/*.rb
-%{_libdir}/ruby/vendor_ruby/%{rb_ver}/%{rb_arch}/yast/*.so
-%{yast_clientdir}/fonts.rb
-%{yast_desktopdir}/fonts.desktop
-%{yast_scrconfdir}/*.scr
-%dir %{yast_docdir}
-%doc %{yast_docdir}/CONTRIBUTING.md
+%{yast_libdir}
+%{rb_vendorarchdir}/yast/*.so
+%{yast_clientdir}
+%{yast_desktopdir}
+%{yast_metainfodir}
+%{yast_scrconfdir}
+%doc %{yast_docdir}
 %license COPYING
-%doc %{yast_docdir}/README.md
-%doc %{yast_docdir}/README.subpixel-patents
 %{yast_icondir}
 
 %changelog

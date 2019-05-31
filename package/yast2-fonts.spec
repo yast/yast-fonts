@@ -17,7 +17,7 @@
 
 
 Name:           yast2-fonts
-Version:        4.1.0
+Version:        4.2.0
 Release:        0
 Summary:        YaST2 - Fonts Configuration
 Group:          System/YaST

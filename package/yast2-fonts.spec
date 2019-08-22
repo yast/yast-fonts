@@ -17,7 +17,7 @@
 
 
 Name:           yast2-fonts
-Version:        4.2.0
+Version:        4.2.1
 Release:        0
 Summary:        YaST2 - Fonts Configuration
 Group:          System/YaST
@@ -30,14 +30,14 @@ BuildRequires:  update-desktop-files
 BuildRequires:  yast2-ruby-bindings >= 1.2.0
 BuildRequires:  yast2-devtools >= 4.2.2
 BuildRequires:  yast2 >= 3.0.5
-BuildRequires:  rubygem(yast-rake)
+BuildRequires:  rubygem(%{rb_default_ruby_abi}:yast-rake)
 # extensions
 BuildRequires:  freetype2-devel
 BuildRequires:  fontconfig-devel
 BuildRequires:  font-specimen-devel
 BuildRequires:  ruby-devel
 # for testing
-BuildRequires:  rubygem(rspec)
+BuildRequires:  rubygem(%{rb_default_ruby_abi}:rspec)
 BuildRequires:  dejavu-fonts
 BuildRequires:  fonts-config >= 20150424
 

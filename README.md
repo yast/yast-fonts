@@ -1,17 +1,11 @@
-yast-fonts
-==========
+Obsoleted Module
+================
 
-[![Travis Build](https://travis-ci.org/yast/yast-fonts.svg?branch=master)](https://travis-ci.org/yast/yast-fonts)
-<!---
-No Jenkins worker is configured for this repository, disable the badge for now
-[![Jenkins Build](http://img.shields.io/jenkins/s/https/ci.opensuse.org/yast-fonts-master.svg)](https://ci.opensuse.org/view/Yast/job/yast-fonts-master/)
--->
+**This module is obsoleted and is not developed anymore.**
 
-This YaST module brings a layer over fontconfig settings to control
-font appearance on the system in two aspects: 
-* font rendering algorithm type,
-* font family preference.
+GIT
+---
 
-The main mission is to bring font rendering options closer 
-to user. It is intended to weaken term 'default font setting'.
+If you want to see the last state check the [*master_old*](../master_old) branch.
 
+Use the [*SLE-15-GA*](../SLE-15-GA) branch for SLE-15 maintenance.

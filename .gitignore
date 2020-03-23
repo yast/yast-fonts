@@ -1,9 +1,0 @@
-/package/*.tar.bz2
-/src/ext/*/Makefile
-/src/ext/*/*.o
-/src/ext/*/*.so
-/src/lib/yast
-**/.*.swp
-doc/autodocs
-/.yardoc
-*.pot
